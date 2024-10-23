@@ -12,9 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlaylistMaker"
         tools:targetApi="31">
+
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:name="com.practicum.playlistmaker.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

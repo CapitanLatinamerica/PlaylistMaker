@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="find_button">Find</string>
+    <string name="btn_media">Media</string>
+    <string name="btn_settings">Settings</string>
+    <string name="btn_theme">Dark theme</string>
+    <string name="btn_share">Share app</string>
+    <string name="btn_help">Support</string>
+    <string name="btn_licence">User licence</string>
+    <string name="button_back">btnBack</string>
+</resources>

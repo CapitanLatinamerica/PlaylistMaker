@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="button_corner_radius">16dp</dimen>
+    <dimen name="button_margin">8dp</dimen>
+    <dimen name="button_spacing">16dp</dimen>
+    <dimen name="layout_top_padding">24dp</dimen>
+    <dimen name="layout_padding">16dp</dimen>
+    <dimen name="layout_margin_bottom">28dp</dimen>
+    <dimen name="button_text_size">16sp</dimen>
+</resources>
