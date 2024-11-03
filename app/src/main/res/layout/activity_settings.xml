@@ -5,58 +5,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/layout_top_padding"
     android:orientation="vertical">
 
-
     <LinearLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         android:orientation="vertical"
         tools:ignore="UseSwitchCompatOrMaterialXml">
 
-        <LinearLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:contentDescription="@string/button_back"
-                android:id="@+id/button_back"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:background="?android:attr/selectableItemBackground"
-                android:baselineAlignBottom="true"
-                android:clickable="true"
-                android:src="@drawable/arrow_back_light_mode"
-                android:text="" />
-            <TextView
-                android:id="@+id/label_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/button_back"
-                android:clickable="false"
-                android:gravity="center"
-                android:text="@string/btn_settings"
-                android:textColor="@android:color/black"
-                android:textSize="22sp" />
-
-
-        </LinearLayout>
+            android:background="@color/white"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:navigationIcon="@drawable/arrow_back_light_mode"
+            app:title="@string/btn_settings" />
 
         <Switch
             android:id="@+id/switch1"
             android:layout_width="match_parent"
             android:layout_height="61dp"
+            android:background="@color/white"
             android:paddingStart="@dimen/layout_padding"
             android:paddingEnd="@dimen/layout_padding"
             android:text="@string/btn_theme"
             android:textColor="@android:color/black"
             android:textSize="@dimen/button_text_size"
-            app:iconTintMode="multiply" />
+            app:iconTintMode="multiply"
+            app:thumbTint="@color/track_off"
+            app:trackTint="@color/track_off" />
 
         <RelativeLayout
             android:id="@+id/button_share_app"
@@ -164,4 +145,4 @@
         </RelativeLayout>
 
     </LinearLayout>
-    </LinearLayout>
+</LinearLayout>
