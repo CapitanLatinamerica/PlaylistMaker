@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--    android:theme="@style/AppTheme" -->
     <LinearLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
@@ -21,7 +23,6 @@
             android:layout_height="56dp"
             android:background="@color/white"
             android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"
             app:navigationIcon="@drawable/arrow_back_light_mode"
             app:title="@string/btn_settings" />
 
@@ -29,21 +30,20 @@
             android:id="@+id/switch1"
             android:layout_width="match_parent"
             android:layout_height="61dp"
-            android:background="@color/white"
             android:paddingStart="@dimen/layout_padding"
             android:paddingEnd="@dimen/layout_padding"
             android:text="@string/btn_theme"
             android:textColor="@android:color/black"
             android:textSize="@dimen/button_text_size"
-            app:iconTintMode="multiply"
-            app:thumbTint="@color/track_off"
-            app:trackTint="@color/track_off" />
+            app:thumbTint="@color/switch1_thumb_color"
+            app:trackTint="@color/switch1_track_color"/>
+
 
         <RelativeLayout
             android:id="@+id/button_share_app"
             android:layout_width="match_parent"
             android:layout_height="61dp"
-            android:background="?android:attr/selectableItemBackground"
+            android:background="@color/white"
             android:clickable="true"
             android:focusable="true"
             android:paddingStart="@dimen/layout_padding"
@@ -54,6 +54,7 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:background="@color/white"
                 android:clickable="false"
                 android:gravity="center_vertical"
                 android:text="@string/btn_share"
@@ -62,7 +63,6 @@
                 app:iconTintMode="multiply" />
 
             <ImageButton
-                android:contentDescription="@string/share_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -70,6 +70,7 @@
                 android:background="@color/white"
                 android:baselineAlignBottom="false"
                 android:clickable="false"
+                android:contentDescription="@string/share_app"
                 android:src="@drawable/ic_share"
                 android:textSize="@dimen/button_text_size"
                 app:tintMode="multiply" />
@@ -79,7 +80,7 @@
             android:id="@+id/button_help"
             android:layout_width="match_parent"
             android:layout_height="61dp"
-            android:background="?android:attr/selectableItemBackground"
+            android:background="@color/white"
             android:clickable="true"
             android:focusable="true"
             android:paddingStart="@dimen/layout_padding"
@@ -97,7 +98,6 @@
                 android:textSize="@dimen/button_text_size" />
 
             <ImageButton
-                android:contentDescription="@string/button_help"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -105,6 +105,7 @@
                 android:background="@color/white"
                 android:baselineAlignBottom="false"
                 android:clickable="false"
+                android:contentDescription="@string/button_help"
                 android:src="@drawable/help"
                 android:textSize="@dimen/button_text_size"
                 app:tintMode="multiply" />
@@ -114,7 +115,7 @@
             android:id="@+id/button_licence"
             android:layout_width="match_parent"
             android:layout_height="61dp"
-            android:background="?android:attr/selectableItemBackground"
+            android:background="@color/white"
             android:clickable="true"
             android:focusable="true"
             android:paddingStart="@dimen/layout_padding"
@@ -132,17 +133,17 @@
                 android:textSize="@dimen/button_text_size" />
 
             <ImageButton
-                android:contentDescription="@string/button_licence"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="@color/white"
                 android:clickable="false"
+                android:contentDescription="@string/button_licence"
                 android:src="@drawable/licence"
                 android:textSize="@dimen/button_text_size"
                 app:tintMode="multiply" />
         </RelativeLayout>
 
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

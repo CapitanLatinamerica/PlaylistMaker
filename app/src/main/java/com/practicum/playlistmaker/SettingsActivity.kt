@@ -16,14 +16,14 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         val buttonFind = findViewById<Toolbar>(R.id.toolbar)
-        val switch1: Switch = findViewById(R.id.switch1)
+ //       val switch1: Switch = findViewById(R.id.switch1)
 
         buttonFind.setOnClickListener {
             val displayMainActivity = Intent(this, MainActivity::class.java)
             startActivity(displayMainActivity)
         }
 
-        val thumbColorStateList = ColorStateList(
+ /*       val thumbColorStateList = ColorStateList(
             arrayOf(
                 intArrayOf(android.R.attr.state_checked), // checked
                 intArrayOf(-android.R.attr.state_checked)  //unchecked
@@ -34,7 +34,7 @@ class SettingsActivity : AppCompatActivity() {
             )
         )
 
-        DrawableCompat.setTintList(DrawableCompat.wrap(switch1.thumbDrawable), thumbColorStateList)
+        DrawableCompat.setTintList(DrawableCompat.wrap(switch1.thumbDrawable), thumbColorStateList)*/
     }
 
     override fun onStop() {
