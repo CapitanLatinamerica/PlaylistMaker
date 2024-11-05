@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--    android:theme="@style/AppTheme" -->
     <LinearLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
@@ -35,8 +34,8 @@
             android:text="@string/btn_theme"
             android:textColor="@android:color/black"
             android:textSize="@dimen/button_text_size"
-            app:thumbTint="@color/switch1_thumb_color"
-            app:trackTint="@color/switch1_track_color"/>
+            android:thumbTint="@color/switch_thumb_color"
+            android:trackTint="@color/switch_track_color"/>
 
 
         <RelativeLayout
