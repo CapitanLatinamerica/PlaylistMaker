@@ -8,4 +8,12 @@
     <string name="btn_help">Support</string>
     <string name="btn_licence">User licence</string>
     <string name="button_back">btnBack</string>
+    <string name="search">Search</string>
+    <string name="clear">Clear input field</string>
+    <string name="share_text">Learn Android Development with Yandex Practicum: https://practicum.yandex.ru/android-developer/</string>
+    <string name="support_subject">Message to the developers of the Playlist Maker app</string>
+    <string name="support_text">Thanks to the developers for a cool app!</string>
+    <string name="search_toast_text_added">You have entered the text to search for: </string>
+    <string name="search_toast_text_null">The search field is empty</string>
+    <string name="media_library">Media</string>
 </resources>

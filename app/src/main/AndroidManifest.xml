@@ -6,20 +6,24 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_pm191"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_pm191"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PlaylistMaker"
+        android:theme="@style/Base.Theme.PlaylistMaker"
         tools:targetApi="31">
+        <activity
+            android:name=".TestxActivity"
+            android:exported="false" />
         <activity
             android:name=".MediaActivity"
             android:exported="false" />
         <activity
-            android:name=".FindActivity"
+            android:name=".SearchActivity"
             android:exported="false" />
         <activity
             android:name=".SettingsActivity"
+            android:theme="@style/Theme.PlaylistMaker"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

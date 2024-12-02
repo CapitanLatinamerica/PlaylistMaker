@@ -1,44 +1,91 @@
 package com.practicum.playlistmaker
 
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Switch
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.DrawableCompat
-
+import com.google.android.material.appbar.MaterialToolbar
 
 class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        val buttonFind = findViewById<Toolbar>(R.id.toolbar)
- //       val switch1: Switch = findViewById(R.id.switch1)
+        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
 
-        buttonFind.setOnClickListener {
-            val displayMainActivity = Intent(this, MainActivity::class.java)
-            startActivity(displayMainActivity)
+        val themeSwitch: SwitchCompat = findViewById(R.id.switch1)
+
+        val shareButton: TextView = findViewById(R.id.button_share_app)
+        shareButton.setOnClickListener {
+            shareApp()
+        }
+        val supportButton: TextView = findViewById(R.id.button_help)
+        supportButton.setOnClickListener {
+            sendSupportMail()
+        }
+        val userAgreementButton: TextView = findViewById(R.id.button_licence)
+        userAgreementButton.setOnClickListener {
+            openUserLicence()
         }
 
- /*       val thumbColorStateList = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked), // checked
-                intArrayOf(-android.R.attr.state_checked)  //unchecked
-            ),
-            intArrayOf(
-                Color.parseColor("#3772E7"),
-                Color.parseColor("#9FBBF3")
+
+        toolbar.setNavigationOnClickListener {
+            onBackPressed()  // Возвращает на предыдущую страницу
+        }
+
+        themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+
+        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // Switch to dark theme
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                // Switch to light theme
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            recreate()
+        }
+    }
+
+    private fun shareApp() {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(
+                Intent.EXTRA_TEXT,
+                getString(R.string.share_text)
             )
-        )
-
-        DrawableCompat.setTintList(DrawableCompat.wrap(switch1.thumbDrawable), thumbColorStateList)*/
+        }
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
     }
 
-    override fun onStop() {
-        super.onStop()
-        this.finish()
+    private fun sendSupportMail() {
+
+        val studentEmail = "capitan@latinoamerica512.ru"
+
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+
+            data = Uri.parse("mailto:$studentEmail")
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject)) // Set subject
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.support_text)) // Set body
+        }
+
+        startActivity(Intent.createChooser(emailIntent, getString(R.string.btn_help)))
     }
+
+    private fun openUserLicence() {
+
+        val userAgreementUrl = getString(R.string.user_agreement_url)
+
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(userAgreementUrl))
+
+        startActivity(browserIntent)
+    }
+
 }

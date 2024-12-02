@@ -11,4 +11,13 @@
     <string name="share_app" translatable="false">share_app</string>
     <string name="button_help" translatable="false">button help</string>
     <string name="button_licence" translatable="false">licence</string>
+    <string name="search">Поиск</string>
+    <string name="clear">Очистить поле ввода</string>
+    <string name="share_text">Изучайте Android-разработку с Яндекс Практикумом: https://practicum.yandex.ru/android-developer/</string>
+    <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="user_agreement_url" translatable="false">https://yandex.ru/legal/practicum_offer/\n</string>
+    <string name="search_toast_text_added">Вы ввели текст для поиска: </string>
+    <string name="search_toast_text_null">Поле поиска пустое</string>
+    <string name="media_library">Медиатека</string>
 </resources>

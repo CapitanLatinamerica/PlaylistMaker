@@ -10,11 +10,27 @@
     <color name="switch_off">#AEAFB4</color>
     <color name="track_on">#9FBBF3</color>
     <color name="track_off">#E6E8EB</color>
-
-
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
+    <color name="yp_black">#1a1b22</color>
+    <color name="yp_white">#FFFFFFFF</color>
+    <color name="yp_text_gray">#aeafb4</color>
+    <color name="yp_light_gray">#aeafb4</color>
+    <color name="yp_red">#f56b6c</color>
+    <color name="yp_blue">#3772e7</color>
+    <color name="yp_background">#8c8d90</color>
+    <color name="yp_blue_light">#9fbbf3</color>
+
+    <color name="find_line_color">#E6E8EB</color>
+    <color name="find_line_hint_color">#AEAFB4</color>
+    <color name="find_input_text_color">#1A1B22</color>
+
+    <color name="toolbar_text_color_light">#000000</color> <!-- Чёрный для светлой темы -->
+    <color name="toolbar_arrow_color_light">#000000</color> <!-- Чёрный для стрелки -->
+    <color name="cursor_color">#3772E7</color> <!-- Красный цвет для курсора -->
+
 </resources>
