@@ -4,20 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:theme="@style/Theme.PlaylistMaker"
-    android:fontFamily="@font/ys_display_regular"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSecondaryVariant"
-    android:orientation="vertical"
     tools:context=".SettingsActivity">
-
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         style="@style/MyAwesomeToolbar"
-
-        android:layout_width="0dp"
-        android:layout_height="56dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +47,6 @@
         style="@style/MyAwesomeSettingsButton"
         android:contentDescription="@string/share_app"
         android:src="@drawable/ic_share"
-        android:tintMode="screen"
         app:layout_constraintEnd_toEndOf="@id/button_share_app"
         app:layout_constraintTop_toTopOf="@id/button_share_app"
         app:layout_constraintBottom_toBottomOf="@id/button_share_app" />

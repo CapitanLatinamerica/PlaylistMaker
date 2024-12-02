@@ -10,7 +10,6 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         style="@style/MyAwesomeToolbar"
-
         app:navigationIcon="@drawable/arrow_back_light_mode"
         app:title="@string/search" />
 
@@ -24,34 +23,7 @@
 
         <EditText
             android:id="@+id/findEditText"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:drawableStart="@drawable/ic_find"
-            android:paddingStart="12dp"
-            android:drawablePadding="10dp"
-            android:fontFamily="@font/ys_display_regular"
-            android:textFontWeight="400"
-            android:textSize="16sp"
-            android:hint="@string/search"
-            android:inputType="text"
-            android:maxLines="1"
-            android:maxLength="50"
-            android:textColor="@color/find_input_text_color"
-            android:textColorHint="@color/find_line_hint_color"
-            android:drawableTint="@color/find_line_hint_color"
-            android:background="@drawable/rounded_edittext"
-            />
-
-        <ImageView
-            android:id="@+id/clearTextIcon0"
-            android:visibility="gone"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_margin="10dp"
-            android:contentDescription="@string/clear"
-            android:src="@drawable/ic_find"
-            app:tint="@color/find_line_hint_color"/>
+            style="@style/MyAwesomeEditText" />
 
         <ImageView
             android:id="@+id/clearTextIcon"
@@ -60,9 +32,9 @@
             android:layout_height="16dp"
             android:layout_margin="10dp"
             android:contentDescription="@string/clear"
-            android:src="@drawable/ic_share"
-            app:tint="@color/find_line_hint_color"
-            android:onClick="onClearTextClick"/>
+            android:src="@drawable/close"
+            android:tintMode="multiply"
+            app:tint="@color/find_line_hint_color"/>
 
     </LinearLayout>
 </LinearLayout>

@@ -73,7 +73,6 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.setText("")
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
-        Toast.makeText(this, "У меня в Figma недоступна иконка Х, поэтому сделал такую пока", Toast.LENGTH_SHORT).show()
     }
 
     // Обработка кнопки поиска

@@ -3,14 +3,10 @@ package com.practicum.playlistmaker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
-import androidx.appcompat.widget.Toolbar
 import com.google.android.material.appbar.MaterialToolbar
 
 class SettingsActivity : AppCompatActivity() {
@@ -66,18 +62,21 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun sendSupportMail() {
-
-        val studentEmail = "capitan@latinoamerica512.ru"
+        val studentEmail = getString(R.string.support_manager) // Адресат
+        val subject = getString(R.string.support_subject) // Тема письма
+        val message = getString(R.string.support_text) // Текст письма
 
         val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-
-            data = Uri.parse("mailto:$studentEmail")
-            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject)) // Set subject
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.support_text)) // Set body
+            // Устанавливаем адрес для отправки письма
+            data = Uri.parse("mailto:") // "mailto:" без конкретного адреса
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(studentEmail)) // Кому
+            putExtra(Intent.EXTRA_SUBJECT, subject) // Тема
+            putExtra(Intent.EXTRA_TEXT, message) // Текст письма
         }
 
         startActivity(Intent.createChooser(emailIntent, getString(R.string.btn_help)))
     }
+
 
     private fun openUserLicence() {
 
