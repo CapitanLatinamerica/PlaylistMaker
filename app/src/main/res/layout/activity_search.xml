@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -21,20 +22,31 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/findEditText"
-            style="@style/MyAwesomeEditText" />
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
-        <ImageView
-            android:id="@+id/clearTextIcon"
-            android:visibility="gone"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_margin="10dp"
-            android:contentDescription="@string/clear"
-            android:src="@drawable/close"
-            android:tintMode="multiply"
-            app:tint="@color/find_line_hint_color"/>
+            <!-- Поле ввода текста -->
+            <EditText
+                android:id="@+id/findEditText"
+                style="@style/MyAwesomeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Кнопка очистки, расположенная поверх поля ввода -->
+            <ImageView
+                android:id="@+id/clearTextIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/clear"
+                android:src="@drawable/close"
+                android:visibility="gone" />
+        </RelativeLayout>
 
     </LinearLayout>
 </LinearLayout>

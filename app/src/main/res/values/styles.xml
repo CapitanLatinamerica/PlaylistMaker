@@ -95,11 +95,9 @@
 
 
     <style name="MyAwesomeEditText">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_weight">1</item>
         <item name="android:drawableStart">@drawable/ic_find</item>
         <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">4dp</item>
         <item name="android:drawablePadding">10dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:hint">@string/search</item>
@@ -108,7 +106,6 @@
         <item name="android:maxLength">50</item>
         <item name="android:textColor">@color/find_input_text_color</item>
         <item name="android:textColorHint">@color/find_line_hint_color</item>
-        <item name="android:drawableTint">@color/find_line_hint_color</item>
         <item name="android:background">@drawable/rounded_edittext</item>
     </style>
 
