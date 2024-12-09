@@ -9,4 +9,10 @@
     <dimen name="layout_right_padding">26dp</dimen>
     <dimen name="layout_margin_bottom">28dp</dimen>
     <dimen name="button_text_size">16sp</dimen>
+    <dimen name="edit_text_height">36dp</dimen>
+    <dimen name="edit_text_margin_horizontal">16dp</dimen>
+    <dimen name="edit_text_margin_vertical">8dp</dimen>
+    <dimen name="image_size">60dp</dimen>
+    <dimen name="image_margin">16dp</dimen>
+
 </resources>
