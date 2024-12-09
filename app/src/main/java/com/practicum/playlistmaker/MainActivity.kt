@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonMedia.setOnClickListener {
-            val displayMediaActivity = Intent(this, MediaActivity::class.java)
+            val displayMediaActivity = Intent(this, TestxActivity::class.java)
             startActivity(displayMediaActivity)
         }
 

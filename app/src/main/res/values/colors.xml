@@ -29,6 +29,10 @@
     <color name="find_line_hint_color">#AEAFB4</color>
     <color name="find_input_text_color">#1A1B22</color>
 
+    <color name="text_black">#000000</color>
+    <color name="text_dark_gray">#808080</color>
+    <color name="icon_placeholder">#CCCCCC</color>
+
     <color name="toolbar_text_color_light">#000000</color> <!-- Чёрный для светлой темы -->
     <color name="toolbar_arrow_color_light">#000000</color> <!-- Чёрный для стрелки -->
     <color name="cursor_color">#3772E7</color> <!-- Красный цвет для курсора -->

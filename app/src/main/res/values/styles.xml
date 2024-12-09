@@ -109,4 +109,27 @@
         <item name="android:background">@drawable/rounded_edittext</item>
     </style>
 
+    <style name="MyAwesomeTracker">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <!-- Стиль для названия трека -->
+    <style name="MyTrackTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <!-- Стиль для исполнителя и длительности -->
+    <style name="MyTrackInfo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+    </style>
+
 </resources>
