@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="61dp"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:gravity="center_vertical">
 
-    <!-- Изображение обложки -->
-    <ImageView
+    <!-- Изображение обложки с закругленными углами -->
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/artworkImageView"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/MyAwesomeRoundedImage"
         android:contentDescription="@string/track_artwork" />
 
     <!-- Контейнер для названия трека, исполнителя и длительности -->
@@ -38,6 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:ellipsize="end"
             android:gravity="start|center_vertical">
 
             <!-- Исполнитель -->
@@ -69,5 +73,11 @@
         </LinearLayout>
 
     </LinearLayout>
-
+    <ImageView
+        android:id="@+id/rightArrowImageView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="13dp"
+        android:layout_gravity="center_vertical|end"
+        android:src="@drawable/arrow_right"  />
 </LinearLayout>

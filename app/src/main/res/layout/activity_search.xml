@@ -1,20 +1,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.PlaylistMaker">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         style="@style/MyAwesomeToolbar"
         app:navigationIcon="@drawable/arrow_back_light_mode"
         app:title="@string/search" />
 
-    <!-- Строка поиска -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="36dp"
@@ -50,12 +47,10 @@
 
     </LinearLayout>
 
-    <!-- RecyclerView для отображения списка треков -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/trackRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:layout_weight="1"
-        android:visibility="gone" />
+        android:layout_marginStart="13dp"
+        android:layout_weight="1" />
 </LinearLayout>

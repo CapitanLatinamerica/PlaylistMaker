@@ -8,6 +8,7 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="clear_icon_color">@color/clear_icon_color_dark</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
@@ -18,7 +19,8 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/yp_black</item>
         <item name="colorOnSecondary">@color/yp_white</item>
-
+        <item name="clear_icon_color">@color/clear_icon_color_dark</item>
+        <item name="right_arrow_color">@color/arrow_icon_color_dark</item>
         <item name="android:background">@color/yp_black</item>
         <!-- Base theme customization -->
     </style>

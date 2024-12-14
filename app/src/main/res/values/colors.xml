@@ -37,4 +37,10 @@
     <color name="toolbar_arrow_color_light">#000000</color> <!-- Чёрный для стрелки -->
     <color name="cursor_color">#3772E7</color> <!-- Красный цвет для курсора -->
 
+    <color name="clear_icon_color_light">#AEAFB4</color>
+    <color name="clear_icon_color_dark">#000000</color>
+
+    <color name="arrow_icon_color_light">#AEAFB4</color>
+    <color name="arrow_icon_color_dark">#FFFFFF</color>
+
 </resources>
