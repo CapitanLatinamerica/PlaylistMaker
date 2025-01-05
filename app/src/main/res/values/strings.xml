@@ -20,4 +20,7 @@
     <string name="search_toast_text_null">Поле поиска пустое</string>
     <string name="media_library">Медиатека</string>
     <string name="support_manager" translatable="false">capitan@latinoamerica512.ru</string>
+    <string name="track_artwork">Обложка трека</string>
+    <string name="no_internet_message">Нет интернета</string>
+
 </resources>

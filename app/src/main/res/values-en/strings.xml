@@ -16,4 +16,6 @@
     <string name="search_toast_text_added">You have entered the text to search for: </string>
     <string name="search_toast_text_null">The search field is empty</string>
     <string name="media_library">Media</string>
+    <string name="track_artwork">Track cover</string>
+    <string name="no_internet_message">No internet</string>
 </resources>

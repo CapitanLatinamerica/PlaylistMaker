@@ -10,16 +10,4 @@
     <color name="switch_off">#AEAFB4</color>
     <color name="track_on">#9FBBF3</color>
     <color name="track_off">#E6E8EB</color>
-    <color name="switch1_thumb_color">
-        <selector >
-            <item app:color="#3772E7" translatable="false" app:state_checked="true" />
-            <item app:color="#9FBBF3" translatable="false" app:state_checked="false" />
-        </selector>
-    </color>
-    <color name="switch1_track_color">
-        <selector xmlns:android="http://schemas.android.com/apk/res/android">
-            <item android:color="#3772E7" android:state_checked="true" />
-            <item android:color="#E6E8EB" android:state_checked="false" />
-        </selector>
-    </color>
 </resources>

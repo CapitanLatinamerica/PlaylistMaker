@@ -79,8 +79,8 @@
         <item name="colorSecondaryVariant">@color/yp_white</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:background">@color/white</item>
+        <item name="clear_icon_color">@color/clear_icon_color_light</item>
     </style>
-
 
     <!-- для тёмной темы -->
     <style name="Theme.PlaylistMakerNight" parent="Theme.Material3.DayNight.NoActionBar">
@@ -91,8 +91,8 @@
         <item name="colorSecondaryVariant">@color/yp_white</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:background">@color/dark_background</item>
+        <item name="clear_icon_color">@color/clear_icon_color_dark</item>
     </style>
-
 
     <style name="MyAwesomeEditText">
         <item name="android:drawableStart">@drawable/ic_find</item>
@@ -107,6 +107,34 @@
         <item name="android:textColor">@color/find_input_text_color</item>
         <item name="android:textColorHint">@color/find_line_hint_color</item>
         <item name="android:background">@drawable/rounded_edittext</item>
+    </style>
+
+    <style name="MyAwesomeTracker">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <!-- Стиль для названия трека -->
+    <style name="MyTrackTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <!-- Стиль для исполнителя и длительности -->
+    <style name="MyTrackInfo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+    </style>
+
+    <style name="MyAwesomeRoundedImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">2dp</item>
     </style>
 
 </resources>
