@@ -14,7 +14,18 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 // Адаптер для отображения списка треков
-class TrackAdapter(private val tracks: List<Track>, private val context: Context) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tracks: MutableList<Track>, private val context: Context) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
+    fun getTracks(): List<Track> {
+        return tracks
+    }
+
+    // Обновление списка треков
+    fun updateTracks(newTracks: List<Track>) {
+        tracks.clear()
+        tracks.addAll(newTracks)
+        notifyDataSetChanged()
+    }
 
     // Создание и возврат ViewHolder для каждого элемента списка
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -48,7 +59,7 @@ class TrackAdapter(private val tracks: List<Track>, private val context: Context
             // Устанавливаем текст в TextView
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(293000L) // Это нужно заменить на track.trackTime
+            trackTime.text = track.trackTime // Это нужно заменить на track.trackTime
 
             // Загружаем изображение с проверкой наличия интернета
             val context = itemView.context
