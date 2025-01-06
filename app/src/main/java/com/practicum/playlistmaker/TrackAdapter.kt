@@ -61,26 +61,12 @@ class TrackAdapter(private val tracks: MutableList<Track>, private val context: 
             artistName.text = track.artistName
             trackTime.text = track.trackTime // Это нужно заменить на track.trackTime
 
-            // Загружаем изображение с проверкой наличия интернета
-            val context = itemView.context
-            if (isNetworkAvailable(context)) {
-                Glide.with(context)
-                    .load(track.artworkUrl100)
-                    .placeholder(R.drawable.p_holder) // Плейсхолдер при загрузке
-                    .error(R.drawable.error_image) // Плейсхолдер при ошибке
-                    .into(artworkUrl100)
-            } else {
-                // Если нет интернета, загружаем только плейсхолдер
-                Glide.with(context)
-                    .load(R.drawable.p_holder)
-                    .into(artworkUrl100)
-            }
-        }
-        // Функция для проверки подключения к интернету
-        private fun isNetworkAvailable(context: Context): Boolean {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-            return activeNetwork?.isConnected == true
+            // Загружаем изображение с использованием Glide
+            Glide.with(itemView.context)
+                .load(track.artworkUrl100)
+                .placeholder(R.drawable.p_holder) // Плейсхолдер при загрузке
+                .error(R.drawable.error_image) // Плейсхолдер при ошибке
+                .into(artworkUrl100)
         }
     }
 }

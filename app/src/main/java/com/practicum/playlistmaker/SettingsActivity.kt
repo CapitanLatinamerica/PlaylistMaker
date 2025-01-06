@@ -5,9 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -16,7 +15,10 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
 
-        val themeSwitch: SwitchCompat = findViewById(R.id.switch1)
+        val themeSwitch: SwitchMaterial = findViewById(R.id.switch1)
+        // Установка текущего состояния переключателя
+        val app = application as App
+        themeSwitch.isChecked = app.isDarkThemeEnabled()
 
         val shareButton: TextView = findViewById(R.id.button_share_app)
         shareButton.setOnClickListener {
@@ -36,17 +38,9 @@ class SettingsActivity : AppCompatActivity() {
             onBackPressed()  // Возвращает на предыдущую страницу
         }
 
-        themeSwitch.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
-        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                // Switch to dark theme
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                // Switch to light theme
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            recreate()
+        themeSwitch.setOnCheckedChangeListener { switcher, isChecked: Boolean ->
+            app.switchTheme(isChecked)
         }
     }
 

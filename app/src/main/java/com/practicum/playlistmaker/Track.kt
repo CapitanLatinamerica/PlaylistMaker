@@ -1,5 +1,8 @@
 package com.practicum.playlistmaker
 
+import java.text.SimpleDateFormat
+import java.util.Locale
+
 data class Track(
     val trackName: String,  // Название композиции
     val artistName: String, // Имя исполнителя
@@ -8,8 +11,7 @@ data class Track(
 ) {
     val trackTime: String
         get() {
-            val minutes = (trackTimeMillis / 1000) / 60
-            val seconds = (trackTimeMillis / 1000) % 60
-            return String.format("%d:%02d", minutes, seconds)
+            val dateFormat = SimpleDateFormat("m:ss", Locale.getDefault())
+            return dateFormat.format(trackTimeMillis)
         }
 }

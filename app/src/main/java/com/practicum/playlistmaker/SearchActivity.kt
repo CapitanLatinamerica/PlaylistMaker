@@ -1,25 +1,32 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
-import android.graphics.Rect
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
-import android.widget.*
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import retrofit2.*
-import retrofit2.converter.gson.GsonConverterFactory
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.appbar.MaterialToolbar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
@@ -31,9 +38,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorImage: ImageView
     private lateinit var errorMessage: TextView
     private lateinit var retryButton: Button
-    private var currentOffset = 0
-    private var isLoadingMore = false
-    private var allResultsLoaded = false
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com/")
@@ -95,25 +99,6 @@ class SearchActivity : AppCompatActivity() {
                 false
             }
         }
-
-        trackRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val visibleItemCount = layoutManager.childCount
-                val totalItemCount = layoutManager.itemCount
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-
-                if (!isLoadingMore && !allResultsLoaded &&
-                    visibleItemCount + firstVisibleItemPosition >= totalItemCount &&
-                    firstVisibleItemPosition >= 0) {
-                    isLoadingMore = true
-                    performSearch(inputEditText.text.toString(), append = true)
-                }
-            }
-        })
-
     }
 
     private fun clearInputText() {
@@ -137,50 +122,38 @@ class SearchActivity : AppCompatActivity() {
             hideError()
         }
 
-        if (!append) {
-            currentOffset = 0
-            allResultsLoaded = false
-            trackAdapter.updateTracks(emptyList()) // Сбрасываем список при новом поиске
-        }
-
-        if (allResultsLoaded) return
-
         showLoading(!append)
 
-        iTunesService.searchSongs(sanitizedQuery).enqueue(object : Callback<ITunesSearchResponse> {
+        fetchSearchResults(sanitizedQuery)
+    }
+
+    private fun fetchSearchResults(query: String) {
+        iTunesService.searchSongs(query).enqueue(object : Callback<ITunesSearchResponse> {
             override fun onResponse(call: Call<ITunesSearchResponse>, response: Response<ITunesSearchResponse>) {
                 showLoading(false)
-                isLoadingMore = false
                 if (response.isSuccessful) {
                     val results = response.body()?.results.orEmpty()
                     if (results.isNotEmpty()) {
                         hideError()
-                        trackAdapter.updateTracks(if (append) trackAdapter.getTracks() + results else results)
-                        currentOffset += results.size
+                        trackAdapter.updateTracks(results)
                     } else {
-                        allResultsLoaded = true // Если новых результатов нет, больше не загружаем
-                        if (!append) {
-                            showError(
-                                getString(R.string.nothing_founded),
-                                R.drawable.ic_no_results,
-                                showRetryButton = false
-                            )
-                        }
-                    }
-                } else {
-                    if (!append) {
                         showError(
                             getString(R.string.nothing_founded),
                             R.drawable.ic_no_results,
                             showRetryButton = false
                         )
                     }
+                } else {
+                    showError(
+                        getString(R.string.nothing_founded),
+                        R.drawable.ic_no_results,
+                        showRetryButton = false
+                    )
                 }
             }
 
             override fun onFailure(call: Call<ITunesSearchResponse>, t: Throwable) {
                 showLoading(false)
-                isLoadingMore = false
                 showError(
                     getString(R.string.no_internet_error),
                     R.drawable.ic_no_connection,
@@ -189,9 +162,6 @@ class SearchActivity : AppCompatActivity() {
             }
         })
     }
-
-
-
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
