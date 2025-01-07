@@ -114,6 +114,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
         <item name="android:textSize">11sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
     </style>
 
     <!-- Стиль для названия трека -->
@@ -122,14 +123,19 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <!-- Стиль для исполнителя и длительности -->
     <style name="MyTrackInfo">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="fontWeight">100</item>
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="MyAwesomeRoundedImage">

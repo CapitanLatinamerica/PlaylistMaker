@@ -132,7 +132,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ITunesSearchResponse>, response: Response<ITunesSearchResponse>) {
                 showLoading(false)
                 if (response.isSuccessful) {
-                    val results = response.body()?.results.orEmpty()
+                    val results = response.body()?.results.orEmpty().map { it.trimmed() }
                     if (results.isNotEmpty()) {
                         hideError()
                         trackAdapter.updateTracks(results)
@@ -162,6 +162,7 @@ class SearchActivity : AppCompatActivity() {
             }
         })
     }
+
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

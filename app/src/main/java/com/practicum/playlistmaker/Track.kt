@@ -1,5 +1,3 @@
-package com.practicum.playlistmaker
-
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -14,4 +12,11 @@ data class Track(
             val dateFormat = SimpleDateFormat("m:ss", Locale.getDefault())
             return dateFormat.format(trackTimeMillis)
         }
+
+    fun trimmed(): Track {
+        return copy(
+            trackName = trackName.trim(),
+            artistName = artistName.trim()
+        )
+    }
 }

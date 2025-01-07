@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker
 
+import Track
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
@@ -59,7 +60,11 @@ class TrackAdapter(private val tracks: MutableList<Track>, private val context: 
             // Устанавливаем текст в TextView
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = track.trackTime // Это нужно заменить на track.trackTime
+            trackTime.text = track.trackTime
+
+            //Пересчитываю разметку для треков внизу списка
+            artistName.requestLayout()
+            trackTime.requestLayout()
 
             // Загружаем изображение с использованием Glide
             Glide.with(itemView.context)
