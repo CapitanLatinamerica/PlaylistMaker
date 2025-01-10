@@ -1,11 +1,14 @@
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Track(
-    val trackName: String,  // Название композиции
-    val artistName: String, // Имя исполнителя
-    val trackTimeMillis: Long,  // Продолжительность трека в миллисекундах
-    val artworkUrl100: String   // Ссылка на изображение обложки
+    val trackId: Int,         // Уникальный идентификатор трека
+    val trackName: String,    // Название композиции
+    val artistName: String,   // Имя исполнителя
+    val trackTimeMillis: Long, // Продолжительность трека в миллисекундах
+    val artworkUrl100: String  // Ссылка на изображение обложки
 ) {
     val trackTime: String
         get() {
@@ -20,3 +23,4 @@ data class Track(
         )
     }
 }
+
