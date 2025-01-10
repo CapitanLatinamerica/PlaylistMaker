@@ -18,7 +18,7 @@
         app:navigationIcon="@drawable/arrow_back_light_mode"
         app:title="@string/btn_settings" />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/switch1"
         android:layout_width="0dp"
         android:layout_height="61dp"

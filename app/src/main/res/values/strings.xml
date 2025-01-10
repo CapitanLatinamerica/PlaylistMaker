@@ -22,5 +22,8 @@
     <string name="support_manager" translatable="false">capitan@latinoamerica512.ru</string>
     <string name="track_artwork">Обложка трека</string>
     <string name="no_internet_message">Нет интернета</string>
-
+    <string name="retry">Обновить</string>
+    <string name="no_internet_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте\nподключение к интернету</string>
+    <string name="nothing_founded">Ничего не нашлось</string>
+    <string name="text_for_toast_write_something">Введите текст для поиска</string>
 </resources>

@@ -18,4 +18,8 @@
     <string name="media_library">Media</string>
     <string name="track_artwork">Track cover</string>
     <string name="no_internet_message">No internet</string>
+    <string name="retry">Update</string>
+    <string name="no_internet_error">Connection troubles\n\nFailure search. Check your\ninternet connection</string>
+    <string name="nothing_founded">Nothing founded</string>
+    <string name="text_for_toast_write_something">Enter a text for searching</string>
 </resources>

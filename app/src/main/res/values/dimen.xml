@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_error_message">19sp</dimen>
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="button_margin">8dp</dimen>
     <dimen name="button_spacing">16dp</dimen>
@@ -14,5 +15,6 @@
     <dimen name="edit_text_margin_vertical">8dp</dimen>
     <dimen name="image_size">60dp</dimen>
     <dimen name="image_margin">16dp</dimen>
+    <dimen name="button_retry_text_size">14sp</dimen>
 
 </resources>

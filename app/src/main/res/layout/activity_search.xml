@@ -29,7 +29,9 @@
                 android:id="@+id/findEditText"
                 style="@style/MyAwesomeEditText"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
 
             <!-- Кнопка очистки -->
             <ImageView
@@ -47,10 +49,72 @@
 
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/trackRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="13dp"
         android:layout_weight="1" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id = "@+id/floating_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:layout_marginTop="102dp"
+        android:layout_weight="1">
+
+        <!-- Картинка ошибки -->
+        <ImageView
+            android:id="@+id/error_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/error_message"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Текст ошибки -->
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/image_margin"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/text_size_error_message"
+            android:text=""
+            android:maxLines="4"
+            android:textAlignment="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/error_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Кнопка "Обновить" -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/retry_button"
+            android:theme="@style/Theme.PlaylistMaker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_top_padding"
+            android:text="@string/retry"
+            android:textSize="@dimen/button_retry_text_size"
+            app:layout_constraintTop_toBottomOf="@id/error_message"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:backgroundTint="?attr/colorOnSecondary"
+            android:visibility="gone"
+            android:textColor="?attr/colorSecondaryVariant" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>

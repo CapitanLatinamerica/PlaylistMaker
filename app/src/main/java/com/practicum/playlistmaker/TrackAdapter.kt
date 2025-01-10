@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker
 
+import Track
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
@@ -14,7 +15,18 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 // Адаптер для отображения списка треков
-class TrackAdapter(private val tracks: List<Track>, private val context: Context) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tracks: MutableList<Track>, private val context: Context) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
+    fun getTracks(): List<Track> {
+        return tracks
+    }
+
+    // Обновление списка треков
+    fun updateTracks(newTracks: List<Track>) {
+        tracks.clear()
+        tracks.addAll(newTracks)
+        notifyDataSetChanged()
+    }
 
     // Создание и возврат ViewHolder для каждого элемента списка
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -48,28 +60,18 @@ class TrackAdapter(private val tracks: List<Track>, private val context: Context
             // Устанавливаем текст в TextView
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(293000L) // Это нужно заменить на track.trackTime
+            trackTime.text = track.trackTime
 
-            // Загружаем изображение с проверкой наличия интернета
-            val context = itemView.context
-            if (isNetworkAvailable(context)) {
-                Glide.with(context)
-                    .load(track.artworkUrl100)
-                    .placeholder(R.drawable.p_holder) // Плейсхолдер при загрузке
-                    .error(R.drawable.error_image) // Плейсхолдер при ошибке
-                    .into(artworkUrl100)
-            } else {
-                // Если нет интернета, загружаем только плейсхолдер
-                Glide.with(context)
-                    .load(R.drawable.p_holder)
-                    .into(artworkUrl100)
-            }
-        }
-        // Функция для проверки подключения к интернету
-        private fun isNetworkAvailable(context: Context): Boolean {
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-            return activeNetwork?.isConnected == true
+            //Пересчитываю разметку для треков внизу списка
+            artistName.requestLayout()
+            trackTime.requestLayout()
+
+            // Загружаем изображение с использованием Glide
+            Glide.with(itemView.context)
+                .load(track.artworkUrl100)
+                .placeholder(R.drawable.p_holder) // Плейсхолдер при загрузке
+                .error(R.drawable.error_image) // Плейсхолдер при ошибке
+                .into(artworkUrl100)
         }
     }
 }
