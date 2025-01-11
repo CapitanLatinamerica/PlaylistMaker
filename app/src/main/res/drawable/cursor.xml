@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/drawable/cursor.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <size android:width="2dp" /> <!-- Ширина курсора -->
-    <solid android:color="@drawable/cursor_color" /> <!-- Цвет курсора -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Цвет указателя -->
+    <solid android:color="@color/cursor_color" />
+    <!-- Прозрачный фон вокруг указателя -->
+    <size android:width="2dp" />
 </shape>

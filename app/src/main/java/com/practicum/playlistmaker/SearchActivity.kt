@@ -40,7 +40,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorMessage: TextView
     private lateinit var retryButton: Button
     private lateinit var searchHistory: SearchHistory
-
+    private lateinit var historyTitle: TextView
+    private lateinit var clearHistoryButton: Button
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com/")
@@ -62,9 +63,10 @@ class SearchActivity : AppCompatActivity() {
         errorImage = findViewById(R.id.error_image)
         errorMessage = findViewById(R.id.error_message)
         retryButton = findViewById(R.id.retry_button)
-        val clearHistoryButton: Button = findViewById(R.id.clearHistoryButton)
+        historyTitle = findViewById(R.id.historyTitle)
+        clearHistoryButton = findViewById(R.id.clearHistoryButton)
 
-        trackAdapter = TrackAdapter(mutableListOf(), this)
+        trackAdapter = TrackAdapter(mutableListOf())
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
         trackRecyclerView.adapter = trackAdapter
 
@@ -80,6 +82,7 @@ class SearchActivity : AppCompatActivity() {
         // Очистка текста в поле поиска
         clearIcon.setOnClickListener {
             clearInputText()
+            inputEditText.clearFocus()
             hideKeyboard() // Скрываем клавиатуру
             showHistory() // Показываем историю, если текст очищен
         }
@@ -97,6 +100,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                showHistory()
                 if (s.isNullOrEmpty()) {
                     hideKeyboard() // Скрываем клавиатуру
                     showHistory() // Показываем историю
@@ -112,9 +116,10 @@ class SearchActivity : AppCompatActivity() {
         // Обработка изменения фокуса
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                showHistory()
                 // Если поле ввода в фокусе, скрываем историю, кнопку и заголовок
-                findViewById<TextView>(R.id.historyTitle).isVisible = false
-                findViewById<Button>(R.id.clearHistoryButton).isVisible = false
+                historyTitle.isVisible = false
+                clearHistoryButton.isVisible = false
                 trackAdapter.updateTracks(emptyList()) // Очищаем адаптер
             } else {
                 // Если поле ввода не в фокусе и текст пустой, показываем историю
@@ -253,20 +258,17 @@ class SearchActivity : AppCompatActivity() {
         // Проверяем, что поле ввода пустое
         if (inputEditText.text.isNullOrEmpty()) {
             // Показ или скрытие элементов в зависимости от наличия истории
-            findViewById<TextView>(R.id.historyTitle).isVisible = !isHistoryEmpty
-            findViewById<Button>(R.id.clearHistoryButton).isVisible = !isHistoryEmpty
-            trackRecyclerView.isVisible = true // Делаем RecyclerView видимым
 
-            // Если история не пуста, обновляем адаптер
-            if (!isHistoryEmpty) {
-                trackAdapter.updateTracks(history) // Показываем историю в RecyclerView
-            } else {
-                trackAdapter.updateTracks(emptyList()) // Очищаем список в адаптере
-            }
+            historyTitle.isVisible = !isHistoryEmpty
+            clearHistoryButton.isVisible = !isHistoryEmpty
+            trackRecyclerView.isVisible = true
+
+            trackAdapter.updateTracks(history) // Показываем историю в RecyclerView
+
         } else {
             // Если поле ввода не пустое, скрываем историю
-            findViewById<TextView>(R.id.historyTitle).isVisible = false
-            findViewById<Button>(R.id.clearHistoryButton).isVisible = false
+            historyTitle.isVisible = false
+            clearHistoryButton.isVisible = false
             trackAdapter.updateTracks(emptyList()) // Очищаем список в адаптере
         }
     }
@@ -274,5 +276,6 @@ class SearchActivity : AppCompatActivity() {
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+        inputEditText.clearFocus()
     }
 }
