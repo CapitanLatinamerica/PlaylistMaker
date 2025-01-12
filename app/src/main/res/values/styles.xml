@@ -107,6 +107,11 @@
         <item name="android:textColor">@color/find_input_text_color</item>
         <item name="android:textColorHint">@color/find_line_hint_color</item>
         <item name="android:background">@drawable/rounded_edittext</item>
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="android:shadowRadius">0</item>
+        <item name="android:shadowColor">@android:color/transparent</item>
     </style>
 
     <style name="MyAwesomeTracker">
@@ -142,5 +147,9 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">2dp</item>
     </style>
+
+    <style name="CustomEditTextStyle" parent="Widget.AppCompat.EditText">
+    </style>
+
 
 </resources>

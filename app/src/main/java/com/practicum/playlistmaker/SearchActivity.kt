@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -38,6 +39,9 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorImage: ImageView
     private lateinit var errorMessage: TextView
     private lateinit var retryButton: Button
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var historyTitle: TextView
+    private lateinit var clearHistoryButton: Button
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com/")
@@ -59,31 +63,71 @@ class SearchActivity : AppCompatActivity() {
         errorImage = findViewById(R.id.error_image)
         errorMessage = findViewById(R.id.error_message)
         retryButton = findViewById(R.id.retry_button)
+        historyTitle = findViewById(R.id.historyTitle)
+        clearHistoryButton = findViewById(R.id.clearHistoryButton)
 
-        trackAdapter = TrackAdapter(mutableListOf(), this)
+        trackAdapter = TrackAdapter(mutableListOf())
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
         trackRecyclerView.adapter = trackAdapter
+
+        searchHistory = SearchHistory(getSharedPreferences("search_prefs", MODE_PRIVATE))
 
         // Обработка нажатия на кнопку "Назад" в тулбаре
         toolbar.setNavigationOnClickListener {
             finish()
         }
 
-        clearIcon.setOnClickListener { clearInputText() }
+        showHistory() // Показываем историю
+
+        // Очистка текста в поле поиска
+        clearIcon.setOnClickListener {
+            clearInputText()
+            inputEditText.clearFocus()
+            hideKeyboard() // Скрываем клавиатуру
+            showHistory() // Показываем историю, если текст очищен
+        }
 
         retryButton.setOnClickListener { performSearch(inputEditText.text.toString()) }
 
+        // Очистка истории поиска
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            showHistory() // Обновляем адаптер для отображения пустой истории
+        }
+
         inputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                if (!s.isNullOrEmpty()) {
-                    hideError() // Убираем ошибку, так как текст изменён
+                showHistory()
+                if (s.isNullOrEmpty()) {
+                    hideKeyboard() // Скрываем клавиатуру
+                    showHistory() // Показываем историю
+                } else {
+                    hideError()
+                    trackAdapter.updateTracks(emptyList()) // Убираем найденные треки
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        // Обработка изменения фокуса
+        inputEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                showHistory()
+                // Если поле ввода в фокусе, скрываем историю, кнопку и заголовок
+                historyTitle.isVisible = false
+                clearHistoryButton.isVisible = false
+                trackAdapter.updateTracks(emptyList()) // Очищаем адаптер
+            } else {
+                // Если поле ввода не в фокусе и текст пустой, показываем историю
+                if (inputEditText.text.isNullOrEmpty()) {
+                    showHistory()
+                }
+            }
+        }
 
         // Обработка нажатия кнопки "Done"
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -98,6 +142,11 @@ class SearchActivity : AppCompatActivity() {
             } else {
                 false
             }
+        }
+
+        trackAdapter.setOnItemClickListener { track ->
+            searchHistory.addTrack(track) // Добавляем трек в историю
+            Toast.makeText(this, getString(R.string.toast_track_added, track.trackName), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -150,6 +199,7 @@ class SearchActivity : AppCompatActivity() {
                         showRetryButton = false
                     )
                 }
+
             }
 
             override fun onFailure(call: Call<ITunesSearchResponse>, t: Throwable) {
@@ -201,5 +251,31 @@ class SearchActivity : AppCompatActivity() {
             showRetryButton = true
         )
     }
+    private fun showHistory() {
+        val history = searchHistory.getHistory()
+        val isHistoryEmpty = history.isEmpty()
 
+        // Проверяем, что поле ввода пустое
+        if (inputEditText.text.isNullOrEmpty()) {
+            // Показ или скрытие элементов в зависимости от наличия истории
+
+            historyTitle.isVisible = !isHistoryEmpty
+            clearHistoryButton.isVisible = !isHistoryEmpty
+            trackRecyclerView.isVisible = true
+
+            trackAdapter.updateTracks(history) // Показываем историю в RecyclerView
+
+        } else {
+            // Если поле ввода не пустое, скрываем историю
+            historyTitle.isVisible = false
+            clearHistoryButton.isVisible = false
+            trackAdapter.updateTracks(emptyList()) // Очищаем список в адаптере
+        }
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+        inputEditText.clearFocus()
+    }
 }

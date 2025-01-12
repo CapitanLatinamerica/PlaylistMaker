@@ -8,8 +8,8 @@ const val PREFERENCE_NAME = "user_preferences"
 const val PREFERENCE_THEME_KEY = "is_dark_theme_enabled"
 
 sealed class ThemeMode(val mode: Int) {
-    object Light : ThemeMode(AppCompatDelegate.MODE_NIGHT_NO)
-    object Dark : ThemeMode(AppCompatDelegate.MODE_NIGHT_YES)
+    data object Light : ThemeMode(AppCompatDelegate.MODE_NIGHT_NO)
+    data object Dark : ThemeMode(AppCompatDelegate.MODE_NIGHT_YES)
 
     companion object {
         fun fromBoolean(isDark: Boolean): ThemeMode {

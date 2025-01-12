@@ -22,4 +22,8 @@
     <string name="no_internet_error">Connection troubles\n\nFailure search. Check your\ninternet connection</string>
     <string name="nothing_founded">Nothing founded</string>
     <string name="text_for_toast_write_something">Enter a text for searching</string>
+    <string name="history_title">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="toast_track_added">"%1$s" added to history</string>
+
 </resources>

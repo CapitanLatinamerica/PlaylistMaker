@@ -15,10 +15,12 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 // Адаптер для отображения списка треков
-class TrackAdapter(private val tracks: MutableList<Track>, private val context: Context) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
-    fun getTracks(): List<Track> {
-        return tracks
+    private var onItemClickListener: ((Track) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (Track) -> Unit) {
+        onItemClickListener = listener
     }
 
     // Обновление списка треков
@@ -38,6 +40,11 @@ class TrackAdapter(private val tracks: MutableList<Track>, private val context: 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = tracks[position]
         holder.bind(track)
+
+        // Обработка нажатия
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(track)
+        }
     }
 
     // Возвращаем размер списка
@@ -54,6 +61,7 @@ class TrackAdapter(private val tracks: MutableList<Track>, private val context: 
         private val trackName: TextView = itemView.findViewById(R.id.trackNameTextView)
         private val artistName: TextView = itemView.findViewById(R.id.artistNameTextView)
         private val trackTime: TextView = itemView.findViewById(R.id.trackTimeTextView)
+
 
         // Привязка данных
         fun bind(track: Track) {

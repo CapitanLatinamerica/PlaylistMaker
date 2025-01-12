@@ -26,4 +26,8 @@
     <string name="no_internet_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте\nподключение к интернету</string>
     <string name="nothing_founded">Ничего не нашлось</string>
     <string name="text_for_toast_write_something">Введите текст для поиска</string>
+    <string name="history_title">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="toast_track_added">"%1$s" добавлен в историю</string>
+
 </resources>
