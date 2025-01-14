@@ -25,5 +25,6 @@
     <string name="history_title">Вы искали</string>
     <string name="clear_history">Очистить историю</string>
     <string name="toast_track_added">"%1$s" added to history</string>
+    <string name="track_cover_description">Track cover</string>
 
 </resources>

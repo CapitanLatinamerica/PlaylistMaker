@@ -1,18 +1,19 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -28,6 +29,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
 
 class SearchActivity : AppCompatActivity() {
 
@@ -146,8 +148,23 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapter.setOnItemClickListener { track ->
             searchHistory.addTrack(track) // Добавляем трек в историю
-            Toast.makeText(this, getString(R.string.toast_track_added, track.trackName), Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AudioPlayerActivity::class.java)
+            intent.putExtra("track_name", track.trackName)
+            intent.putExtra("artist_name", track.artistName)
+            intent.putExtra("track_time", track.trackTimeMillis?.toString() ?: "")
+            intent.putExtra("album_cover", track.artworkUrl512)
+            intent.putExtra("collection_name", track.collectionName ?: "")
+            intent.putExtra("release_year", track.releaseYear ?: "")
+            intent.putExtra("genre", track.genre ?: "")
+            intent.putExtra("country", track.country ?: "")
+            startActivity(intent)
+            Log.d(
+                "SearchActivity",
+                "Sending: trackName=${track.trackName}, artistName=${track.artistName}, trackTimeMillis=${track.trackTimeMillis}, albumCover=${track.artworkUrl512}, collectionName=${track.collectionName}, releaseYear=${track.releaseYear}, genre=${track.genre}, country=${track.country}"
+            )
+
         }
+
     }
 
     private fun clearInputText() {
@@ -199,7 +216,6 @@ class SearchActivity : AppCompatActivity() {
                         showRetryButton = false
                     )
                 }
-
             }
 
             override fun onFailure(call: Call<ITunesSearchResponse>, t: Throwable) {

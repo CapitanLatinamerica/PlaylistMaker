@@ -43,4 +43,7 @@
     <color name="arrow_icon_color_light">#AEAFB4</color>
     <color name="arrow_icon_color_dark">#FFFFFF</color>
 
+    <color name="like_icon_color_active">#F56B6C</color>
+    <color name="like_icon_color_inactive">#FFFFFF</color>
+
 </resources>

@@ -52,7 +52,6 @@ class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapte
         return tracks.size
     }
 
-
     // ViewHolder для элемента списка
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
