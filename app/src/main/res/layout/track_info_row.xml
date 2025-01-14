@@ -9,7 +9,7 @@
     <!-- Параметр трека -->
     <TextView
         android:id="@+id/parameter_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text=""
@@ -22,9 +22,11 @@
     <!-- Значение параметра -->
     <TextView
         android:id="@+id/parameter_value"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
+        android:layout_weight="40"
+        android:textAlignment="viewEnd"
         android:textSize="14sp"
         android:fontFamily="@font/ys_display_regular"
         android:textColor="?attr/colorOnSecondary"

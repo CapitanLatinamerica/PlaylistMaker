@@ -76,7 +76,8 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/sample_track_name"
                 android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:ellipsize="end"
+                app:layout_constraintEnd_toEndOf="@id/guideline_end"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
                 app:layout_constraintTop_toBottomOf="@id/track_cover_container" />
 

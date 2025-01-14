@@ -30,7 +30,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var floatingContainer: ConstraintLayout
@@ -155,16 +154,10 @@ class SearchActivity : AppCompatActivity() {
             intent.putExtra("album_cover", track.artworkUrl512)
             intent.putExtra("collection_name", track.collectionName ?: "")
             intent.putExtra("release_year", track.releaseYear ?: "")
-            intent.putExtra("genre", track.genre ?: "")
+            intent.putExtra("genre", track.primaryGenreName ?: "")
             intent.putExtra("country", track.country ?: "")
             startActivity(intent)
-            Log.d(
-                "SearchActivity",
-                "Sending: trackName=${track.trackName}, artistName=${track.artistName}, trackTimeMillis=${track.trackTimeMillis}, albumCover=${track.artworkUrl512}, collectionName=${track.collectionName}, releaseYear=${track.releaseYear}, genre=${track.genre}, country=${track.country}"
-            )
-
         }
-
     }
 
     private fun clearInputText() {

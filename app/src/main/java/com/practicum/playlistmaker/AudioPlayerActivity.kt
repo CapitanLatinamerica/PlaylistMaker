@@ -37,7 +37,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         val trackName = intent.getStringExtra("track_name")
         val collectionName = intent.getStringExtra("collection_name")
         val releaseYear = intent.getStringExtra("release_year")
-        val genre = intent.getStringExtra("genre")
+        val primaryGenreName = intent.getStringExtra("genre")
         val country = intent.getStringExtra("country")
 
         val artistName = intent.getStringExtra("artist_name")
@@ -65,7 +65,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             "Длительность" to trackTimeFormatted.takeIf { it.isNotEmpty() },
             "Альбом" to collectionName.takeIf { !collectionName.isNullOrEmpty() },
             "Год" to releaseYear.takeIf { !releaseYear.isNullOrEmpty() },
-            "Жанр" to genre.takeIf { !genre.isNullOrEmpty() },
+            "Жанр" to (intent.getStringExtra("genre") ?: primaryGenreName).takeIf { !it.isNullOrEmpty() },
             "Страна" to country.takeIf { !country.isNullOrEmpty() }
         )
 
@@ -110,24 +110,5 @@ class AudioPlayerActivity : AppCompatActivity() {
                 Toast.makeText(this, "Deleted!", Toast.LENGTH_SHORT).show()
             }
         } /*Это, наверное, надо будет удалить/переписать потом*/
-    }
-
-    override fun onPause() {
-        super.onPause()
-        saveState() // Сохраняем состояние при уходе в фон
-    }
-
-    private fun saveState() {
-        val intent = intent
-        sharedPreferences.edit()
-            .putString("track_name", intent.getStringExtra("track_name"))
-            .putString("artist_name", intent.getStringExtra("artist_name"))
-            .putString("track_time", intent.getStringExtra("track_time"))
-            .putString("album_cover", intent.getStringExtra("album_cover"))
-            .putString("collection_name", intent.getStringExtra("collection_name"))
-            .putString("release_year", intent.getStringExtra("release_year"))
-            .putString("genre", intent.getStringExtra("genre"))
-            .putString("country", intent.getStringExtra("country"))
-            .apply()
     }
 }

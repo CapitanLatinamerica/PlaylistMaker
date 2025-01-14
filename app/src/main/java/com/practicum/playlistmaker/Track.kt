@@ -10,8 +10,8 @@ data class Track(
     val trackTimeMillis: Long,
     val artworkUrl100: String,
     val collectionName: String? = null, // Альбом
-    val releaseYear: String? = null,    // Год
-    val genre: String? = null,          // Жанр
+    val releaseDate: String? = null,    // Год
+    val primaryGenreName: String? = null, // Жанр
     val country: String? = null         // Страна исполнителя
 ) {
     val trackTime: String
@@ -23,26 +23,17 @@ data class Track(
     val artworkUrl512: String
         get() = artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg") // Высокое качество
 
+    val releaseYear: String?
+        get() = releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) // Извлечение года
+
     fun trimmed(): Track {
         return copy(
             trackName = trackName.trim(),
             artistName = artistName.trim(),
             collectionName = collectionName?.trim(),
-            genre = genre?.trim(),
+            primaryGenreName = primaryGenreName?.trim(),
             country = country?.trim()
         )
-    }
-
-    fun getName(): String {
-        return trackName
-    }
-
-    fun getArtist(): String {
-        return artistName
-    }
-
-    fun getTime(): Long {
-        return trackTimeMillis
     }
 }
 
