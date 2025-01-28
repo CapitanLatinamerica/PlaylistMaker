@@ -29,5 +29,15 @@
     <string name="history_title">Вы искали</string>
     <string name="clear_history">Очистить историю</string>
     <string name="toast_track_added">"%1$s" добавлен в историю</string>
+    <string name="track_cover_description">Обложка трека</string>
+    <string name="sample_artist_name" translatable="false">my_awesome_artist</string>
+    <string name="sample_track_name" translatable="false">My Awesome Track</string>
+    <string name="add_track_to_playlist" translatable="false">Add track to playlist</string>
+    <string name="set_play_or_pause" translatable="false">Set play or pause</string>
+    <string name="like_track" translatable="false">Liked track</string>
+    <string name="unknown_track" translatable="false">Неизвестный трек</string>
+    <string name="unknown_artist" translatable="false">Неизвестный исполнитель</string>
+    <string name="unknown_duration">Some duration</string>
+
 
 </resources>
