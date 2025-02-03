@@ -2,6 +2,7 @@ package com.practicum.playlistmaker
 
 import Track
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.view.LayoutInflater
@@ -43,7 +44,7 @@ class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapte
 
         // Обработка нажатия
         holder.itemView.setOnClickListener {
-            onItemClickListener?.invoke(track)
+            onItemClickListener?.invoke(track) // Ожидаем обработчик клика из SearchActivity
         }
     }
 
