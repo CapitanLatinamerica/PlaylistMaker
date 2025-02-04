@@ -12,7 +12,8 @@ data class Track(
     val collectionName: String? = null, // Альбом
     val releaseDate: String? = null,    // Год
     val primaryGenreName: String? = null, // Жанр
-    val country: String? = null         // Страна исполнителя
+    val country: String? = null,         // Страна исполнителя
+    val previewUrl: String? = null      // Ссылка на отрывок трека
 ) {
     val trackTime: String
         get() {
@@ -25,15 +26,5 @@ data class Track(
 
     val releaseYear: String?
         get() = releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) // Извлечение года
-
-    fun trimmed(): Track {
-        return copy(
-            trackName = trackName.trim(),
-            artistName = artistName.trim(),
-            collectionName = collectionName?.trim(),
-            primaryGenreName = primaryGenreName?.trim(),
-            country = country?.trim()
-        )
-    }
 }
 

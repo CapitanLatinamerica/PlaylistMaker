@@ -1,10 +1,13 @@
 package com.practicum.playlistmaker
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -43,6 +46,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistory: SearchHistory
     private lateinit var historyTitle: TextView
     private lateinit var clearHistoryButton: Button
+    private lateinit var progressBar: ProgressBar
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com/")
@@ -50,6 +54,13 @@ class SearchActivity : AppCompatActivity() {
         .build()
 
     private val iTunesService = retrofit.create(ITunesService::class.java)
+
+    private val handler = Handler(Looper.getMainLooper())                                           //Создание Handler для управления задержками
+    private val debounceRunnable = Runnable {                                                       // Runnable, который будет выполняться с задержкой
+        performSearch(inputEditText.text.toString())
+    }
+    private val debounceDelay: Long = 500                                                           // Миллисекунды до выполнения запроса
+    private var isNavigatingToPlayer = false                                                        // Флаг для проверки перехода на экран плеера
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +77,7 @@ class SearchActivity : AppCompatActivity() {
         retryButton = findViewById(R.id.retry_button)
         historyTitle = findViewById(R.id.historyTitle)
         clearHistoryButton = findViewById(R.id.clearHistoryButton)
+        progressBar = findViewById(R.id.progress_bar)
 
         trackAdapter = TrackAdapter(mutableListOf())
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -93,21 +105,22 @@ class SearchActivity : AppCompatActivity() {
         // Очистка истории поиска
         clearHistoryButton.setOnClickListener {
             searchHistory.clearHistory()
-            showHistory() // Обновляем адаптер для отображения пустой истории
+            showHistory()
         }
 
-        inputEditText.addTextChangedListener(object : TextWatcher {
+        inputEditText.addTextChangedListener(object : TextWatcher {                                 // Обработка изменений текста в поле
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                 showHistory()
                 if (s.isNullOrEmpty()) {
-                    hideKeyboard() // Скрываем клавиатуру
-                    showHistory() // Показываем историю
+                    hideKeyboard()
+                    showHistory()
                 } else {
                     hideError()
-                    trackAdapter.updateTracks(emptyList()) // Убираем найденные треки
+                    handler.removeCallbacks(debounceRunnable)
+                    handler.postDelayed(debounceRunnable, debounceDelay) // Задержка перед запросом
                 }
             }
 
@@ -130,23 +143,13 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        // Обработка нажатия кнопки "Done"
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val query = inputEditText.text.toString()
-                if (query.isNotEmpty()) {
-                    performSearch(query)
-                } else {
-                    Toast.makeText(this, getString(R.string.text_for_toast_write_something), Toast.LENGTH_SHORT).show()
-                }
-                true
-            } else {
-                false
-            }
-        }
-
         trackAdapter.setOnItemClickListener { track ->
-            searchHistory.addTrack(track) // Добавляем трек в историю
+
+            handler.removeCallbacks(debounceRunnable)                                               // Добавляем debounce для предотвращения открытия нескольких аудиоплееров
+            handler.postDelayed(debounceRunnable, debounceDelay)                                    // Минимизация рисков открытия нескольких аудиоплееров
+            isNavigatingToPlayer = true                                                             // Устанавливаем флаг перед переходом на экран плеера
+
+            searchHistory.addTrack(track)                                                           // Добавляем трек в историю
             val intent = Intent(this, AudioPlayerActivity::class.java)
             intent.putExtra("track_name", track.trackName)
             intent.putExtra("artist_name", track.artistName)
@@ -156,7 +159,19 @@ class SearchActivity : AppCompatActivity() {
             intent.putExtra("release_year", track.releaseYear ?: "")
             intent.putExtra("genre", track.primaryGenreName ?: "")
             intent.putExtra("country", track.country ?: "")
-            startActivity(intent)
+            intent.putExtra("preview_url", track.previewUrl)
+
+            // Проверяем, не активна ли уже эта активность
+            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val runningTasks = activityManager.getRunningTasks(1)
+            if (runningTasks.isNotEmpty()) {
+                val currentActivity = runningTasks[0].topActivity?.className
+                if (currentActivity != AudioPlayerActivity::class.java.name) {
+                    startActivity(intent)
+                }
+            } else {
+                startActivity(intent)
+            }
         }
     }
 
@@ -168,7 +183,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun performSearch(query: String, append: Boolean = false) {
-        val sanitizedQuery = query.trim() // Убираем только лишние пробелы
+        if (isNavigatingToPlayer) return                                                            // Если мы уже переходим на экран плеера, просто выходим
+        val sanitizedQuery = query.trim()                                                           // Убираем только лишние пробелы (а это надо?)
         if (sanitizedQuery.isEmpty()) {
             Toast.makeText(this, getString(R.string.text_for_toast_write_something), Toast.LENGTH_SHORT).show()
             return
@@ -191,7 +207,10 @@ class SearchActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ITunesSearchResponse>, response: Response<ITunesSearchResponse>) {
                 showLoading(false)
                 if (response.isSuccessful) {
-                    val results = response.body()?.results.orEmpty().map { it.trimmed() }
+                    val results = response.body()?.results.orEmpty().map { result ->
+                        // Используем уже существующий объект Track, добавив новый параметр previewUrl
+                        result.copy(previewUrl = result.previewUrl)
+                    }
                     if (results.isNotEmpty()) {
                         hideError()
                         trackAdapter.updateTracks(results)
@@ -246,7 +265,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        findViewById<ProgressBar>(R.id.progress_bar).isVisible = isLoading
+        progressBar.isVisible = isLoading // Показываем или скрываем ProgressBar
         trackRecyclerView.isVisible = !isLoading
         errorImage.isVisible = false
         errorMessage.isVisible = false
@@ -286,5 +305,10 @@ class SearchActivity : AppCompatActivity() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
         inputEditText.clearFocus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isNavigatingToPlayer = false // Сбрасываем флаг, чтобы поиск не выполнялся при возвращении на экран
     }
 }
