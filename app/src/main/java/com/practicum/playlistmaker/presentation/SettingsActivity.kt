@@ -1,24 +1,34 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.interactors.ChangeThemeInteractor
+import com.practicum.playlistmaker.root.App
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var themeSwitch: Switch
+    private lateinit var changeThemeInteractor: ChangeThemeInteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
+        changeThemeInteractor = Creator.provideChangeThemeInteractor()                              // Получаем интерактор из Creator
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
 
         val themeSwitch: SwitchMaterial = findViewById(R.id.switch1)
-        // Установка текущего состояния переключателя
+
         val app = application as App
-        themeSwitch.isChecked = app.isDarkThemeEnabled()
+        themeSwitch.isChecked = app.isDarkThemeEnabled()                                            // Установка текущего состояния переключателя
 
         val shareButton: TextView = findViewById(R.id.button_share_app)
         shareButton.setOnClickListener {
@@ -33,14 +43,13 @@ class SettingsActivity : AppCompatActivity() {
             openUserLicence()
         }
 
-
         toolbar.setNavigationOnClickListener {
             onBackPressed()  // Возвращает на предыдущую страницу
         }
 
-
-        themeSwitch.setOnCheckedChangeListener { switcher, isChecked: Boolean ->
-            app.switchTheme(isChecked)
+        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            // Переключаем тему
+            changeThemeInteractor.changeTheme(isChecked)
         }
     }
 

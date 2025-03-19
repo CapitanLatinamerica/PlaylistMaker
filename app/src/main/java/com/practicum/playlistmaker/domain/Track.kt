@@ -1,10 +1,12 @@
+package com.practicum.playlistmaker.domain
+
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Track(
-    val trackId: Int,
+    val trackId: Long,
     val trackName: String,
     val artistName: String,
     val trackTimeMillis: Long,
