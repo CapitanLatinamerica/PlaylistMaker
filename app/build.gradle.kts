@@ -39,7 +39,6 @@ android {
 }
 
 
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -58,5 +57,5 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
-
+    implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 }

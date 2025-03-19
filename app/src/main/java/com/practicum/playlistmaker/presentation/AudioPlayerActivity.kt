@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
+import com.practicum.playlistmaker.R
 
 class AudioPlayerActivity : AppCompatActivity() {
 

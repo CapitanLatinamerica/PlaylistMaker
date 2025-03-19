@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.root
 
 import android.app.Application
 import android.content.SharedPreferences
@@ -19,12 +19,17 @@ sealed class ThemeMode(val mode: Int) {
 }
 
 class App : Application() {
+    companion object {
+        lateinit var instance: App                                                                  //Синглтон
+            private set
+    }
 
     private lateinit var preferences: SharedPreferences
     private lateinit var currentTheme: ThemeMode
 
     override fun onCreate() {
         super.onCreate()
+        instance = this // Инициализация синглтона
 
         // Инициализация SharedPreferences
         preferences = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE)

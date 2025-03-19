@@ -1,10 +1,6 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation
 
-import Track
-import android.content.Context
-import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
+import com.practicum.playlistmaker.domain.Track
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.practicum.playlistmaker.R
 
 // Адаптер для отображения списка треков
 class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
