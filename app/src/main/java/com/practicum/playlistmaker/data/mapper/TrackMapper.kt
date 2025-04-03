@@ -1,7 +1,7 @@
 package com.practicum.playlistmaker.data.mapper  // 📌 Новый пакет для мапперов
 
-import com.practicum.playlistmaker.data.dto.TrackDto
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.search.data.dto.TrackDto
+import com.practicum.playlistmaker.player.domain.Track
 
 // Объект для преобразования данных между слоями
 object TrackMapper {

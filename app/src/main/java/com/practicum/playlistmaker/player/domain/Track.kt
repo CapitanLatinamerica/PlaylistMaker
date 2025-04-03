@@ -1,8 +1,9 @@
-package com.practicum.playlistmaker.domain
+package com.practicum.playlistmaker.player.domain
 
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class Track(
@@ -28,5 +29,6 @@ data class Track(
 
     val releaseYear: String?
         get() = releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) // Извлечение года
+
 }
 

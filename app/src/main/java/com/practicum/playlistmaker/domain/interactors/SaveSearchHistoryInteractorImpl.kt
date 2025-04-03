@@ -1,7 +1,7 @@
 package com.practicum.playlistmaker.domain.interactors
 
 import com.practicum.playlistmaker.data.SearchHistory
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.player.domain.Track
 
 class SaveSearchHistoryInteractorImpl(
     private val searchHistory: SearchHistory

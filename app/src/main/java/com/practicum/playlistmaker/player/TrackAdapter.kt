@@ -1,6 +1,6 @@
-package com.practicum.playlistmaker.presentation
+package com.practicum.playlistmaker.player
 
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.player.domain.Track
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

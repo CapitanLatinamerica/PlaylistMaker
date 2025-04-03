@@ -1,7 +1,7 @@
-package com.practicum.playlistmaker.data.dto
+package com.practicum.playlistmaker.search.data.dto
 
 import com.google.gson.annotations.SerializedName
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.player.domain.Track
 
 data class TrackDto(
     @SerializedName("trackId") val trackId: Long,

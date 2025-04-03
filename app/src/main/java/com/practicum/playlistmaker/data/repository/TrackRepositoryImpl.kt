@@ -1,10 +1,9 @@
 package com.practicum.playlistmaker.data.repository
 
-import android.util.Log
-import com.practicum.playlistmaker.data.ITunesSearchResponse
-import com.practicum.playlistmaker.data.ITunesService
+import com.practicum.playlistmaker.search.data.network.ITunesSearchResponse
+import com.practicum.playlistmaker.search.data.network.ITunesService
 import com.practicum.playlistmaker.data.SearchHistory
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.domain.repository.TrackRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

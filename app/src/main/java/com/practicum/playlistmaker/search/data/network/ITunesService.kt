@@ -1,6 +1,6 @@
-package com.practicum.playlistmaker.data  //Пакет для работы с данными (Data слой)
+package com.practicum.playlistmaker.search.data.network  //Пакет для работы с данными (Data слой)
 
-import com.practicum.playlistmaker.data.dto.TrackDto                                                // Импортируем TrackDto для работы с API
+import com.practicum.playlistmaker.search.data.dto.TrackDto                                                // Импортируем TrackDto для работы с API
 import retrofit2.Call                                                                               //Call — асинхронный запрос через Retrofit
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

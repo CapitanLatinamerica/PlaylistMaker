@@ -1,11 +1,13 @@
-package com.practicum.playlistmaker                                                                 // Пакет для создания зависимостей
+package com.practicum.playlistmaker.creator                                                                 // Пакет для создания зависимостей
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.practicum.playlistmaker.data.ITunesService                                               // Импортируем ITunesService
+import androidx.lifecycle.ViewModelProvider
+import com.practicum.playlistmaker.search.data.network.ITunesService                                               // Импортируем ITunesService
 import com.practicum.playlistmaker.data.SearchHistory
-import com.practicum.playlistmaker.data.repository.ThemeRepositoryImpl
 import com.practicum.playlistmaker.data.repository.TrackRepositoryImpl                              // Импортируем TrackRepositoryImpl
+import com.practicum.playlistmaker.settings.data.ThemeRepository
+import com.practicum.playlistmaker.settings.data.ThemeRepositoryImpl
 import com.practicum.playlistmaker.domain.interactors.ChangeThemeInteractor
 import com.practicum.playlistmaker.domain.interactors.ChangeThemeInteractorImpl
 import com.practicum.playlistmaker.domain.interactors.GetSearchHistoryInteractor
@@ -14,9 +16,15 @@ import com.practicum.playlistmaker.domain.interactors.SaveSearchHistoryInteracto
 import com.practicum.playlistmaker.domain.interactors.SaveSearchHistoryInteractorImpl
 import com.practicum.playlistmaker.domain.interactors.SearchTracksInteractor
 import com.practicum.playlistmaker.domain.interactors.SearchTracksInteractorImpl
-import com.practicum.playlistmaker.domain.repository.ThemeRepository
 import com.practicum.playlistmaker.domain.repository.TrackRepository                                // Импортируем TrackRepository
-import com.practicum.playlistmaker.root.App
+import com.practicum.playlistmaker.app.App
+import com.practicum.playlistmaker.settings.domain.SettingsInteractor
+import com.practicum.playlistmaker.settings.domain.SettingsInteractorImpl
+import com.practicum.playlistmaker.settings.ui.viewmodel.SettingsViewModelFactory
+import com.practicum.playlistmaker.sharing.data.SharingInteractorImpl
+import com.practicum.playlistmaker.sharing.data.SharingRepository
+import com.practicum.playlistmaker.sharing.data.SharingRepositoryImpl
+import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 
 object Creator {
 
@@ -67,7 +75,26 @@ object Creator {
     }
 
     // Метод для создания репозитория для темы
-    private fun provideThemeRepository(): ThemeRepository {
-        return ThemeRepositoryImpl()
+    fun provideThemeRepository(): ThemeRepository {
+        return ThemeRepositoryImpl(provideSharedPreferences())
+    }
+
+    fun provideSettingsInteractor(): SettingsInteractor {
+        return SettingsInteractorImpl(provideThemeRepository())
+    }
+
+    fun provideSharingInteractor(context: Context): SharingInteractor {
+        return SharingInteractorImpl(provideSharingRepository(context))
+    }
+
+    fun provideSharingRepository(context: Context): SharingRepository {
+        return SharingRepositoryImpl(context)
+    }
+
+    fun provideSettingsViewModelFactory(context: Context): ViewModelProvider.Factory {
+        return SettingsViewModelFactory(
+            provideSharingInteractor(context),
+            provideSettingsInteractor()
+        )
     }
 }

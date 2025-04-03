@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.presentation
+package com.practicum.playlistmaker.search.ui
 
 import android.content.Context
 import android.content.Intent
@@ -24,12 +24,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
-import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.domain.interactors.GetSearchHistoryInteractor
 import com.practicum.playlistmaker.domain.interactors.SaveSearchHistoryInteractor
 import com.practicum.playlistmaker.domain.interactors.SearchTracksInteractor
+import com.practicum.playlistmaker.player.AudioPlayerActivity
+import com.practicum.playlistmaker.player.TrackAdapter
 import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {

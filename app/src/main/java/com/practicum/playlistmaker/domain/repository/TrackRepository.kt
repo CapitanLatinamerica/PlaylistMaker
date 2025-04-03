@@ -1,6 +1,6 @@
 package com.practicum.playlistmaker.domain.repository  // Пакет для репозиториев
 
-import com.practicum.playlistmaker.domain.Track  // Импортируем Track из Domain слоя
+import com.practicum.playlistmaker.player.domain.Track  // Импортируем Track из Domain слоя
 
 interface TrackRepository {                                                                         // Интерфейс репозитория для работы с треками
 

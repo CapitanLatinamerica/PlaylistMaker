@@ -1,8 +1,7 @@
 package com.practicum.playlistmaker.data
 
-import com.practicum.playlistmaker.domain.Track
+import com.practicum.playlistmaker.player.domain.Track
 import android.content.SharedPreferences
-import android.util.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
