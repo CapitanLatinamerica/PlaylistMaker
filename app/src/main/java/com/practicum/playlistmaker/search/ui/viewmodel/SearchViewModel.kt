@@ -1,19 +1,15 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.domain.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.SearchInteractor
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -21,27 +17,37 @@ class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor
 ) : ViewModel() {
 
-    // LiveData для истории поиска
+    companion object {
+        private const val TAG = "SearchViewModel"
+    }
+
+    enum class SearchScreenState {
+        HISTORY, RESULTS, EMPTY_RESULTS, ERROR, IDLE
+    }
+
+    private val _screenState = MutableLiveData<SearchScreenState>()
+    val screenState: LiveData<SearchScreenState> = _screenState
+
     private val _history = MutableLiveData<List<Track>>()
     val history: LiveData<List<Track>> = _history
 
-    // LiveData для состояния загрузки
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    // LiveData для результатов поиска
     private val _searchResults = MutableLiveData<List<Track>>()
     val searchResults: LiveData<List<Track>> = _searchResults
 
-    // LiveData для ошибок
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
+    private var currentQuery: String = ""
+    private var searchJob: Job? = null
+
     init {
-        loadSearchHistory()  // Загрузка истории при инициализации
+        Log.d(TAG, "ViewModel initialized")
+        loadSearchHistory()
     }
 
-    // Загрузка истории поиска
     fun loadSearchHistory() {
         val history = searchHistoryInteractor.getHistory()
         if (history.isNullOrEmpty()) {
@@ -49,66 +55,78 @@ class SearchViewModel(
         } else {
             _history.value = history
         }
+        _screenState.value = SearchScreenState.HISTORY
     }
 
-    // Поиск треков по запросу
     fun searchTracks(query: String) {
-        viewModelScope.launch {
+        Log.d(TAG, "Search request for: '$query'")
+        currentQuery = query
+
+        if (query.isBlank()) {
+            Log.d(TAG, "Query is blank, showing history")
+            loadSearchHistory()
+            return
+        }
+
+        _isLoading.value = true
+        _screenState.value = SearchScreenState.IDLE
+        _history.value = emptyList()
+        _error.value = ""
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             try {
-                _isLoading.value = true
+                Log.d(TAG, "Starting network request")
                 val tracks = searchInteractor.searchTracks(query)
+                Log.d(TAG, "Received ${tracks.size} tracks")
 
                 if (tracks.isEmpty()) {
-                    _error.postValue(R.string.nothing_founded.toString())
+                    Log.d(TAG, "No tracks found")
+                    _screenState.value = SearchScreenState.EMPTY_RESULTS
+                    _error.value = "NO_RESULTS"
                 } else {
-                    _error.postValue("")
+                    Log.d(TAG, "Showing results")
+                    _screenState.value = SearchScreenState.RESULTS
                 }
-
-                _searchResults.postValue(tracks)
+                _searchResults.value = tracks
             } catch (e: Exception) {
-                _error.postValue("Error occurred: ${e.message}")
-                _searchResults.postValue(emptyList())
+                Log.e(TAG, "Search error", e)
+                _screenState.value = SearchScreenState.ERROR
+                _error.value = "NETWORK_ERROR"
+                _searchResults.value = emptyList()
             } finally {
                 _isLoading.value = false
+                Log.d(TAG, "Search completed")
             }
         }
     }
 
-    // Сохранение трека в историю
     fun saveTrackToHistory(track: Track) {
+        Log.d(TAG, "Saving track to history: ${track.trackName}")
         viewModelScope.launch {
             try {
-                Log.d("SearchViewModel", "Saving track to history: ${track.trackName}")
                 searchHistoryInteractor.saveTrack(track)
-                Log.d("SearchViewModel", "Track saved successfully")
+                Log.d(TAG, "Track saved successfully")
             } catch (e: Exception) {
-                Log.e("SearchViewModel", "Error saving track to history: ${e.message}", e)
+                Log.e(TAG, "Error saving track", e)
             }
         }
     }
 
-    // Очистка истории поиска
     fun clearSearchHistory() {
+        Log.d(TAG, "Clearing search history")
         viewModelScope.launch {
             searchHistoryInteractor.clearHistory()
             loadSearchHistory()
         }
     }
 
- /*   // Функция для проверки сети
-    fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }*/
-
-    // Очистка результатов поиска
     fun clearSearchResults() {
+        Log.d(TAG, "Clearing search results")
         _searchResults.value = emptyList()
+        loadSearchHistory()
     }
 
-    // Фабрика для создания ViewModel
     class Factory(
         private val searchInteractor: SearchInteractor,
         private val searchHistoryInteractor: SearchHistoryInteractor
