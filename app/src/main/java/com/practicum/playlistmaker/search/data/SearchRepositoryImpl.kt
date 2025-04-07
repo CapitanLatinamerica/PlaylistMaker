@@ -2,32 +2,35 @@ package com.practicum.playlistmaker.search.data
 
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.data.network.ITunesService
-import com.practicum.playlistmaker.search.data.network.ITunesSearchResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class SearchRepositoryImpl(private val iTunesService: ITunesService) : SearchRepository {
+class SearchRepositoryImpl(
+    private val iTunesService: ITunesService  // Сервис для выполнения запросов
+) : SearchRepository {
 
-    override fun searchTracks(query: String, callback: (List<Track>) -> Unit) {
-        val call = iTunesService.searchSongs(query) // Используем метод searchSongs, который возвращает ITunesSearchResponse
-        call.enqueue(object : Callback<ITunesSearchResponse> {  // Исправили тип на ITunesSearchResponse
-            override fun onResponse(
-                call: Call<ITunesSearchResponse>,
-                response: Response<ITunesSearchResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val tracks = response.body()?.results?.map { it.toDomain() } ?: emptyList()
-                    callback(tracks)
-                } else {
-                    callback(emptyList())
+    // Реализация поиска треков
+    override suspend fun searchTracks(query: String): List<Track> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = iTunesService.searchSongs(query)
+                response.results.map {
+                    Track(
+                        trackId = it.trackId,
+                        trackName = it.trackName,
+                        artistName = it.artistName,
+                        trackTimeMillis = it.trackTimeMillis,
+                        artworkUrl100 = it.artworkUrl100,
+                        collectionName = it.collectionName,
+                        releaseDate = it.releaseDate,
+                        primaryGenreName = it.primaryGenreName,
+                        country = it.country,
+                        previewUrl = it.previewUrl
+                    )
                 }
+            } catch (e: Exception) {
+                emptyList()
             }
-
-            // Исправили тип в onFailure на ITunesSearchResponse
-            override fun onFailure(call: Call<ITunesSearchResponse>, t: Throwable) {
-                callback(emptyList())
-            }
-        })
+        }
     }
 }

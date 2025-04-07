@@ -21,6 +21,7 @@ class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapte
 
     // Обновление списка треков
     fun updateTracks(newTracks: List<Track>) {
+        if (tracks == newTracks) return
         tracks.clear()
         tracks.addAll(newTracks)
         notifyDataSetChanged()

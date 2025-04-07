@@ -1,6 +1,5 @@
-package com.practicum.playlistmaker.domain.interactors
+package com.practicum.playlistmaker.search.domain
 
-import com.practicum.playlistmaker.data.SearchHistory
 import com.practicum.playlistmaker.player.domain.Track
 
 class SaveSearchHistoryInteractorImpl(
@@ -8,10 +7,6 @@ class SaveSearchHistoryInteractorImpl(
 ) : SaveSearchHistoryInteractor {
 
     override suspend fun saveTrackToHistory(track: Track) {
-        searchHistory.addTrack(track)  // Добавляем трек в историю
-    }
-
-    override suspend fun saveSearchHistory(track: Track) {
         searchHistory.addTrack(track)  // Добавляем трек в историю
     }
 

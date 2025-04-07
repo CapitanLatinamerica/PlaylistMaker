@@ -1,7 +1,6 @@
-package com.practicum.playlistmaker.domain.interactors                                              //Пакет для интеракторов
+package com.practicum.playlistmaker.search.domain
 
-import com.practicum.playlistmaker.domain.repository.TrackRepository                                //Импортируем репозиторий
-import com.practicum.playlistmaker.player.domain.Track                                                     //Импортируем Track
+import com.practicum.playlistmaker.player.domain.Track
 
 class GetSearchHistoryInteractorImpl(
     private val trackRepository: TrackRepository                                                    //Репозиторий для работы с историей поиска

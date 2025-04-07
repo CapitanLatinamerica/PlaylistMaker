@@ -1,37 +1,29 @@
-package com.practicum.playlistmaker.search.data.network  //Пакет для работы с данными (Data слой)
+package com.practicum.playlistmaker.search.data.network
 
-import com.practicum.playlistmaker.search.data.dto.TrackDto                                                // Импортируем TrackDto для работы с API
-import retrofit2.Call                                                                               //Call — асинхронный запрос через Retrofit
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET                                                                           //GET-запрос
-import retrofit2.http.Query                                                                         // Аннотация для передачи параметров в запросе
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-//Интерфейс для взаимодействия с API iTunes
+// Интерфейс для работы с API iTunes
 interface ITunesService {
 
-    @GET("search")                                                                                  //Определяем, что это GET-запрос по пути "search"
-    fun searchSongs(
-        @Query("term") text: String,                                                                //"term" — ключевое слово для поиска
-        @Query("entity") entity: String = ENTITY_SONG                                               // "entity" — тип сущности (по умолчанию "song")
-    ): Call<ITunesSearchResponse>  // Метод вернет Call с ITunesSearchResponse
+    // Поиск песен по запросу
+    @GET("search")
+    suspend fun searchSongs(
+        @Query("term") text: String,                                                                // Поисковый запрос
+        @Query("entity") entity: String = ENTITY_SONG                                               // Тип сущности (по умолчанию - песни)
+    ): ITunesSearchResponse
 
     companion object {
-        const val ENTITY_SONG = "song"                                                              // Константа для обозначения поиска песен
-        // Метод для создания экземпляра ITunesService
+        const val ENTITY_SONG = "song"                                                              // Константа для типа сущности
+
+        // Создание экземпляра ITunesService
         fun create(): ITunesService {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://itunes.apple.com/")                                                   //Базовый URL
-                .addConverterFactory(GsonConverterFactory.create())                                     //Используем Gson для конвертации
+            val retrofit = retrofit2.Retrofit.Builder()
+                .baseUrl("https://itunes.apple.com/")                                               // Базовый URL
+                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())        // Конвертер Gson
                 .build()
 
-            return retrofit.create(ITunesService::class.java)                                           //Возвращаем экземпляр ITunesService
+            return retrofit.create(ITunesService::class.java)
         }
     }
 }
-
-//Ответ от сервера (список треков)
-data class ITunesSearchResponse(
-    val resultCount: Int,  //Количество найденных треков
-    val results: List<TrackDto> //Список треков (в формате DTO)
-)

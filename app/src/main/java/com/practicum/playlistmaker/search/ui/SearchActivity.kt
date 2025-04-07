@@ -1,16 +1,14 @@
 package com.practicum.playlistmaker.search.ui
 
-import android.content.Context
+import android.util.Log
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -19,55 +17,84 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.player.domain.Track
-import com.practicum.playlistmaker.domain.interactors.GetSearchHistoryInteractor
-import com.practicum.playlistmaker.domain.interactors.SaveSearchHistoryInteractor
-import com.practicum.playlistmaker.domain.interactors.SearchTracksInteractor
+import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.player.AudioPlayerActivity
 import com.practicum.playlistmaker.player.TrackAdapter
+import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.search.domain.SearchTracksInteractor
+import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
 
-    // UI элементы
-    private lateinit var floatingContainer: ConstraintLayout
-    private lateinit var inputEditText: EditText
-    private lateinit var clearIcon: ImageView
-    private lateinit var trackRecyclerView: RecyclerView
-    private lateinit var trackAdapter: TrackAdapter
-    private lateinit var errorImage: ImageView
-    private lateinit var errorMessage: TextView
-    private lateinit var retryButton: Button
-    private lateinit var historyTitle: TextView
-    private lateinit var clearHistoryButton: Button
-    private lateinit var progressBar: ProgressBar
+    // ViewModel для управления логикой поиска
+    private lateinit var viewModel: SearchViewModel
 
-    // Интеракторы
+    // Менеджер ввода для управления клавиатурой
+    private lateinit var imm: InputMethodManager
+
+    // Интерактор для работы с поиском треков
     private lateinit var searchTracksInteractor: SearchTracksInteractor
-    private lateinit var saveSearchHistoryInteractor: SaveSearchHistoryInteractor
-    private lateinit var getSearchHistoryInteractor: GetSearchHistoryInteractor
 
-    private val handler = Handler(Looper.getMainLooper()) // Handler для задержек
-    private val debounceDelay: Long = 500 // Задержка перед поиском
-    private val debounceRunnable = Runnable { performSearch(inputEditText.text.toString()) }
+    // UI элементы
+    private lateinit var floatingContainer: ConstraintLayout  // Контейнер для сообщений об ошибке
+    private lateinit var retryButton: Button                 // Кнопка повтора при ошибке
+    private lateinit var inputEditText: EditText            // Поле ввода поискового запроса
+    private lateinit var clearIcon: ImageView               // Иконка очистки поля ввода
+    private lateinit var trackRecyclerView: RecyclerView    // Список треков
+    private lateinit var trackAdapter: TrackAdapter         // Адаптер для списка треков
+    private lateinit var errorImage: ImageView              // Иконка ошибки
+    private lateinit var errorMessage: TextView             // Текст ошибки
+    private lateinit var historyTitle: TextView             // Заголовок истории поиска
+    private lateinit var clearHistoryButton: Button         // Кнопка очистки истории
+    private lateinit var progressBar: ProgressBar           // Индикатор загрузки
+
+    // Handler и Runnable для реализации задержки при поиске (debounce)
+    private val handler = Handler(Looper.getMainLooper())
+    private val debounceDelay: Long = 500  // Задержка в миллисекундах
+    private val debounceRunnable = Runnable {
+        val query = inputEditText.text.toString()
+        if (query.isBlank()) {
+            viewModel.clearSearchResults()
+        } else {
+            viewModel.searchTracks(query)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        Log.d("SearchActivity", "onCreate started")
 
-        // Получаем интеракторы из Creator
-        searchTracksInteractor = Creator.provideSearchTracksInteractor()
-        saveSearchHistoryInteractor = Creator.provideSaveSearchHistoryInteractor()
-        getSearchHistoryInteractor = Creator.provideGetSearchHistoryInteractor()
+        // Инициализация ViewModel с фабрикой
+        val searchInteractorImpl = Creator.provideSearchInteractor(this)
+        val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(applicationContext)
+        val factory = SearchViewModel.Factory(searchInteractorImpl, searchHistoryInteractor)
+        viewModel = ViewModelProvider(this, factory).get(SearchViewModel::class.java)
 
-        // Инициализация UI-компонентов
+        // Инициализация UI элементов
+        initViews()
+
+        // Настройка RecyclerView
+        setupRecyclerView()
+
+        // Настройка слушателей
+        setupListeners()
+
+        // Наблюдение за LiveData из ViewModel
+        observeViewModel()
+    }
+
+    private fun initViews() {
+        // Получение ссылок на все UI элементы
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
         floatingContainer = findViewById(R.id.floating_container)
         inputEditText = findViewById(R.id.findEditText)
@@ -80,99 +107,132 @@ class SearchActivity : AppCompatActivity() {
         clearHistoryButton = findViewById(R.id.clearHistoryButton)
         progressBar = findViewById(R.id.progress_bar)
 
+        // Настройка тулбара
+        toolbar.setNavigationOnClickListener { finish() }
+    }
+
+    private fun setupRecyclerView() {
+        // Инициализация адаптера с пустым списком
         trackAdapter = TrackAdapter(mutableListOf())
+
+        // Настройка менеджера компоновки
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
         trackRecyclerView.adapter = trackAdapter
 
-        // Обработчик нажатия "Назад"
-        toolbar.setNavigationOnClickListener { finish() }
-
-        // Отобразить историю поиска
-        showHistory()
-
-        // Обработчик изменения фокуса у поля ввода
-        inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                // Если поле в фокусе, скрываем историю, кнопку очистки и заголовок
-                historyTitle.isVisible = false
-                clearHistoryButton.isVisible = false
-                trackAdapter.updateTracks(emptyList()) // Очищаем адаптер
-            } else {
-                // Если поле ввода не в фокусе и текст пустой, показываем историю
-                if (inputEditText.text.isNullOrEmpty()) {
-                    showHistory()
-                }
-            }
-        }
-
-        // Очистка поля ввода
-
-        clearIcon.setOnClickListener {
-            clearInputText()  // Очищаем текст в поле и обновляем интерфейс
-            inputEditText.clearFocus()  // Убираем фокус у поля ввода
-        }
-
-        // Очистка истории
-        clearHistoryButton.setOnClickListener { clearHistory() }
-
-        // Обработчик изменения текста
-        inputEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearIcon.isVisible = !s.isNullOrEmpty()
-                handler.removeCallbacks(debounceRunnable)
-                handler.postDelayed(debounceRunnable, debounceDelay)
-
-                // Если в поле есть текст, скрываем заголовок истории
-                if (!s.isNullOrEmpty()) {
-                    historyTitle.isVisible = false
-                    clearHistoryButton.isVisible = false // Скрываем кнопку очистки истории
-                    hideError() // Скрываем все ошибки
-                } else {
-                    hideError()  // Скрываем все ошибки, если поле пустое
-                    showHistory() // Показываем историю, если поле пустое
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-
-        // Обработчик клика по треку
+        // Установка слушателя кликов по элементам списка
         trackAdapter.setOnItemClickListener { track ->
-            saveSearchHistory(track) // Сохраняем трек в историю
-            openAudioPlayer(track) // Открываем плеер для выбранного трека
+            viewModel.saveTrackToHistory(track)
+            openAudioPlayer(track)
         }
     }
 
-    // Функция для выполнения поиска
-    private fun performSearch(query: String) {
-        val sanitizedQuery = query.trim()                                                           // Убираем только лишние пробелы
-        if (sanitizedQuery.isEmpty()) {
-            showHistory()
+    private fun setupListeners() {
+        // Очистка поля ввода
+        clearIcon.setOnClickListener {
+            clearInputText()
+            viewModel.clearSearchResults()
+            hideKeyboard()
+        }
+
+        // Очистка истории поиска
+        clearHistoryButton.setOnClickListener {
+            viewModel.clearSearchHistory()
+        }
+
+        // Повторный поиск при ошибке
+        retryButton.setOnClickListener {
+            val query = inputEditText.text.toString()
+            viewModel.searchTracks(query)
+//            performSearch(inputEditText.text.toString())
+        }
+
+        // Слушатель изменений текста в поле ввода
+        inputEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Не используется
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Показать/скрыть иконку очистки
+                clearIcon.isVisible = !s.isNullOrEmpty()
+
+                // Отменить предыдущий запрос
+                handler.removeCallbacks(debounceRunnable)
+
+                // Запустить новый запрос с задержкой
+                handler.postDelayed(debounceRunnable, debounceDelay)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Не используется
+            }
+        })
+    }
+
+    private fun observeViewModel() {
+        // Наблюдение за результатами поиска
+        viewModel.searchResults.observe(this, Observer { tracks ->
+            Log.d("SearchActivity", "Search results updated: ${tracks.size} tracks")
+            trackAdapter.updateTracks(tracks)
+
+            // Показываем ошибку, если результатов нет
+            if (tracks.isEmpty() && inputEditText.text.isNotBlank()) {
+                showError(
+                    getString(R.string.nothing_founded),
+                    R.drawable.ic_no_results,
+                    showRetryButton = false
+                )
+            } else {
+                hideError()
+            }
+        })
+
+        // Наблюдение за состоянием загрузки
+        viewModel.isLoading.observe(this, Observer { isLoading ->
+            Log.d("SearchActivity", "isLoading: $isLoading")
+            progressBar.isVisible = isLoading
+        })
+
+        // Наблюдение за ошибками
+        viewModel.error.observe(this, Observer { error ->
+            Log.d("SearchActivity", "Error: $error")
+            errorMessage.text = error
+            errorMessage.isVisible = error.isNotEmpty()
+        })
+
+        // Наблюдение за историей поиска
+        viewModel.history.observe(this) { history ->
+            clearHistoryButton.isVisible = history.isNotEmpty()
+            if (history != null && history.isNotEmpty()) {
+                historyTitle.isVisible = false
+                clearHistoryButton.isVisible = false
+                trackAdapter.updateTracks(history)
+            } else {
+                historyTitle.isVisible = history.isNotEmpty()
+                trackAdapter.updateTracks(emptyList())
+                trackRecyclerView.isVisible = true
+            }
+        }
+    }
+
+/*    private fun performSearch(query: String) {
+
+        Log.d("SearchActivity", "Performing search for query: $query")
+        if (query.isBlank()) {
+            Log.d("SearchActivity", "Search query is blank, skipping search.")
             return
         }
 
-        if (!isNetworkAvailable()) {
-            showError(
-                getString(R.string.no_internet_error),
-                R.drawable.ic_no_connection,
-                showRetryButton = true
-            )
-            return
-        } else {
-            hideError()
-        }
-        showLoading(true)
+        showLoading(true)                                                                  // Показываем индикатор загрузки
 
-        lifecycleScope.launch {                                                                     //Для выполнения асинхронных операций
+        lifecycleScope.launch {
             try {
-                val tracks = searchTracksInteractor.searchTracks(query)
-                showLoading(false)
+                val tracks = searchTracksInteractor.searchTracks(query)                             // Получаем список треков через ViewModel
+                Log.d("SearchActivity", "Received tracks: ${tracks.size}")                 // Логируем количество полученных треков
+                showLoading(false)                                                         // Прячем индикатор загрузки
 
-                // Обновляем адаптер данными
                 if (tracks.isEmpty()) {
+                    Log.d("SearchActivity", "No tracks found.")
                     showError(
                         getString(R.string.nothing_founded),
                         R.drawable.ic_no_results,
@@ -180,58 +240,20 @@ class SearchActivity : AppCompatActivity() {
                     )
                 } else {
                     trackAdapter.updateTracks(tracks)
-                    hideError() // Скрываем ошибку, если результаты есть
+                    hideError()
                 }
             } catch (e: Exception) {
                 showLoading(false)
+                Log.e("SearchActivity", "Error during search: ${e.message}")
                 showError(
                     getString(R.string.nothing_founded),
                     R.drawable.ic_no_results,
-                    showRetryButton = false
+                    showRetryButton = true
                 )
             }
         }
-    }
+    }*/
 
-    // Показываем историю поиска
-    private fun showHistory() {
-        lifecycleScope.launch {
-            val history = getSearchHistoryInteractor.getSearchHistory()
-            Log.d("SearchActivity", "History size: ${history.size}")  // Логируем размер истории
-            Log.d("SearchActivity", "Is trackRecyclerView visible: ${trackRecyclerView.isVisible}")
-            if (inputEditText.hasFocus() && !inputEditText.text.isNullOrEmpty()) {
-                // Если поле ввода в фокусе и текст не пустой, скрываем историю, кнопку очистки и заголовок
-                historyTitle.isVisible = false
-                clearHistoryButton.isVisible = false
-                trackAdapter.updateTracks(emptyList())
-                Log.d("SearchActivity", "Hiding history: input field has focus and is not empty")
-            } else {
-                // Если фокуса нет или текст пустой, показываем историю
-                historyTitle.isVisible = history.isNotEmpty()
-                clearHistoryButton.isVisible = history.isNotEmpty()
-                trackAdapter.updateTracks(history)
-                trackRecyclerView.isVisible=true
-                Log.d("SearchActivity", "Showing history: input field is empty or not focused")
-            }
-        }
-    }
-
-    // Функция для сохранения река в историю
-    private fun saveSearchHistory(track: Track) {
-        lifecycleScope.launch {
-            saveSearchHistoryInteractor.saveSearchHistory(track)
-        }
-    }
-
-    // Функция для очистки истории поиска
-    private fun clearHistory() {
-        lifecycleScope.launch {
-            saveSearchHistoryInteractor.clearSearchHistory() // Очищаем историю
-            showHistory() // Обновляем список
-        }
-    }
-
-    // Функция для открытия плеера для выбранного трека
     private fun openAudioPlayer(track: Track) {
         val intent = Intent(this, AudioPlayerActivity::class.java).apply {
             putExtra("track_name", track.trackName)
@@ -248,16 +270,16 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showError(message: String, imageRes: Int, showRetryButton: Boolean = false) {
-        floatingContainer.visibility = View.VISIBLE
-        errorImage.isVisible = true
-        errorMessage.isVisible = true
-        retryButton.isVisible = showRetryButton
-        trackRecyclerView.isVisible = false
-        Glide.with(this).load(imageRes).into(errorImage)
-        errorMessage.text = message
+        Log.d("SearchActivity", "Displaying error message: $message")
+        floatingContainer.visibility = View.VISIBLE                                                 // Показываем контейнер с ошибкой
+        errorImage.isVisible = true                                                                 // Показываем иконку ошибки
+        errorMessage.isVisible = true                                                               // Показываем текст ошибки
+        errorMessage.text = message                                                                 // Текст ошибки
+        retryButton.isVisible = showRetryButton                                                     // Показываем кнопку повторного поиска
+        trackRecyclerView.isVisible = false                                                         // Скрываем RecyclerView
+        Glide.with(this).load(imageRes).into(errorImage)                                     // Загружаем иконку ошибки
     }
 
-    // Функция для скрытия ошибки
     private fun hideError() {
         floatingContainer.isVisible = false
         errorImage.isVisible = false
@@ -265,25 +287,21 @@ class SearchActivity : AppCompatActivity() {
         retryButton.isVisible = false
     }
 
-    // Функция для отображения загрузки
     private fun showLoading(isLoading: Boolean) {
         progressBar.isVisible = isLoading
         trackRecyclerView.isVisible = !isLoading
     }
 
-    // Функция для проверки сети
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    private fun clearInputText() {
+        inputEditText.text.clear()
+        inputEditText.clearFocus()
+        imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+        viewModel.searchTracks("")
+        clearIcon.isVisible = false
     }
 
-    // Функция для очистки текста в поле ввода
-    private fun clearInputText() {
-        inputEditText.text.clear()  // Очищаем текст в поле
-        inputEditText.clearFocus()  // Убираем фокус с поля ввода
-        hideError()  // Скрываем ошибку, если она была показана
-        showHistory()  // Показываем историю поиска
+    private fun hideKeyboard() {
+        val imm = getSystemService(InputMethodManager::class.java)
+        imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
     }
 }

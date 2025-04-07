@@ -6,14 +6,15 @@ import com.practicum.playlistmaker.search.data.SearchHistoryRepository
 class SearchHistoryInteractor(private val searchHistoryRepository: SearchHistoryRepository) {
 
     fun saveTrack(track: Track) {
-        searchHistoryRepository.saveTrack(track)
+        searchHistoryRepository.saveTrack(track)  // Сохраняем трек
     }
 
     fun getHistory(): List<Track> {
-        return searchHistoryRepository.getHistory()
+        return searchHistoryRepository.getHistory()  // Получаем историю
     }
 
     fun clearHistory() {
-        searchHistoryRepository.clearHistory()
+        searchHistoryRepository.clearHistory()  // Очищаем историю
     }
 }
+

@@ -3,5 +3,6 @@ package com.practicum.playlistmaker.search.data
 import com.practicum.playlistmaker.player.domain.Track
 
 interface SearchRepository {
-    fun searchTracks(query: String, callback: (List<Track>) -> Unit)
+    suspend fun searchTracks(query: String): List<Track>  // Метод поиска треков
 }
+

@@ -1,9 +1,8 @@
-package com.practicum.playlistmaker.domain.interactors  //Пакет для интеракторов
+package com.practicum.playlistmaker.search.domain
 
-import com.practicum.playlistmaker.player.domain.Track  //Импортируем Track
+import com.practicum.playlistmaker.player.domain.Track
 
 interface SaveSearchHistoryInteractor {
     suspend fun saveTrackToHistory(track: Track)                                                    //Метод для сохранения трека в историю
-    suspend fun saveSearchHistory(track: Track)
     suspend fun clearSearchHistory()
 }
