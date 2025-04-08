@@ -24,7 +24,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.player.AudioPlayerActivity
+import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.player.TrackAdapter
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel

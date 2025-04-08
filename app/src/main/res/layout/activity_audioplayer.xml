@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.PlaylistMaker"
-    tools:context=".player.AudioPlayerActivity">
+    tools:context=".player.ui.view.AudioPlayerActivity">
 
     <!-- Тулбар -->
     <com.google.android.material.appbar.MaterialToolbar

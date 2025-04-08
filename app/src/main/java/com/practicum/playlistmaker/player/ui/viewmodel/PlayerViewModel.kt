@@ -2,13 +2,12 @@ package com.practicum.playlistmaker.player.ui.viewmodel
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,17 +16,21 @@ class PlayerViewModel(
     private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
+    private val HARDCODED_DURATION_MS = 30_000
+
     // Состояние плеера
-    private val _playerState = MutableLiveData<PlayerState>(PlayerState.IDLE)
-    val playerState: LiveData<PlayerState> = _playerState
+    private val _playerState = MutableStateFlow<PlayerState>(PlayerState.IDLE)
+    val playerState: StateFlow<PlayerState> = _playerState
 
     // Прогресс трека (в миллисекундах)
     private val _progress = MutableStateFlow(0)
     val progress: StateFlow<Int> = _progress
 
-    // Текущий трек
-    private val _currentTrack = MutableLiveData<Track?>()
-    val currentTrack: LiveData<Track?> = _currentTrack
+    fun setInitialDuration() {
+        _progress.value = HARDCODED_DURATION_MS         // Устанавливаем начальный прогресс
+    }
+
+    private var playbackJob: Job? = null
 
     private var handler = Handler(Looper.getMainLooper())
     private val updateProgress = object : Runnable {
@@ -38,31 +41,35 @@ class PlayerViewModel(
     }
 
     init {
-        Log.e("LIFECYCLE", "ViewModel initialized")
-        check(playerRepository != null) { "PlayerRepository is null!" }
-
         playerRepository.setOnCompletionListener {
             _playerState.value = PlayerState.IDLE
+            _progress.value = HARDCODED_DURATION_MS
+            playbackJob?.cancel()
             handler.removeCallbacks(updateProgress)
         }
     }
 
     fun playTrack(track: Track) {
+        if (_playerState.value == PlayerState.PLAYING) return
 
-        track.previewUrl?.let { url ->
-            _playerState.value = PlayerState.PREPARING
+        _playerState.value = PlayerState.PREPARING
+
+        track.previewUrl?.let { url ->                                                              // Передаём проверку на null для previewUrl
             playerRepository.preparePlayer(
                 url = url,
                 onPrepared = {
                     _playerState.value = PlayerState.PLAYING
-                    startProgressUpdates()
+                    _progress.value = HARDCODED_DURATION_MS
+                    startPlaybackCoroutine()
                 },
+                // Обработка ошибки
                 onError = { e ->
-                    Log.e("PLAYER_DEBUG", "Playback error: ${e.message}")
                     _playerState.value = PlayerState.ERROR(e.message ?: "Unknown error")
                 }
             )
-        } ?: Log.e("PLAYER_DEBUG", "playTrack(): previewUrl is null!")
+        } ?: run {
+            _playerState.value = PlayerState.ERROR("Track preview URL is missing.")
+        }
     }
 
     // Управление воспроизведением
@@ -71,29 +78,43 @@ class PlayerViewModel(
             PlayerState.PLAYING -> {
                 playerRepository.pausePlayer()
                 _playerState.value = PlayerState.PAUSED
-                handler.removeCallbacks(updateProgress)
+                playbackJob?.cancel()
             }
             PlayerState.PAUSED -> {
                 playerRepository.startPlayer()
                 _playerState.value = PlayerState.PLAYING
-                startProgressUpdates()
+                startPlaybackCoroutine()
             }
-            else -> {} // Игнорируем другие состояния
+            else -> {}
         }
-    }
-
-    private fun startProgressUpdates() {
-        handler.post(updateProgress)
     }
 
     override fun onCleared() {
         handler.removeCallbacks(updateProgress)
         playerRepository.releasePlayer()
         super.onCleared()
+        stopPlayback()
     }
 
-    // Состояния плеера
-    sealed class PlayerState {
+    fun stopPlayback() {
+        playerRepository.releasePlayer()
+        _playerState.value = PlayerState.IDLE
+        _progress.value = 0
+        playbackJob?.cancel()
+    }
+
+    private fun startPlaybackCoroutine() {
+        playbackJob = viewModelScope.launch {
+            while (_playerState.value == PlayerState.PLAYING) {
+                val currentPosition = playerRepository.getCurrentPosition()
+                val remainingTime = (HARDCODED_DURATION_MS - currentPosition).coerceAtLeast(0) // Чтобы не ушёл в минус
+                _progress.value = remainingTime
+                delay(500L)
+            }
+        }
+    }
+
+    sealed class PlayerState {                                                                      // Состояния плеера
         object IDLE : PlayerState()
         object PREPARING : PlayerState()
         object PLAYING : PlayerState()
@@ -101,5 +122,3 @@ class PlayerViewModel(
         data class ERROR(val message: String) : PlayerState()
     }
 }
-
-/**/

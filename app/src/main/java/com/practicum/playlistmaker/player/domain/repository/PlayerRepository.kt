@@ -8,4 +8,5 @@ interface PlayerRepository {
     fun releasePlayer()
     fun seekTo(position: Int)
     fun setOnCompletionListener(listener: () -> Unit)
+    fun getDuration(): Int
 }

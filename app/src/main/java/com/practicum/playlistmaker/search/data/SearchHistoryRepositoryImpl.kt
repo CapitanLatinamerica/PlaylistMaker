@@ -3,9 +3,8 @@ package com.practicum.playlistmaker.search.data
 import android.content.SharedPreferences
 import android.util.Log
 import com.practicum.playlistmaker.player.domain.Track
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : SearchHistoryRepository {
 
@@ -13,45 +12,34 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
         private const val HISTORY_KEY = "search_history"
     }
 
-    // Функция для сериализации списка объектов в JSON
-    private fun toJsonList(tracks: List<Track>): String {
+    private fun toJsonList(tracks: List<Track>): String {                                           // Функция для сериализации списка объектов в JSON
         return Json.encodeToString(tracks) // Кодируем список в JSON
     }
 
-    // Функция для десериализации списка объектов из JSON
-    fun fromJsonList(json: String?): List<Track> {
+    fun fromJsonList(json: String?): List<Track> {                                                  // Функция для десериализации списка объектов из JSON
         return if (json.isNullOrEmpty()) {
             emptyList()
         } else {
             try {
-                // Используем kotlinx.serialization для десериализации
-                Json.decodeFromString<List<Track>>(json)
-
+                Json.decodeFromString<List<Track>>(json)                                            // Используем kotlinx.serialization для десериализации
             } catch (e: Exception) {
-                emptyList()  // Возвращаем пустой список в случае ошибки
+                emptyList()                                                                         // Возвращаем пустой список в случае ошибки
             }
         }
     }
-
 
     // Сохранение трека в историю
     override fun saveTrack(track: Track) {
         try {
             val history = getHistory().toMutableList()
             if (history.size >= 10) {
-                history.removeAt(0) // Убираем самый старый элемент, если их больше 10
+                history.removeAt(0)                                                           // Убираем самый старый элемент, если их больше 10
             }
-            history.add(0, track) // Добавляем трек в начало списка
+            history.removeAll { existingTrack -> existingTrack.trackId == track.trackId }
+            history.add(0, track)                                                             // Добавляем трек в начало списка
 
-            // Логирование перед сохранением
-            Log.d("SearchHistoryRepository", "Saving track to history: ${track.trackName}")
-
-            sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(history)).apply()  // Сохраняем историю в SharedPreferences
-
-            // Логирование успешного сохранения
-            Log.d("SearchHistoryRepository", "Track saved successfully.")
+            sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(history)).apply()            // Сохраняем историю в SharedPreferences
         } catch (e: Exception) {
-            // Логируем ошибку
             Log.e("SearchHistoryRepository", "Error saving track to history: ${e.message}", e)
         }
     }
@@ -60,11 +48,8 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
     override fun getHistory(): List<Track> {
         try {
             val json = sharedPreferences.getString(HISTORY_KEY, "[]") ?: "[]"
-            // Логирование истории, полученной из SharedPreferences
-            Log.d("SearchHistoryRepository", "Loaded history: $json")
             return fromJsonList(json)
         } catch (e: Exception) {
-            Log.e("SearchHistoryRepository", "Error getting history: ${e.message}", e)
             return emptyList()  // Возвращаем пустой список в случае ошибки
         }
     }

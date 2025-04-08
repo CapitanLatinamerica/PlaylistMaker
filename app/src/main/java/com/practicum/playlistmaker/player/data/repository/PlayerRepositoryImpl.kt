@@ -10,15 +10,13 @@ class PlayerRepositoryImpl(
 
     override fun preparePlayer(url: String, onPrepared: () -> Unit, onError: (Exception) -> Unit) {
         try {
-            with(MediaPlayer()) {
-                setDataSource(url)
-                prepare() // Синхронная подготовка вместо prepareAsync()
-                start()
-                onPrepared()
-            }
+            mediaPlayer.reset() // Сброс перед повторным использованием
+            mediaPlayer.setDataSource(url)
+            mediaPlayer.prepare() // Синхронная подготовка
+            mediaPlayer.start()
+            onPrepared()
         } catch (e: Exception) {
             onError(e)
-            Log.e("CRASH", "MediaPlayer crashed: ${e.printStackTrace()}")
         }
     }
 
@@ -47,4 +45,6 @@ class PlayerRepositoryImpl(
     override fun setOnCompletionListener(listener: () -> Unit) {
         mediaPlayer.setOnCompletionListener { listener() }
     }
+
+    override fun getDuration(): Int = mediaPlayer.duration
 }

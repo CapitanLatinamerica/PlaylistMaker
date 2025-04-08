@@ -22,11 +22,11 @@
         android:theme="@style/Base.Theme.PlaylistMaker"
         tools:targetApi="31">
         <activity
-            android:name=".player.AudioPlayerActivity"
+            android:name=".player.ui.view.AudioPlayerActivity"
             android:exported="false"
             android:theme="@style/Theme.PlaylistMaker" />
         <activity
-            android:name=".player.MediaActivity"
+            android:name=".player.ui.view.MediaActivity"
             android:exported="false"
             android:theme="@style/Theme.PlaylistMaker" />
         <activity
