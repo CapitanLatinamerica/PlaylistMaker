@@ -24,7 +24,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.player.ui.AudioPlayerActivity
+import com.practicum.playlistmaker.player.AudioPlayerActivity
 import com.practicum.playlistmaker.player.TrackAdapter
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
@@ -226,12 +226,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun openAudioPlayer(track: Track) {
-        Log.d(TAG, "Opening player for track: ${track.trackName}")
+        Log.d("SEARCH_DEBUG", "Opening player for track: ${track.trackName}, URL: ${track.previewUrl}")
         startActivity(Intent(this, AudioPlayerActivity::class.java).apply {
             putExtra("track_name", track.trackName)
             putExtra("artist_name", track.artistName)
             putExtra("track_time", track.trackTimeMillis.toString())
-            putExtra("album_cover", track.artworkUrl512)
+            putExtra("album_cover", track.getArtworkUrl512())
             putExtra("collection_name", track.collectionName ?: "")
             putExtra("release_year", track.releaseYear ?: "")
             putExtra("genre", track.primaryGenreName ?: "")

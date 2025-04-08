@@ -31,7 +31,6 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
                 emptyList()  // Возвращаем пустой список в случае ошибки
             }
         }
-        Log.d("SearchHistoryRepositoryImpl", "Loaded JSON from SharedPreferences: $json")
     }
 
 

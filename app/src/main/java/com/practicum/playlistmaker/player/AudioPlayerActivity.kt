@@ -1,233 +1,177 @@
 package com.practicum.playlistmaker.player
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
+import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModel
+import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 
 class AudioPlayerActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityAudioplayerBinding
+    private val viewModel: PlayerViewModel by viewModels {
+        PlayerViewModelFactory(PlayerRepositoryImpl(MediaPlayer()))
+    }
 
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var mediaPlayer: MediaPlayer
-    private var isPlaying = false
-    private var currentTrackPosition = 0  // Сохранение текущей позиции
-
-    private lateinit var currentTimeTextView: TextView
-    private lateinit var playButton: ImageButton
-
-    private val handler = Handler(Looper.getMainLooper())  // Обработчик для обновления UI
+    private var track: Track? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_audioplayer)
+        Log.d("PLAYER_DEBUG", "Intent extras: ${intent.extras?.keySet()}")
+        binding = ActivityAudioplayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        mediaPlayer = MediaPlayer()
-        sharedPreferences = getSharedPreferences("audio_player_prefs", Context.MODE_PRIVATE)
+        track = createTrackFromIntent()
 
-        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
-        val albumCoverImageView: ImageView = findViewById(R.id.track_cover)
-        val trackNameTextView: TextView = findViewById(R.id.track_name)
-        val artistNameTextView: TextView = findViewById(R.id.artist_name)
-        val trackInfoContainer: LinearLayout = findViewById(R.id.track_info_container)
+        // Потом настраиваем UI
+        track?.let {
+            setupUI(it)
+            setupObservers()
+            setupListeners()
+        } ?: run {
+            Toast.makeText(this, "Ошибка загрузки трека", Toast.LENGTH_LONG).show()
+            finish()
+        }
 
-        currentTimeTextView = findViewById(R.id.current_time)  // Инициализируем TextView для времени
-        playButton = findViewById(R.id.buttonPlay)
-
-        toolbar.setNavigationOnClickListener { finish() }
-
-        // Получаем данные из Intent
-        val intent = intent
-        val trackName = intent.getStringExtra("track_name")
+        // Достаём все переданные поля
+        val trackName = intent.getStringExtra("track_name") ?: "Unknown"
+        val artistName = intent.getStringExtra("artist_name") ?: "Unknown"
+        val trackTimeMillis = intent.getStringExtra("track_time")?.toLongOrNull() ?: 0
+        val artworkUrl512 = intent.getStringExtra("album_cover") ?: ""
+        val previewUrl = intent.getStringExtra("preview_url")
+        Log.d("PLAYER_DEBUG", "Received previewUrl: $previewUrl")
+        val albumCover = intent.getStringExtra("album_cover")
         val collectionName = intent.getStringExtra("collection_name")
         val releaseYear = intent.getStringExtra("release_year")
-        val primaryGenreName = intent.getStringExtra("genre")
+        val genre = intent.getStringExtra("genre")
         val country = intent.getStringExtra("country")
-        val previewUrl = intent.getStringExtra("preview_url")
 
-        val artistName = intent.getStringExtra("artist_name")
-        val trackTimeMillis = intent.getStringExtra("track_time")
-        val albumCover = intent.getStringExtra("album_cover")
-        val trackTimeFormatted = trackTimeMillis?.toLongOrNull()?.let {
-            val minutes = it / 60000
-            val seconds = (it % 60000) / 1000
-            String.format("%02d:%02d", minutes, seconds)
-        } ?: getString(R.string.unknown_duration)
+        // Заполняем UI
+        findViewById<TextView>(R.id.track_name).text = trackName
+        findViewById<TextView>(R.id.artist_name).text = artistName
+        findViewById<TextView>(R.id.current_time).text = formatTime(trackTimeMillis)
 
-        // Заполняем название трека и имя исполнителя
-        trackNameTextView.text = trackName ?: getString(R.string.unknown_track)
-        artistNameTextView.text = artistName ?: getString(R.string.unknown_artist)
-
-        // Заполняем обложку
+        // Загружаем обложку
         Glide.with(this)
             .load(albumCover)
-            .placeholder(R.drawable.my_awesome_placeholder)
-            .into(albumCoverImageView)
+            .into(findViewById(R.id.track_cover))
 
-        // Обработка кнопки Play
-        playButton.setOnClickListener {
-            Log.d("AudioPlayer", "Play button clicked. isPlaying: $isPlaying, currentTrackPosition: $currentTrackPosition")
+        // Добавляем параметры трека (альбом, год, жанр и т.д.)
+        val trackInfoContainer = findViewById<LinearLayout>(R.id.track_info_container)
+        trackInfoContainer.removeAllViews()
 
-            if (isPlaying) {
-                Log.d("AudioPlayer", "Pausing the track")
-                pauseTrack()  // Приостанавливаем воспроизведение
-            } else {
-                // Если трек был приостановлен, продолжаем с текущей позиции
-                if (currentTrackPosition > 0) {
-                    Log.d("AudioPlayer", "Resuming track from position: $currentTrackPosition")
-                    mediaPlayer.seekTo(currentTrackPosition)  // Восстанавливаем позицию
-                    mediaPlayer.start()  // Продолжаем воспроизведение
-                    isPlaying = true
-                    findViewById<ImageButton>(R.id.buttonPlay).setImageResource(R.drawable.ic_pause)  // Меняем иконку на "Pause"
-                    startUpdatingTime()  // Начинаем обновление времени
-                } else {
-                    // Если трек ещё не был проигран, начинаем его с начала
-                    Log.d("AudioPlayer", "Starting new track from the beginning")
-                    previewUrl?.let { url -> startTrack(url) }
+        val params = listOfNotNull(
+            "Длительность" to formatTime(trackTimeMillis),
+            "Альбом" to collectionName,
+            "Год" to releaseYear,
+            "Жанр" to genre,
+            "Страна" to country
+        )
+
+        params.forEach { (param, value) ->
+            if (!value.isNullOrEmpty()) {
+                val row = LayoutInflater.from(this).inflate(R.layout.track_info_row, trackInfoContainer, false)
+                row.findViewById<TextView>(R.id.parameter_name).text = param
+                row.findViewById<TextView>(R.id.parameter_value).text = value
+                trackInfoContainer.addView(row)
+            }
+        }
+
+        val track = Track(
+            trackId = -1,  // Временный ID
+            trackName = trackName,
+            artistName = artistName,
+            trackTimeMillis = trackTimeMillis,
+            artworkUrl100 = artworkUrl512.replace("512x512bb.jpg", "100x100bb.jpg"), // Обратная замена
+            previewUrl = previewUrl
+        ).also {
+            Log.d("TRACK_INIT", "Track created: ${it.trackName}, URL: ${it.previewUrl}")
+        }
+
+        setupUI(track)
+        setupObservers()
+        setupListeners()
+    }
+
+    private fun setupUI(track: Track) {
+        binding.trackName.setText(track.trackName)
+        binding.artistName.setText(track.artistName)
+        Glide.with(this)
+            .load(track.getArtworkUrl512())
+            .into(binding.trackCover)
+    }
+
+    private fun setupObservers() {
+        // LiveData
+        viewModel.playerState.observe(this) { state ->
+            Log.d("PLAYER_DEBUG", "Player state changed: $state")
+            when (state) {
+                is PlayerViewModel.PlayerState.PLAYING ->
+                    binding.buttonPlay.setImageResource(R.drawable.ic_pause)
+                is PlayerViewModel.PlayerState.PAUSED ->
+                    binding.buttonPlay.setImageResource(R.drawable.ic_play)
+                is PlayerViewModel.PlayerState.ERROR ->
+                    Toast.makeText(this, "Ошибка: ${state.message}", Toast.LENGTH_SHORT).show()
+                else -> {}
+            }
+        }
+
+        // StateFlow (коллектим в корутине)
+        lifecycleScope.launch {
+            viewModel.progress.collectLatest { position ->
+                val minutes = position / 60000
+                val seconds = (position % 60000) / 1000
+                binding.currentTime.setText(String.format("%02d:%02d", minutes, seconds))
+            }
+        }
+    }
+
+    private fun setupListeners() {
+        binding.buttonPlay.setOnClickListener {
+            viewModel.playerState.value?.let { state ->
+                when (state) {
+                    PlayerViewModel.PlayerState.IDLE -> track?.let(viewModel::playTrack)
+                    PlayerViewModel.PlayerState.PLAYING -> viewModel.togglePlayPause()
+                    PlayerViewModel.PlayerState.PAUSED -> viewModel.togglePlayPause()
+                    else -> {}
                 }
             }
         }
-
-
-        // Динамически добавляем параметры в trackInfoContainer
-        val parameters = listOfNotNull(
-            "Длительность" to trackTimeFormatted.takeIf { it.isNotEmpty() },
-            "Альбом" to collectionName.takeIf { !collectionName.isNullOrEmpty() },
-            "Год" to releaseYear.takeIf { !releaseYear.isNullOrEmpty() },
-            "Жанр" to (intent.getStringExtra("genre") ?: primaryGenreName).takeIf { !it.isNullOrEmpty() },
-            "Страна" to country.takeIf { !country.isNullOrEmpty() }
-        )
-
-        // Очищаем контейнер перед добавлением новых элементов
-        trackInfoContainer.removeAllViews()
-
-        // Добавляем каждую пару параметров
-        for ((param, value) in parameters) {
-            if (!value.isNullOrEmpty()) {
-                val rowView = LayoutInflater.from(this).inflate(R.layout.track_info_row, trackInfoContainer, false)
-                rowView.findViewById<TextView>(R.id.parameter_name).text = param
-                rowView.findViewById<TextView>(R.id.parameter_value).text = value
-                trackInfoContainer.addView(rowView)
-            }
-        }
-
-        // Настроим кнопку "Like"
-        val likeButton: ImageButton = findViewById(R.id.buttonLike)
-        likeButton.setOnClickListener {
-            val isSelected = likeButton.isSelected
-            likeButton.isSelected = !isSelected
-
-            if (likeButton.isSelected) {
-                Toast.makeText(this, "Liked!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Unliked!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        // Настроим кнопку "Добавить в плейлист"
-        val addToPlaylistButton: ImageButton = findViewById(R.id.buttonAdd)
-        addToPlaylistButton.setOnClickListener {
-            val isSelected = addToPlaylistButton.isSelected
-            addToPlaylistButton.isSelected = !isSelected
-
-            if (addToPlaylistButton.isSelected) {
-                Toast.makeText(this, "Added!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Deleted!", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
-    override fun onPause() {                                                                        // Приостанавливаем медиаплеер при уходе в фоновый режим
-        super.onPause()
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
-            pauseTrack()                                                                            // Автоматически ставим трек на паузу при сворачивании приложения
-            currentTrackPosition = mediaPlayer.currentPosition                                      // Сохраняем текущую позицию
-        }
+    private fun formatTime(millis: Long): String {
+        val minutes = millis / 60000
+        val seconds = (millis % 60000) / 1000
+        return String.format("%02d:%02d", minutes, seconds)
     }
 
-    override fun onResume() {                                                                       // Восстанавливаем воспроизведение при возвращении в активное состояние
-        super.onResume()
-        if (currentTrackPosition > 0) {
-            mediaPlayer.seekTo(currentTrackPosition)                                                // Восстанавливаем позицию
-            if (isPlaying) {
-                mediaPlayer.start()                                                                 // Продолжаем воспроизведение
-            }
-        }
-    }
+    private fun createTrackFromIntent(): Track? {
 
-    private fun startTrack(url: String) {
-        try {
-            mediaPlayer.reset()                                                                     // Сбрасываем текущий плеер
-            mediaPlayer.setDataSource(url)                                                          // Устанавливаем источник
-            mediaPlayer.prepareAsync()                                                              // Асинхронная подготовка плеера
-
-            mediaPlayer.setOnPreparedListener {
-                mediaPlayer.start()                                                                 // Стартуем плеер
-                isPlaying = true
-                findViewById<ImageButton>(R.id.buttonPlay).setImageResource(R.drawable.ic_pause)    // Меняем иконку на "Pause"
-                startUpdatingTime()                                                                 // Начинаем обновление времени
-            }
-
-            mediaPlayer.setOnCompletionListener {
-                stopTrack()                                                                         // Останавливаем трек по завершению
-            }
+        return try {
+            Track(
+                trackId = -1,
+                trackName = intent.getStringExtra("track_name") ?: return null,
+                artistName = intent.getStringExtra("artist_name") ?: return null,
+                trackTimeMillis = intent.getStringExtra("track_time")?.toLongOrNull() ?: 0,
+                artworkUrl100 = intent.getStringExtra("album_cover")?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
+                previewUrl = intent.getStringExtra("preview_url") ?: return null
+            )
         } catch (e: Exception) {
-            Log.e("AudioPlayer", "Error playing track: $e")
+            Log.e("TRACK_CREATION", "Error creating track", e)
+            null
         }
-    }
-
-    private fun pauseTrack() {
-        mediaPlayer.pause()
-        isPlaying = false
-        currentTrackPosition = mediaPlayer.currentPosition
-        findViewById<ImageButton>(R.id.buttonPlay).setImageResource(R.drawable.ic_play)             // Меняем иконку на "Play"
-        handler.removeCallbacks(updateTimeRunnable)                                                 // Останавливаем обновление времени
-    }
-
-    private fun stopTrack() {
-        mediaPlayer.stop()
-        isPlaying = false
-        findViewById<ImageButton>(R.id.buttonPlay).setImageResource(R.drawable.ic_play)             // Меняем иконку на "Play"
-        handler.removeCallbacks(updateTimeRunnable)                                                 // Останавливаем обновление времени
-    }
-
-    private val updateTimeRunnable: Runnable = object : Runnable {                                  // Обновление времени
-        override fun run() {
-            if (mediaPlayer.isPlaying) {
-                val currentPosition = mediaPlayer.currentPosition
-                val duration = mediaPlayer.duration                                                 // Берём продолжительность из медиаплеера
-                val remainingTime = duration - currentPosition - 1000
-
-                val minutes = remainingTime / 60000
-                val seconds = (remainingTime % 60000) / 1000
-                currentTimeTextView.text = String.format("%02d:%02d", minutes, seconds)
-
-                handler.postDelayed(this, 1000)                                         // Запускаем обновление времени каждую секунду
-            }
-        }
-    }
-
-    private fun startUpdatingTime() {
-        handler.post(updateTimeRunnable)                                                            // Начинаем обновление времени
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer.release()                                                                       // Освобождаем ресурсы плеера
-        handler.removeCallbacks(updateTimeRunnable)                                                 // Убираем все запланированные обновления времени
     }
 }
