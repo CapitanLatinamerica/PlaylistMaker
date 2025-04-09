@@ -56,8 +56,4 @@ class App : Application() {
             .putBoolean(PREFERENCE_THEME_KEY, isDarkTheme)
             .apply()
     }
-
-    fun isDarkThemeEnabled(): Boolean {
-        return currentTheme is ThemeMode.Dark
-    }
 }

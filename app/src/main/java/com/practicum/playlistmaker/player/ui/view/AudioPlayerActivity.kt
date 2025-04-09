@@ -20,6 +20,7 @@ import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.player.data.Constants
 
 class AudioPlayerActivity : AppCompatActivity() {
 
@@ -61,14 +62,14 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
 
         // Получение данных о треке из Intent
-        val trackName = intent.getStringExtra("track_name") ?: "Unknown"
-        val artistName = intent.getStringExtra("artist_name") ?: "Unknown"
-        val trackTimeMillis = intent.getStringExtra("track_time")?.toLongOrNull() ?: 0
-        val albumCover = intent.getStringExtra("album_cover")
-        val collectionName = intent.getStringExtra("collection_name")
-        val releaseYear = intent.getStringExtra("release_year")
-        val genre = intent.getStringExtra("genre")
-        val country = intent.getStringExtra("country")
+        val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: "Unknown"
+        val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: "Unknown"
+        val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0
+        val albumCover = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
+        val collectionName = intent.getStringExtra(Constants.Extra.COLLECTION_NAME)
+        val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
+        val genre = intent.getStringExtra(Constants.Extra.GENRE)
+        val country = intent.getStringExtra(Constants.Extra.COUNTRY)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -187,15 +188,14 @@ class AudioPlayerActivity : AppCompatActivity() {
         return try {
             Track(
                 trackId = -1,
-                trackName = intent.getStringExtra("track_name") ?: return null,
-                artistName = intent.getStringExtra("artist_name") ?: return null,
-                trackTimeMillis = intent.getStringExtra("track_time")?.toLongOrNull() ?: 0,
-                artworkUrl100 = intent.getStringExtra("album_cover")
+                trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: return null,
+                artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: return null,
+                trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
+                artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
                     ?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
-                previewUrl = intent.getStringExtra("preview_url") ?: return null
+                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null
             )
         } catch (e: Exception) {
-            Log.e("TRACK_CREATION", "Error creating track", e)
             null
         }
     }

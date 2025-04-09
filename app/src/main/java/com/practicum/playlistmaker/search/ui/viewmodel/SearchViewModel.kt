@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
-import com.practicum.playlistmaker.search.domain.SearchHistoryInteractor
-import com.practicum.playlistmaker.search.domain.SearchInteractor
+import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
+import com.practicum.playlistmaker.search.domain.interactor.SearchInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -24,6 +24,9 @@ class SearchViewModel(
     enum class SearchScreenState {
         HISTORY, RESULTS, EMPTY_RESULTS, ERROR, IDLE
     }
+
+    private val _state = MutableLiveData<SearchState>(SearchState.Idle)
+    val state: LiveData<SearchState> = _state
 
     private val _screenState = MutableLiveData<SearchScreenState>()
     val screenState: LiveData<SearchScreenState> = _screenState
@@ -59,11 +62,9 @@ class SearchViewModel(
     }
 
     fun searchTracks(query: String) {
-        Log.d(TAG, "Search request for: '$query'")
         currentQuery = query
 
         if (query.isBlank()) {
-            Log.d(TAG, "Query is blank, showing history")
             loadSearchHistory()
             return
         }
@@ -76,27 +77,21 @@ class SearchViewModel(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             try {
-                Log.d(TAG, "Starting network request")
                 val tracks = searchInteractor.searchTracks(query)
-                Log.d(TAG, "Received ${tracks.size} tracks")
 
                 if (tracks.isEmpty()) {
-                    Log.d(TAG, "No tracks found")
                     _screenState.value = SearchScreenState.EMPTY_RESULTS
                     _error.value = "NO_RESULTS"
                 } else {
-                    Log.d(TAG, "Showing results")
                     _screenState.value = SearchScreenState.RESULTS
                 }
                 _searchResults.value = tracks
             } catch (e: Exception) {
-                Log.e(TAG, "Search error", e)
                 _screenState.value = SearchScreenState.ERROR
                 _error.value = "NETWORK_ERROR"
                 _searchResults.value = emptyList()
             } finally {
                 _isLoading.value = false
-                Log.d(TAG, "Search completed")
             }
         }
     }
@@ -139,4 +134,13 @@ class SearchViewModel(
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+}
+
+sealed class SearchState {
+    data class History(val tracks: List<Track>) : SearchState()
+    data class Results(val tracks: List<Track>, val query: String) : SearchState()
+    object EmptyResults : SearchState()
+    object Error : SearchState()
+    object Loading : SearchState()
+    object Idle : SearchState()
 }

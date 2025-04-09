@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.search.data
 
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.data.network.ITunesService
+import com.practicum.playlistmaker.search.domain.repository.SearchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

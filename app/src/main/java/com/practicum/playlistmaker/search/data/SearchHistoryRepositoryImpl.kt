@@ -3,10 +3,12 @@ package com.practicum.playlistmaker.search.data
 import android.content.SharedPreferences
 import android.util.Log
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : SearchHistoryRepository {
+class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) :
+    SearchHistoryRepository {
 
     companion object {
         private const val HISTORY_KEY = "search_history"

@@ -1,7 +1,8 @@
 package com.practicum.playlistmaker.search.domain
 
 import com.practicum.playlistmaker.player.domain.Track
-import com.practicum.playlistmaker.search.data.SearchRepository
+import com.practicum.playlistmaker.search.domain.interactor.SearchInteractor
+import com.practicum.playlistmaker.search.domain.repository.SearchRepository
 
 class SearchInteractorImpl(
     private val searchRepository: SearchRepository

@@ -2,8 +2,8 @@ package com.practicum.playlistmaker.search.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.practicum.playlistmaker.search.domain.SearchInteractor
-import com.practicum.playlistmaker.search.domain.SearchHistoryInteractor
+import com.practicum.playlistmaker.search.domain.interactor.SearchInteractor
+import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 
 class SearchViewModelFactory(
     private val searchInteractorImpl: SearchInteractor,

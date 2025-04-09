@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.settings.ui.viewmodel;
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,9 +23,7 @@ class SettingsViewModel(
                 settingsInteractor.changeTheme(isDark)  // Меняем тему через интерактор
                 _isDarkTheme.value = isDark  // Обновляем LiveData для UI
                 App.instance.switchTheme(isDark) // Применяем тему в Application
-                Log.d("Theme", "Switching theme to: $isDark")  // Логируем корректное значение
         }
-
 
         fun shareApp() {
                 sharingInteractor.shareApp()

@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.player.ui.TimeFormatter
 
 // Адаптер для отображения списка треков
 class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
@@ -64,7 +65,7 @@ class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapte
             // Устанавливаем текст в TextView
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = track.trackTime
+            trackTime.text = TimeFormatter.formatTrackTime(track.trackTimeMillis)
 
             //Пересчитываю разметку для треков внизу списка
             artistName.requestLayout()

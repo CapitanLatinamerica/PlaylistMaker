@@ -1,9 +1,9 @@
 package com.practicum.playlistmaker.settings.ui
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
@@ -34,6 +34,19 @@ class SettingsActivity : AppCompatActivity() {
         // Переключаем тему через ViewModel
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.toggleTheme(isChecked)
+        }
+
+        // Добавляем обработчики для кнопок
+        findViewById<TextView>(R.id.button_share_app).setOnClickListener {
+            viewModel.shareApp()
+        }
+
+        findViewById<TextView>(R.id.button_help).setOnClickListener {
+            viewModel.contactSupport()
+        }
+
+        findViewById<TextView>(R.id.button_licence).setOnClickListener {
+            viewModel.openTerms()
         }
     }
 }
