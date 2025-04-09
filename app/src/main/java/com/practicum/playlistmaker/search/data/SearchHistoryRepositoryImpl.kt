@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.search.data
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
 import kotlinx.serialization.encodeToString
@@ -42,7 +41,6 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
 
             sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(history)).apply()            // Сохраняем историю в SharedPreferences
         } catch (e: Exception) {
-            Log.e("SearchHistoryRepository", "Error saving track to history: ${e.message}", e)
         }
     }
 

@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,16 +16,9 @@ class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "SearchViewModel"
-    }
-
     enum class SearchScreenState {
         HISTORY, RESULTS, EMPTY_RESULTS, ERROR, IDLE
     }
-
-    private val _state = MutableLiveData<SearchState>(SearchState.Idle)
-    val state: LiveData<SearchState> = _state
 
     private val _screenState = MutableLiveData<SearchScreenState>()
     val screenState: LiveData<SearchScreenState> = _screenState
@@ -41,13 +33,11 @@ class SearchViewModel(
     val searchResults: LiveData<List<Track>> = _searchResults
 
     private val _error = MutableLiveData<String>()
-    val error: LiveData<String> = _error
 
     private var currentQuery: String = ""
     private var searchJob: Job? = null
 
     init {
-        Log.d(TAG, "ViewModel initialized")
         loadSearchHistory()
     }
 
@@ -97,19 +87,12 @@ class SearchViewModel(
     }
 
     fun saveTrackToHistory(track: Track) {
-        Log.d(TAG, "Saving track to history: ${track.trackName}")
         viewModelScope.launch {
-            try {
                 searchHistoryInteractor.saveTrack(track)
-                Log.d(TAG, "Track saved successfully")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error saving track", e)
-            }
         }
     }
 
     fun clearSearchHistory() {
-        Log.d(TAG, "Clearing search history")
         viewModelScope.launch {
             searchHistoryInteractor.clearHistory()
             loadSearchHistory()
@@ -117,7 +100,6 @@ class SearchViewModel(
     }
 
     fun clearSearchResults() {
-        Log.d(TAG, "Clearing search results")
         _searchResults.value = emptyList()
         loadSearchHistory()
     }
@@ -134,13 +116,4 @@ class SearchViewModel(
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-}
-
-sealed class SearchState {
-    data class History(val tracks: List<Track>) : SearchState()
-    data class Results(val tracks: List<Track>, val query: String) : SearchState()
-    object EmptyResults : SearchState()
-    object Error : SearchState()
-    object Loading : SearchState()
-    object Idle : SearchState()
 }

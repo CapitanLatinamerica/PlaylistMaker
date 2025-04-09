@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.search.ui
 
-import android.util.Log
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -32,9 +31,6 @@ import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 
 class SearchActivity : AppCompatActivity() {
 
-    companion object {
-        private const val TAG = "SearchActivity"
-    }
 
     private lateinit var viewModel: SearchViewModel
     private lateinit var imm: InputMethodManager
@@ -56,7 +52,6 @@ class SearchActivity : AppCompatActivity() {
     private val debounceDelay: Long = 500
     private val debounceRunnable = Runnable {
         val query = inputEditText.text.toString()
-        Log.d(TAG, "Executing search for: '$query'")
         if (query.isBlank()) {
             viewModel.clearSearchResults()
         } else {
@@ -67,7 +62,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        Log.d(TAG, "Activity created")
 
         imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
@@ -84,7 +78,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        Log.d(TAG, "Initializing views")
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
         floatingContainer = findViewById(R.id.floating_container)
         inputEditText = findViewById(R.id.findEditText)
@@ -98,42 +91,35 @@ class SearchActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progress_bar)
 
         toolbar.setNavigationOnClickListener {
-            Log.d(TAG, "Back button clicked")
             finish()
         }
     }
 
     private fun setupRecyclerView() {
-        Log.d(TAG, "Setting up RecyclerView")
         trackAdapter = TrackAdapter(mutableListOf())
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
         trackRecyclerView.adapter = trackAdapter
 
         trackAdapter.setOnItemClickListener { track ->
-            Log.d(TAG, "Track clicked: ${track.trackName}")
             viewModel.saveTrackToHistory(track)
             openAudioPlayer(track)
         }
     }
 
     private fun setupListeners() {
-        Log.d(TAG, "Setting up listeners")
 
         clearIcon.setOnClickListener {
-            Log.d(TAG, "Clear button clicked")
             clearInputText()
             viewModel.clearSearchResults()
             hideKeyboard()
         }
 
         clearHistoryButton.setOnClickListener {
-            Log.d(TAG, "Clear history button clicked")
             viewModel.clearSearchHistory()
         }
 
         retryButton.setOnClickListener {
             val query = inputEditText.text.toString()
-            Log.d(TAG, "Retry button clicked, query: '$query'")
             viewModel.searchTracks(query)
         }
 
@@ -141,7 +127,6 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                Log.d(TAG, "Text changed: '${s.toString()}'")
                 clearIcon.isVisible = !s.isNullOrEmpty()
                 handler.removeCallbacks(debounceRunnable)
 
@@ -158,10 +143,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        Log.d(TAG, "Setting up observers")
 
         viewModel.screenState.observe(this) { state ->
-            Log.d(TAG, "Screen state changed: $state")
             when (state) {
                 SearchViewModel.SearchScreenState.HISTORY -> showHistoryState()
                 SearchViewModel.SearchScreenState.RESULTS -> showResultsState()
@@ -172,24 +155,20 @@ class SearchActivity : AppCompatActivity() {
         }
 
         viewModel.searchResults.observe(this) { tracks ->
-            Log.d(TAG, "Search results updated: ${tracks.size} tracks")
             trackAdapter.updateTracks(tracks)
         }
 
         viewModel.isLoading.observe(this) { isLoading ->
-            Log.d(TAG, "Loading state: $isLoading")
             progressBar.isVisible = isLoading
             trackRecyclerView.isVisible = !isLoading
         }
 
         viewModel.history.observe(this) { history ->
-            Log.d(TAG, "History updated: ${history.size} items")
             trackAdapter.updateTracks(history)
         }
     }
 
     private fun showHistoryState() {
-        Log.d(TAG, "Showing history state")
         historyTitle.isVisible = viewModel.history.value?.isNotEmpty() == true
         clearHistoryButton.isVisible = viewModel.history.value?.isNotEmpty() == true
         trackRecyclerView.isVisible = true
@@ -197,7 +176,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showResultsState() {
-        Log.d(TAG, "Showing results state")
         historyTitle.isVisible = false
         clearHistoryButton.isVisible = false
         trackRecyclerView.isVisible = true
@@ -205,7 +183,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showEmptyResultsState() {
-        Log.d(TAG, "Showing empty results state")
         historyTitle.isVisible = false
         clearHistoryButton.isVisible = false
         showError(
@@ -216,7 +193,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showErrorState() {
-        Log.d(TAG, "Showing error state")
         historyTitle.isVisible = false
         clearHistoryButton.isVisible = false
         showError(
@@ -262,7 +238,7 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.clearFocus()
         hideKeyboard()
         viewModel.searchTracks("")
-        viewModel.loadSearchHistory() // Загружаем историю поиска
+        viewModel.loadSearchHistory()
         clearIcon.isVisible = false
     }
 
