@@ -17,17 +17,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.player.TrackAdapter
 import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
+import com.practicum.playlistmaker.search.data.dto.SearchScreenState
+import com.practicum.playlistmaker.search.data.dto.SearchScreenUiState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
+import kotlinx.coroutines.flow.collect
 
 class SearchActivity : AppCompatActivity() {
 
@@ -143,63 +147,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-
-        viewModel.screenState.observe(this) { state ->
-            when (state) {
-                SearchViewModel.SearchScreenState.HISTORY -> showHistoryState()
-                SearchViewModel.SearchScreenState.RESULTS -> showResultsState()
-                SearchViewModel.SearchScreenState.EMPTY_RESULTS -> showEmptyResultsState()
-                SearchViewModel.SearchScreenState.ERROR -> showErrorState()
-                SearchViewModel.SearchScreenState.IDLE -> {}
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiState.collect { state ->
+                render(state)
             }
         }
-
-        viewModel.searchResults.observe(this) { tracks ->
-            trackAdapter.updateTracks(tracks)
-        }
-
-        viewModel.isLoading.observe(this) { isLoading ->
-            progressBar.isVisible = isLoading
-            trackRecyclerView.isVisible = !isLoading
-        }
-
-        viewModel.history.observe(this) { history ->
-            trackAdapter.updateTracks(history)
-        }
-    }
-
-    private fun showHistoryState() {
-        historyTitle.isVisible = viewModel.history.value?.isNotEmpty() == true
-        clearHistoryButton.isVisible = viewModel.history.value?.isNotEmpty() == true
-        trackRecyclerView.isVisible = true
-        hideError()
-    }
-
-    private fun showResultsState() {
-        historyTitle.isVisible = false
-        clearHistoryButton.isVisible = false
-        trackRecyclerView.isVisible = true
-        hideError()
-    }
-
-    private fun showEmptyResultsState() {
-        historyTitle.isVisible = false
-        clearHistoryButton.isVisible = false
-        showError(
-            getString(R.string.nothing_founded),
-            R.drawable.ic_no_results,
-            showRetryButton = false
-        )
-    }
-
-    private fun showErrorState() {
-        historyTitle.isVisible = false
-        clearHistoryButton.isVisible = false
-        showError(
-            getString(R.string.no_internet_message),
-            R.drawable.ic_no_connection,
-            showRetryButton = true
-        )
     }
 
     private fun openAudioPlayer(track: Track) {
@@ -244,5 +196,35 @@ class SearchActivity : AppCompatActivity() {
 
     private fun hideKeyboard() {
         imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+    }
+
+    private fun render(state: SearchScreenUiState) {
+        progressBar.isVisible = state.isLoading
+        trackRecyclerView.isVisible = !state.isLoading
+        clearIcon.isVisible = inputEditText.text.isNotEmpty()
+
+        when (state.screenState) {
+            SearchScreenState.HISTORY -> {
+                trackAdapter.updateTracks(state.history)
+                historyTitle.isVisible = state.history.isNotEmpty()
+                clearHistoryButton.isVisible = state.history.isNotEmpty()
+                hideError()
+            }
+            SearchScreenState.RESULTS -> {
+                trackAdapter.updateTracks(state.searchResults)
+                historyTitle.isVisible = false
+                clearHistoryButton.isVisible = false
+                hideError()
+            }
+            SearchScreenState.EMPTY_RESULTS -> {
+                showError(getString(R.string.nothing_founded), R.drawable.ic_no_results, false)
+            }
+            SearchScreenState.ERROR -> {
+                showError(getString(R.string.no_internet_message), R.drawable.ic_no_connection, true)
+            }
+            SearchScreenState.IDLE -> {
+                // Ничего не делаем
+            }
+        }
     }
 }

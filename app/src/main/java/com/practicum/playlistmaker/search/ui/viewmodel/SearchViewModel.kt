@@ -6,9 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.search.data.dto.SearchScreenState
+import com.practicum.playlistmaker.search.data.dto.SearchScreenUiState
 import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.interactor.SearchInteractor
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -16,23 +20,9 @@ class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor
 ) : ViewModel() {
 
-    enum class SearchScreenState {
-        HISTORY, RESULTS, EMPTY_RESULTS, ERROR, IDLE
-    }
+    private val _uiState = MutableStateFlow(SearchScreenUiState())
+    val uiState: StateFlow<SearchScreenUiState> = _uiState
 
-    private val _screenState = MutableLiveData<SearchScreenState>()
-    val screenState: LiveData<SearchScreenState> = _screenState
-
-    private val _history = MutableLiveData<List<Track>>()
-    val history: LiveData<List<Track>> = _history
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _searchResults = MutableLiveData<List<Track>>()
-    val searchResults: LiveData<List<Track>> = _searchResults
-
-    private val _error = MutableLiveData<String>()
 
     private var currentQuery: String = ""
     private var searchJob: Job? = null
@@ -44,11 +34,22 @@ class SearchViewModel(
     fun loadSearchHistory() {
         val history = searchHistoryInteractor.getHistory()
         if (history.isNullOrEmpty()) {
-            _history.value = emptyList()
+            _uiState.value = SearchScreenUiState(
+                isLoading = false,
+                screenState = SearchScreenState.HISTORY,
+                searchResults = emptyList(),
+                history = emptyList(),
+                errorMessage = null
+            )
         } else {
-            _history.value = history
+            _uiState.value = SearchScreenUiState(
+                isLoading = false,
+                screenState = SearchScreenState.HISTORY,
+                searchResults = emptyList(),
+                history = history,
+                errorMessage = null
+            )
         }
-        _screenState.value = SearchScreenState.HISTORY
     }
 
     fun searchTracks(query: String) {
@@ -59,10 +60,13 @@ class SearchViewModel(
             return
         }
 
-        _isLoading.value = true
-        _screenState.value = SearchScreenState.IDLE
-        _history.value = emptyList()
-        _error.value = ""
+        _uiState.value = SearchScreenUiState(
+            isLoading = true,
+            screenState = SearchScreenState.IDLE,
+            searchResults = emptyList(),
+            history = emptyList(),
+            errorMessage = null
+        )
 
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -70,25 +74,37 @@ class SearchViewModel(
                 val tracks = searchInteractor.searchTracks(query)
 
                 if (tracks.isEmpty()) {
-                    _screenState.value = SearchScreenState.EMPTY_RESULTS
-                    _error.value = "NO_RESULTS"
+                    _uiState.value = SearchScreenUiState(
+                        isLoading = false,
+                        screenState = SearchScreenState.EMPTY_RESULTS,
+                        searchResults = emptyList(),
+                        history = emptyList(),
+                        errorMessage = "NO_RESULTS"
+                    )
                 } else {
-                    _screenState.value = SearchScreenState.RESULTS
+                    _uiState.value = SearchScreenUiState(
+                        isLoading = false,
+                        screenState = SearchScreenState.RESULTS,
+                        searchResults = tracks,
+                        history = emptyList(),
+                        errorMessage = null
+                    )
                 }
-                _searchResults.value = tracks
             } catch (e: Exception) {
-                _screenState.value = SearchScreenState.ERROR
-                _error.value = "NETWORK_ERROR"
-                _searchResults.value = emptyList()
-            } finally {
-                _isLoading.value = false
+                _uiState.value = SearchScreenUiState(
+                    isLoading = false,
+                    screenState = SearchScreenState.ERROR,
+                    searchResults = emptyList(),
+                    history = emptyList(),
+                    errorMessage = "NETWORK_ERROR"
+                )
             }
         }
     }
 
     fun saveTrackToHistory(track: Track) {
         viewModelScope.launch {
-                searchHistoryInteractor.saveTrack(track)
+            searchHistoryInteractor.saveTrack(track)
         }
     }
 
@@ -100,8 +116,13 @@ class SearchViewModel(
     }
 
     fun clearSearchResults() {
-        _searchResults.value = emptyList()
-        loadSearchHistory()
+        _uiState.value = SearchScreenUiState(
+            isLoading = false,
+            screenState = SearchScreenState.HISTORY,
+            searchResults = emptyList(),
+            history = emptyList(),
+            errorMessage = null
+        )
     }
 
     class Factory(
