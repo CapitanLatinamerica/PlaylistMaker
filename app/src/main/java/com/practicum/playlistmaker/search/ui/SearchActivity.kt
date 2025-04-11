@@ -31,12 +31,14 @@ import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.search.data.dto.SearchScreenState
 import com.practicum.playlistmaker.search.data.dto.SearchScreenUiState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
-import kotlinx.coroutines.flow.collect
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
 
-    private lateinit var viewModel: SearchViewModel
+    // Получаем ViewModel через Koin
+    private val viewModel: SearchViewModel by viewModel()
+
     private lateinit var imm: InputMethodManager
 
     // UI элементы
@@ -70,10 +72,10 @@ class SearchActivity : AppCompatActivity() {
         imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
         // Инициализация ViewModel
-        val searchInteractor = Creator.provideSearchInteractor(this)
+/*        val searchInteractor = Creator.provideSearchInteractor(this)
         val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(applicationContext)
         val factory = SearchViewModel.Factory(searchInteractor, searchHistoryInteractor)
-        viewModel = ViewModelProvider(this, factory).get(SearchViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory).get(SearchViewModel::class.java)*/
 
         initViews()
         setupRecyclerView()
@@ -99,7 +101,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecyclerView() {
+/*    private fun setupRecyclerView() {
         trackAdapter = TrackAdapter(mutableListOf())
         trackRecyclerView.layoutManager = LinearLayoutManager(this)
         trackRecyclerView.adapter = trackAdapter
@@ -108,9 +110,22 @@ class SearchActivity : AppCompatActivity() {
             viewModel.saveTrackToHistory(track)
             openAudioPlayer(track)
         }
+    }*/
+
+    private fun setupRecyclerView() {
+        // Инициализация адаптера для списка треков
+        trackAdapter = TrackAdapter(mutableListOf()).apply {
+            setOnItemClickListener { track ->
+                viewModel.saveTrackToHistory(track)
+                openAudioPlayer(track)
+            }
+        }
+
+        trackRecyclerView.layoutManager = LinearLayoutManager(this)
+        trackRecyclerView.adapter = trackAdapter
     }
 
-    private fun setupListeners() {
+/*    private fun setupListeners() {
 
         clearIcon.setOnClickListener {
             clearInputText()
@@ -127,6 +142,43 @@ class SearchActivity : AppCompatActivity() {
             viewModel.searchTracks(query)
         }
 
+        inputEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                clearIcon.isVisible = !s.isNullOrEmpty()
+                handler.removeCallbacks(debounceRunnable)
+
+                if (!s.isNullOrEmpty()) {
+                    historyTitle.isVisible = false
+                    clearHistoryButton.isVisible = false
+                }
+
+                handler.postDelayed(debounceRunnable, debounceDelay)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }*/
+
+    private fun setupListeners() {
+        // Обработчики кликов
+        clearIcon.setOnClickListener {
+            clearInputText()
+            viewModel.clearSearchResults()
+            hideKeyboard()
+        }
+
+        clearHistoryButton.setOnClickListener {
+            viewModel.clearSearchHistory()
+        }
+
+        retryButton.setOnClickListener {
+            val query = inputEditText.text.toString()
+            viewModel.searchTracks(query)
+        }
+
+        // Обработчик ввода текста с дебаунсом
         inputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
