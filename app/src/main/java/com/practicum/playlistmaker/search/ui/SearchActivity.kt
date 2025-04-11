@@ -16,14 +16,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.player.TrackAdapter
 import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.domain.Track
@@ -31,12 +29,12 @@ import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.search.data.dto.SearchScreenState
 import com.practicum.playlistmaker.search.data.dto.SearchScreenUiState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
-import kotlinx.coroutines.flow.collect
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
+    // Получаем ViewModel через Koin
+    private val viewModel: SearchViewModel by viewModel()
 
-
-    private lateinit var viewModel: SearchViewModel
     private lateinit var imm: InputMethodManager
 
     // UI элементы
@@ -68,12 +66,6 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-
-        // Инициализация ViewModel
-        val searchInteractor = Creator.provideSearchInteractor(this)
-        val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(applicationContext)
-        val factory = SearchViewModel.Factory(searchInteractor, searchHistoryInteractor)
-        viewModel = ViewModelProvider(this, factory).get(SearchViewModel::class.java)
 
         initViews()
         setupRecyclerView()
@@ -111,7 +103,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-
+        // Обработчики кликов
         clearIcon.setOnClickListener {
             clearInputText()
             viewModel.clearSearchResults()
@@ -127,6 +119,7 @@ class SearchActivity : AppCompatActivity() {
             viewModel.searchTracks(query)
         }
 
+        // Обработчик ввода текста с дебаунсом
         inputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 

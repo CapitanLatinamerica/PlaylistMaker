@@ -1,9 +1,6 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.data.dto.SearchScreenState
@@ -22,7 +19,6 @@ class SearchViewModel(
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
     val uiState: StateFlow<SearchScreenUiState> = _uiState
-
 
     private var currentQuery: String = ""
     private var searchJob: Job? = null
@@ -104,7 +100,10 @@ class SearchViewModel(
 
     fun saveTrackToHistory(track: Track) {
         viewModelScope.launch {
-            searchHistoryInteractor.saveTrack(track)
+            try {
+                searchHistoryInteractor.saveTrack(track)
+            } catch (e: Exception) {
+            }
         }
     }
 
@@ -123,18 +122,5 @@ class SearchViewModel(
             history = emptyList(),
             errorMessage = null
         )
-    }
-
-    class Factory(
-        private val searchInteractor: SearchInteractor,
-        private val searchHistoryInteractor: SearchHistoryInteractor
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return SearchViewModel(searchInteractor, searchHistoryInteractor) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
     }
 }
