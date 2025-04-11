@@ -3,6 +3,11 @@ package com.practicum.playlistmaker.app
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.appModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.context.startKoin
+import org.koin.core.component.get
 
 const val PREFERENCE_NAME = "user_preferences"
 const val PREFERENCE_THEME_KEY = "is_dark_theme_enabled"
@@ -18,42 +23,38 @@ sealed class ThemeMode(val mode: Int) {
     }
 }
 
-class App : Application() {
-    companion object {
-        lateinit var instance: App                                                                  //Синглтон
-            private set
-    }
+class App : Application(), KoinComponent {
 
-    private lateinit var preferences: SharedPreferences
-    private lateinit var currentTheme: ThemeMode
+    // Убираем lateinit, переменная будет инициализироваться сразу
+    private var currentTheme: ThemeMode = ThemeMode.Light
 
     override fun onCreate() {
         super.onCreate()
-        instance = this // Инициализация синглтона
 
-        // Инициализация SharedPreferences
-        preferences = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE)
+        // Стартуем Koin
+        startKoin {
+            androidContext(this@App)
+            modules(appModule)
+        }
 
-        // Загрузка текущей темы
+        // Получаем SharedPreferences через Koin
+        val preferences: SharedPreferences = get()
         val isDarkTheme = preferences.getBoolean(PREFERENCE_THEME_KEY, false)
+
+        // Инициализируем тему
         currentTheme = ThemeMode.fromBoolean(isDarkTheme)
 
-        // Установка темы приложения
+        // Устанавливаем тему
         AppCompatDelegate.setDefaultNightMode(currentTheme.mode)
     }
 
+    // Метод для переключения темы
     fun switchTheme(isDarkTheme: Boolean) {
-        val newTheme = ThemeMode.fromBoolean(isDarkTheme)
-        if (currentTheme != newTheme) {
-            currentTheme = newTheme
-            AppCompatDelegate.setDefaultNightMode(newTheme.mode)
-            saveThemePreference(isDarkTheme)
-        }
-    }
+        val preferences: SharedPreferences = get()
+        preferences.edit().putBoolean(PREFERENCE_THEME_KEY, isDarkTheme).apply()
 
-    private fun saveThemePreference(isDarkTheme: Boolean) {
-        preferences.edit()
-            .putBoolean(PREFERENCE_THEME_KEY, isDarkTheme)
-            .apply()
+        // Обновляем тему
+        currentTheme = ThemeMode.fromBoolean(isDarkTheme)
+        AppCompatDelegate.setDefaultNightMode(currentTheme.mode)
     }
 }

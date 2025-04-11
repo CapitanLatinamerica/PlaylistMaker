@@ -9,13 +9,16 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.settings.ui.viewmodel.SettingsViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
+    private val viewModel: SettingsViewModel by viewModel()
+
     // Создаём ViewModel через ViewModelProvider
-    private val viewModel: SettingsViewModel by viewModels {
+/*    private val viewModel: SettingsViewModel by viewModels {
         Creator.provideSettingsViewModelFactory(this)
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

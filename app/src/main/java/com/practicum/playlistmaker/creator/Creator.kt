@@ -16,7 +16,6 @@ import com.practicum.playlistmaker.settings.data.ThemeRepository
 import com.practicum.playlistmaker.settings.data.ThemeRepositoryImpl
 import com.practicum.playlistmaker.settings.domain.SettingsInteractor
 import com.practicum.playlistmaker.settings.domain.SettingsInteractorImpl
-import com.practicum.playlistmaker.settings.ui.viewmodel.SettingsViewModelFactory
 import com.practicum.playlistmaker.sharing.data.SharingInteractorImpl
 import com.practicum.playlistmaker.sharing.data.SharingRepository
 import com.practicum.playlistmaker.sharing.data.SharingRepositoryImpl
@@ -25,7 +24,7 @@ import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 object Creator {
 
     // Создаем SharedPreferences
-    private fun provideSharedPreferences(): SharedPreferences {
+/*    private fun provideSharedPreferences(): SharedPreferences {
         return App.instance.getSharedPreferences("search_prefs", Context.MODE_PRIVATE)
     }
 
@@ -36,7 +35,7 @@ object Creator {
 
     // Создаем интерактор для настроек
     fun provideSettingsInteractor(): SettingsInteractor {
-        return SettingsInteractorImpl(provideThemeRepository(), App.instance) // Передаем контекст из App.instance
+        return SettingsInteractorImpl(provideThemeRepository())
     }
 
     // Создаем интерактор для обмена
@@ -47,15 +46,15 @@ object Creator {
     // Репозиторий для обмена
     fun provideSharingRepository(context: Context): SharingRepository {
         return SharingRepositoryImpl(context)
-    }
+    }*/
 
     // Фабрика для создания ViewModel для настроек
-    fun provideSettingsViewModelFactory(context: Context): ViewModelProvider.Factory {
+/*    fun provideSettingsViewModelFactory(context: Context): ViewModelProvider.Factory {
         return SettingsViewModelFactory(
             provideSharingInteractor(context),
             provideSettingsInteractor()
         )
-    }
+    }*/
 
     // Создаем репозиторий для истории поиска
     fun provideSearchHistoryRepository(context: Context): SearchHistoryRepository {
