@@ -25,7 +25,6 @@ sealed class ThemeMode(val mode: Int) {
 
 class App : Application(), KoinComponent {
 
-    // Убираем lateinit, переменная будет инициализироваться сразу
     private var currentTheme: ThemeMode = ThemeMode.Light
 
     override fun onCreate() {
@@ -37,15 +36,10 @@ class App : Application(), KoinComponent {
             modules(appModule)
         }
 
-        // Получаем SharedPreferences через Koin
-        val preferences: SharedPreferences = get()
+        val preferences: SharedPreferences = get()                                                  // Получаем SharedPreferences через Koin
         val isDarkTheme = preferences.getBoolean(PREFERENCE_THEME_KEY, false)
-
-        // Инициализируем тему
-        currentTheme = ThemeMode.fromBoolean(isDarkTheme)
-
-        // Устанавливаем тему
-        AppCompatDelegate.setDefaultNightMode(currentTheme.mode)
+        currentTheme = ThemeMode.fromBoolean(isDarkTheme)                                           // Инициализируем тему
+        AppCompatDelegate.setDefaultNightMode(currentTheme.mode)                                    // Устанавливаем тему
     }
 
     // Метод для переключения темы

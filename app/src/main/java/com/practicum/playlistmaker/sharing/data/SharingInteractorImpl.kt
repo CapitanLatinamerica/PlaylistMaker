@@ -1,17 +1,18 @@
 package com.practicum.playlistmaker.sharing.data
 
+import android.content.Context
 import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 
 class SharingInteractorImpl(private val sharingRepository: SharingRepository) : SharingInteractor {
-    override fun shareApp() {
-        sharingRepository.shareApp()
+    override fun shareApp(context: Context) {
+        sharingRepository.shareApp(context)
     }
 
-    override fun openTerms() {
-        sharingRepository.openTerms()
+    override fun openSupport(context: Context) {
+        sharingRepository.openSupport(context)
     }
 
-    override fun openSupport() {
-        sharingRepository.openSupport()
+    override fun openTerms(context: Context) {
+        sharingRepository.openTerms(context)
     }
 }

@@ -11,7 +11,7 @@ import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 class SettingsViewModel(
         private val sharingInteractor: SharingInteractor,
         private val settingsInteractor: SettingsInteractor,
-        private val context: Context
+        private val context: Context // Добавьте контекст
 ) : ViewModel() {
 
         private val _isDarkTheme = MutableLiveData<Boolean>()
@@ -27,15 +27,15 @@ class SettingsViewModel(
                 (context.applicationContext as App).switchTheme(isDark) // Применяем тему в Application
         }
 
-        fun shareApp() {
-                sharingInteractor.shareApp()
+        fun shareApp(context: Context) {
+                sharingInteractor.shareApp(context)
         }
 
-        fun openTerms() {
-                sharingInteractor.openTerms()
+        fun contactSupport(context: Context) {
+                sharingInteractor.openSupport(context)
         }
 
-        fun contactSupport() {
-                sharingInteractor.openSupport()
+        fun openTerms(context: Context) {
+                sharingInteractor.openTerms(context)
         }
 }
