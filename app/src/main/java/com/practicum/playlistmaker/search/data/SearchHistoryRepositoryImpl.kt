@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.search.data
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
 import kotlinx.serialization.encodeToString
@@ -11,27 +12,29 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
 
     companion object {
         private const val HISTORY_KEY = "search_history"
+        private const val TAG = "SearchHistoryRepo" // Тег для логов
     }
 
-    private fun toJsonList(tracks: List<Track>): String {                                           // Функция для сериализации списка объектов в JSON
-        return Json.encodeToString(tracks) // Кодируем список в JSON
+    private val jsonFormat = Json {
+        ignoreUnknownKeys = true // Игнорировать неизвестные ключи
+        coerceInputValues = true // Принудительно преобразовывать некорректные значения
     }
 
-    fun fromJsonList(json: String?): List<Track> {                                                  // Функция для десериализации списка объектов из JSON
-        return if (json.isNullOrEmpty()) {
+    private fun toJsonList(tracks: List<Track>): String {
+        return jsonFormat.encodeToString(tracks)
+    }
+
+    fun fromJsonList(json: String?): List<Track> {
+        return try {
+            jsonFormat.decodeFromString(json ?: "")
+        } catch (e: Exception) {
+            Log.e(TAG, "Ой, котик уронил JSON: ${e.message}")
             emptyList()
-        } else {
-            try {
-                Json.decodeFromString<List<Track>>(json)                                            // Используем kotlinx.serialization для десериализации
-            } catch (e: Exception) {
-                emptyList()                                                                         // Возвращаем пустой список в случае ошибки
-            }
         }
     }
 
     // Сохранение трека в историю
     override fun saveTrack(track: Track) {
-        try {
             val history = getHistory().toMutableList()
             if (history.size >= 10) {
                 history.removeAt(0)                                                           // Убираем самый старый элемент, если их больше 10
@@ -40,8 +43,6 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
             history.add(0, track)                                                             // Добавляем трек в начало списка
 
             sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(history)).apply()            // Сохраняем историю в SharedPreferences
-        } catch (e: Exception) {
-        }
     }
 
     // Получение списка треков из SharedPreferences
