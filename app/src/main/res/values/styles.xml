@@ -165,4 +165,13 @@
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
 
+    <style name="MyAwesomeTabLayout" parent="Widget.MaterialComponents.TabLayout.Colored">
+        <item name="titleTextColor">?attr/colorOnSecondary</item>
+        <item name="tabIndicatorColor">@color/yp_red</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="tabIndicatorAnimationMode">elastic</item>
+        <item name="tabIndicatorFullWidth">false</item>
+        <item name="tabIndicatorGravity">bottom</item>
+    </style>
+
 </resources>

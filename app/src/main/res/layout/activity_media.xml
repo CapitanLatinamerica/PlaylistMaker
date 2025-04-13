@@ -1,21 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mediateca"
+    android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/mediaLibraryText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/media_library"
-        android:gravity="center"
-        android:textSize="65sp"
-        android:maxLines="1"
-        android:ellipsize="end"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_media"
+        style="@style/MyAwesomeToolbar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navigationIcon="@drawable/arrow_back_light_mode"
+        app:title="@string/btn_media" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_media"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:tabIndicatorColor="@android:color/holo_red_light"
+        app:tabIndicatorHeight="2dp"
+        app:tabIndicatorGravity="bottom"
+
+        app:tabTextColor="?attr/colorOnSecondary"
+        app:tabMode="fixed"
+        app:tabGravity="fill"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
