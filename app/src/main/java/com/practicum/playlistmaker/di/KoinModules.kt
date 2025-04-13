@@ -1,8 +1,12 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.di
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
+import com.practicum.playlistmaker.main.data.NaviInteractorImpl
+import com.practicum.playlistmaker.main.domain.NaviInteractor
+import com.practicum.playlistmaker.main.ui.viewmodel.MainViewModel
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -23,11 +27,22 @@ import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
     val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
+
+        // Навигация
+        factory<NaviInteractor> { (activity: Activity) ->
+            NaviInteractorImpl(activity)
+        }
+
+        // ViewModel для MainActivity
+        viewModel { (activity: Activity) ->
+            MainViewModel(get { parametersOf(activity) })
+        }
 
         // Настройки темы
         single<ThemeRepository> { ThemeRepositoryImpl(get()) }
