@@ -1,4 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- для светлой темы -->
+    <style name="Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/yp_white</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/yp_black</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/yp_white</item>
+        <item name="colorOnSecondary">@color/yp_black</item>
+        <item name="android:background">@color/white</item>
+        <item name="clear_icon_color">@color/clear_icon_color_light</item>
+    </style>
+
     <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="colorPrimary">@color/yp_white</item>
