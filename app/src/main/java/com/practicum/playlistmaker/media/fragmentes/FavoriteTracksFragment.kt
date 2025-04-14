@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.R
 
 class FavoriteTracksFragment : Fragment() {
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

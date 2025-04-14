@@ -3,10 +3,13 @@ package com.practicum.playlistmaker.di
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.fragment.app.FragmentActivity
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
 import com.practicum.playlistmaker.main.data.NaviInteractorImpl
 import com.practicum.playlistmaker.main.domain.NaviInteractor
 import com.practicum.playlistmaker.main.ui.viewmodel.MainViewModel
+import com.practicum.playlistmaker.media.MediaPagerAdapter
+import com.practicum.playlistmaker.media.MediaViewModel
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -43,6 +46,10 @@ import org.koin.dsl.module
         viewModel { (activity: Activity) ->
             MainViewModel(get { parametersOf(activity) })
         }
+
+        // Медиатека
+        factory { (activity: Activity) -> MediaPagerAdapter(activity as FragmentActivity) }
+        viewModel { (activity: Activity) -> MediaViewModel(get { parametersOf(activity) }) }
 
         // Настройки темы
         single<ThemeRepository> { ThemeRepositoryImpl(get()) }

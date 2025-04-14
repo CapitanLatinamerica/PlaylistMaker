@@ -13,7 +13,7 @@ class MediaPagerAdapter(
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
-        return when (position) {
+        return when(position) {
             0 -> FavoriteTracksFragment()
             1 -> PlaylistsFragment()
             else -> throw IllegalArgumentException("Invalid position")

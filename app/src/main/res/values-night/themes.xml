@@ -2,6 +2,7 @@
 
     <style name="Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/yp_white</item>
+        <item name="colorPrimaryDark">@color/yp_black</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/yp_black</item>
         <item name="colorSecondary">@color/teal_200</item>
@@ -13,7 +14,7 @@
     </style>
 
     <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/yp_black</item>
         <item name="colorPrimary">@color/yp_white</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/black</item>
@@ -24,4 +25,6 @@
         <item name="clear_icon_color">@color/clear_icon_color_light</item>
         <item name="right_arrow_color">@color/arrow_icon_color_light</item>
     </style>
+
+
 </resources>
