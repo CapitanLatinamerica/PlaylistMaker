@@ -7,7 +7,7 @@
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/yp_black</item>
         <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/yp_red</item>
+        <item name="colorSecondaryVariant">@color/yp_white</item>
         <item name="colorOnSecondary">@color/yp_black</item>
         <item name="android:background">@color/white</item>
         <item name="clear_icon_color">@color/clear_icon_color_light</item>
@@ -26,17 +26,10 @@
         <item name="right_arrow_color">@color/arrow_icon_color_light</item>
     </style>
 
-    <style name="Awesome.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Awesome.Theme.PlaylistMaker" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:statusBarColor">@color/yp_black</item>
         <item name="colorPrimary">@color/yp_black</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/yp_white</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="android:background">@color/teal_200</item>
-        <item name="clear_icon_color">@color/clear_icon_color_light</item>
-        <item name="right_arrow_color">@color/arrow_icon_color_light</item>
     </style>
 
 </resources>

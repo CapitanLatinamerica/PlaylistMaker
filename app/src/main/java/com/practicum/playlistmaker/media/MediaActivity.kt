@@ -18,10 +18,11 @@ class MediaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
 
+        // Минимальный функционал для проверки
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar_media)
         toolbar.setNavigationOnClickListener { finish() }
 
-        val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
+        val tabLayout = findViewById<TabLayout>(R.id.tabs)
         val viewPager = findViewById<ViewPager2>(R.id.view_pager)
 
         // Получаем адаптер из ViewModel

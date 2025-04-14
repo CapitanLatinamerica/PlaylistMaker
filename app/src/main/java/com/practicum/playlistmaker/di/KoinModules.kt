@@ -47,7 +47,8 @@ import org.koin.dsl.module
             MainViewModel(get { parametersOf(activity) })
         }
 
-        // Медиатека
+
+        // TEST Медиатека
         factory { (activity: Activity) -> MediaPagerAdapter(activity as FragmentActivity) }
         viewModel { (activity: Activity) -> MediaViewModel(get { parametersOf(activity) }) }
 

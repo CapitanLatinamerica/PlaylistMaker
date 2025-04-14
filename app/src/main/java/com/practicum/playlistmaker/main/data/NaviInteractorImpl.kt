@@ -2,8 +2,8 @@ package com.practicum.playlistmaker.main.data
 
 import android.app.Activity
 import android.content.Intent
-import com.practicum.playlistmaker.main.domain.NaviInteractor
 import com.practicum.playlistmaker.media.MediaActivity
+import com.practicum.playlistmaker.main.domain.NaviInteractor
 import com.practicum.playlistmaker.search.ui.SearchActivity
 import com.practicum.playlistmaker.settings.ui.SettingsActivity
 

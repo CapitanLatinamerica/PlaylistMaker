@@ -26,5 +26,10 @@
         <item name="right_arrow_color">@color/arrow_icon_color_light</item>
     </style>
 
+    <style name="Awesome.Theme.PlaylistMaker" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/yp_black</item>
+        <item name="colorPrimary">@color/yp_white</item>
+        <item name="colorSecondaryVariant">@color/yp_black</item>
+    </style>
 
 </resources>
