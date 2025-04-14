@@ -10,6 +10,8 @@ import com.practicum.playlistmaker.main.domain.NaviInteractor
 import com.practicum.playlistmaker.main.ui.viewmodel.MainViewModel
 import com.practicum.playlistmaker.media.MediaPagerAdapter
 import com.practicum.playlistmaker.media.MediaViewModel
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -47,10 +49,13 @@ import org.koin.dsl.module
             MainViewModel(get { parametersOf(activity) })
         }
 
-
-        // TEST Медиатека
+        //Медиатека
         factory { (activity: Activity) -> MediaPagerAdapter(activity as FragmentActivity) }
         viewModel { (activity: Activity) -> MediaViewModel(get { parametersOf(activity) }) }
+
+        //Фрагменты медиатеки
+        viewModel { FavoriteTracksViewModel() }
+        viewModel { PlaylistsViewModel() }
 
         // Настройки темы
         single<ThemeRepository> { ThemeRepositoryImpl(get()) }
@@ -64,7 +69,7 @@ import org.koin.dsl.module
         single<SearchRepository> { SearchRepositoryImpl(get()) }
         single<SearchHistoryRepository> {
             SearchHistoryRepositoryImpl(
-                get() // Используем уже зарегистрированные SharedPreferences
+                get()
             )
         }
         single<SearchInteractor> { SearchInteractorImpl(get()) }

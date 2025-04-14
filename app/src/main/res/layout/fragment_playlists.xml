@@ -15,7 +15,7 @@
         android:layout_marginTop="24dp"
         android:textSize="@dimen/button_retry_text_size"
         app:backgroundTint="?attr/colorOnSecondary"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="?attr/colorSecondaryVariant"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

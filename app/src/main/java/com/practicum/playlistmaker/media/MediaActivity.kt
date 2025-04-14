@@ -18,7 +18,6 @@ class MediaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
 
-        // Минимальный функционал для проверки
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar_media)
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -28,6 +27,11 @@ class MediaActivity : AppCompatActivity() {
         // Получаем адаптер из ViewModel
         viewPager.adapter = viewModel.getAdapter()
 
+        // Восстанавливаем состояние текущего таба
+        viewModel.currentTab.observe(this) { tabPosition ->
+            viewPager.setCurrentItem(tabPosition, false)
+        }
+
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when(position) {
                 0 -> getString(R.string.favorite_tracks)
@@ -35,5 +39,31 @@ class MediaActivity : AppCompatActivity() {
                 else -> ""
             }
         }.attach()
+
+        // Обрабатываем смену вкладки
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.position?.let {
+                    viewModel.setCurrentTab(it)
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.currentTab.value?.let {
+            outState.putInt("current_tab", it)
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState.getInt("current_tab", 0).also {
+            viewModel.setCurrentTab(it)
+        }
+    }
+
 }
