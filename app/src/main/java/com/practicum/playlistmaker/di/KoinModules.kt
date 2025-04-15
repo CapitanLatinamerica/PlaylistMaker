@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.di
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
 import com.practicum.playlistmaker.main.data.NaviInteractorImpl
@@ -49,13 +50,16 @@ import org.koin.dsl.module
             MainViewModel(get { parametersOf(activity) })
         }
 
-        //Медиатека
-        factory { (activity: Activity) -> MediaPagerAdapter(activity as FragmentActivity) }
-        viewModel { (activity: Activity) -> MediaViewModel(get { parametersOf(activity) }) }
+        // Медиатека - УПРОЩЕННАЯ ВЕРСИЯ
+        viewModel { MediaViewModel() } // Без параметров
 
-        //Фрагменты медиатеки
-        viewModel { FavoriteTracksViewModel() }
-        viewModel { PlaylistsViewModel() }
+        // Фрагменты медиатеки с параметрами
+        viewModel { (fragment: Fragment) ->
+            FavoriteTracksViewModel(fragment)
+        }
+        viewModel { (fragment: Fragment) ->
+            PlaylistsViewModel(fragment)
+        }
 
         // Настройки темы
         single<ThemeRepository> { ThemeRepositoryImpl(get()) }

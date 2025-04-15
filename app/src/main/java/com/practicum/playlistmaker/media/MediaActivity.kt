@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.media
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
@@ -26,7 +25,7 @@ class MediaActivity : AppCompatActivity() {
         val viewPager = findViewById<ViewPager2>(R.id.view_pager)
 
         // Получаем адаптер из ViewModel
-        viewPager.adapter = viewModel.getAdapter()
+//        viewPager.adapter = viewModel.getAdapter()
 
         // Восстанавливаем состояние текущего таба
         viewModel.currentTab.observe(this) { tabPosition ->
