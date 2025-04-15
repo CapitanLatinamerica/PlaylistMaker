@@ -42,4 +42,11 @@ class MediaFragment : Fragment() {
             }
         }.attach()
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.currentTab.value?.let {
+            outState.putInt("current_tab", it)
+        }
+    }
 }

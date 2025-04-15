@@ -25,8 +25,12 @@ tools:context=".media.MediaFragment">
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        app:tabTextAppearance="@style/TabLayoutTextAppearance"
-        style="@style/TabLayoutTheme" />
+        android:background="?attr/colorSecondaryVariant"
+        app:tabIndicatorHeight="2dp"
+        app:tabIndicatorColor="?attr/colorPrimary"
+        app:tabTextColor="?attr/colorPrimary"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabTextAppearance="@style/TabLayoutTextAppearance"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"

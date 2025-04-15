@@ -6,9 +6,6 @@ import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
-import com.practicum.playlistmaker.main.data.NaviInteractorImpl
-import com.practicum.playlistmaker.main.domain.NaviInteractor
-import com.practicum.playlistmaker.main.ui.viewmodel.MainViewModel
 import com.practicum.playlistmaker.media.MediaPagerAdapter
 import com.practicum.playlistmaker.media.MediaViewModel
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
@@ -40,15 +37,6 @@ import org.koin.dsl.module
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
 
-        // Навигация
-        factory<NaviInteractor> { (activity: Activity) ->
-            NaviInteractorImpl(activity)
-        }
-
-        // ViewModel для MainActivity
-        viewModel { (activity: Activity) ->
-            MainViewModel(get { parametersOf(activity) })
-        }
 
         // Медиатека - УПРОЩЕННАЯ ВЕРСИЯ
         viewModel { MediaViewModel() } // Без параметров
