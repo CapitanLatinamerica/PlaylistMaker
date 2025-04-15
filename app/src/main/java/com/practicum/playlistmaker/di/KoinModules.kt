@@ -1,12 +1,9 @@
 package com.practicum.playlistmaker.di
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
-import com.practicum.playlistmaker.media.MediaPagerAdapter
 import com.practicum.playlistmaker.media.MediaViewModel
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
@@ -18,6 +15,7 @@ import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInterac
 import com.practicum.playlistmaker.search.domain.interactor.SearchInteractor
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
 import com.practicum.playlistmaker.search.domain.repository.SearchRepository
+import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 import com.practicum.playlistmaker.settings.data.ThemeRepository
 import com.practicum.playlistmaker.settings.data.ThemeRepositoryImpl
 import com.practicum.playlistmaker.settings.domain.SettingsInteractor
@@ -27,13 +25,11 @@ import com.practicum.playlistmaker.sharing.data.SharingInteractorImpl
 import com.practicum.playlistmaker.sharing.data.SharingRepository
 import com.practicum.playlistmaker.sharing.data.SharingRepositoryImpl
 import com.practicum.playlistmaker.sharing.domain.SharingInteractor
-import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
-    val appModule = module {
+val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
 

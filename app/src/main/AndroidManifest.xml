@@ -26,7 +26,7 @@
             android:exported="false"
             android:theme="@style/Theme.PlaylistMaker" />
         <activity
-            android:name=".main.ui.MainHostActivity"
+            android:name=".main.MainHostActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
             android:windowSoftInputMode="adjustPan|stateHidden">

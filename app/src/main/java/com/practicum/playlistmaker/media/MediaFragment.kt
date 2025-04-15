@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
@@ -15,6 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MediaFragment : Fragment() {
     private val viewModel: MediaViewModel by viewModel()
     private lateinit var pagerAdapter: MediaPagerAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +33,8 @@ class MediaFragment : Fragment() {
 
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
         val tabLayout = view.findViewById<TabLayout>(R.id.tabs)
+        tabLayout?.setSelectedTabIndicatorColor(ContextCompat.getColor(requireContext(), R.color.tab_indicator_color))
+
 
         viewPager.adapter = pagerAdapter
 

@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -116,18 +114,15 @@ class SearchViewModel(
     }
 
     fun saveTrackToHistory(track: Track) {
-        Log.d("SearchViewModel", "saveTrackToHistory() called for track: ${track.trackName}")
         viewModelScope.launch {
             try {
                 searchHistoryInteractor.saveTrack(track)
-                Log.d("SearchViewModel", "Track saved to history")
             } catch (e: Exception) {
             }
         }
     }
 
     fun clearSearchHistory() {
-        Log.d("SearchViewModel", "Clearing history")
         viewModelScope.launch {
             searchHistoryInteractor.clearHistory()
             loadSearchHistory()

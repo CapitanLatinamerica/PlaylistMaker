@@ -184,4 +184,12 @@
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0.03</item>
     </style>
+
+    <style name="TabLayoutInvertedTheme" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabIndicatorColor">?attr/colorOnPrimary</item>  <!-- для индикатора -->
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabIndicatorGravity">bottom</item>
+        <item name="tabIndicatorFullWidth">true</item>
+        <item name="android:background">?attr/colorSecondaryVariant</item>  <!-- Подложка вкладки -->
+    </style>
 </resources>

@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,7 +66,6 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("SearchFragment", "onCreateView() called")
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
@@ -146,21 +144,18 @@ class SearchFragment : Fragment() {
     private fun observeViewModel() {
         lifecycleScope.launchWhenStarted {
             viewModel.uiState.collect { state ->
-                Log.d("SearchFragment", "New UI state: $state")
                 render(state)
             }
         }
     }
 
     private fun render(state: SearchScreenUiState) {
-        Log.d("SearchFragment", "Rendering state: ${state.screenState}, history size: ${state.history.size}")
         progressBar.isVisible = state.isLoading
         trackRecyclerView.isVisible = !state.isLoading
         clearIcon.isVisible = inputEditText.text.isNotEmpty()
 
         when (state.screenState) {
             SearchScreenState.HISTORY -> {
-                Log.d("SearchFragment", "Showing HISTORY, items: ${state.history.size}")
                 trackAdapter.updateTracks(state.history)
                 historyTitle.isVisible = state.history.isNotEmpty()
                 clearHistoryButton.isVisible = state.history.isNotEmpty()
@@ -232,14 +227,12 @@ class SearchFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         val query = inputEditText.text.toString()
-        Log.d("SearchFragment", "onSaveInstanceState(), saving query: '$query'")
         outState.putString("searchQuery", query)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         val query = savedInstanceState?.getString("searchQuery") ?: ""
-        Log.d("SearchFragment", "onViewStateRestored(), restored query: '$query'")
 
         if (query.isNotEmpty()) {
             inputEditText.setText(query)
