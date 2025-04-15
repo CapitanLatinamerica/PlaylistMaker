@@ -70,30 +70,6 @@
         <item name="trackTint">@color/switch_track_color</item>
     </style>
 
-    <!-- для светлой темы -->
-    <style name="Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/yp_white</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/yp_black</item>
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/yp_white</item>
-        <item name="colorOnSecondary">@color/yp_black</item>
-        <item name="android:background">@color/white</item>
-        <item name="clear_icon_color">@color/clear_icon_color_light</item>
-    </style>
-
-    <!-- для тёмной темы -->
-    <style name="Theme.PlaylistMakerNight" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/yp_white</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/yp_white</item>
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/yp_white</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="android:background">@color/dark_background</item>
-        <item name="clear_icon_color">@color/clear_icon_color_dark</item>
-    </style>
-
     <style name="MyAwesomeEditText">
         <item name="android:drawableStart">@drawable/ic_find</item>
         <item name="android:paddingStart">12dp</item>
@@ -153,9 +129,6 @@
         <item name="cornerSize">8dp</item>
     </style>
 
-    <style name="CustomEditTextStyle" parent="Widget.AppCompat.EditText">
-    </style>
-
     <style name="MyAwesomeTrackTitleParameter">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -164,5 +137,12 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
+
+    <!-- Стиль для текста вкладок -->
+    <style name="TabLayoutTextAppearance">
+        <item name="android:fontFamily">@font/ys_display_medium</item> <!-- Шрифт -->
+        <item name="android:textSize">14sp</item> <!-- Размер шрифта -->
+    </style>
+
 
 </resources>

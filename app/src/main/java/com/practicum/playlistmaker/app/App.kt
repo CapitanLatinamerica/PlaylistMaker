@@ -3,7 +3,7 @@ package com.practicum.playlistmaker.app
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.practicum.playlistmaker.appModule
+import com.practicum.playlistmaker.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin

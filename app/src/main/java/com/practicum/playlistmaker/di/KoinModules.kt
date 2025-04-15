@@ -1,8 +1,17 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.di
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.fragment.app.FragmentActivity
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
+import com.practicum.playlistmaker.main.data.NaviInteractorImpl
+import com.practicum.playlistmaker.main.domain.NaviInteractor
+import com.practicum.playlistmaker.main.ui.viewmodel.MainViewModel
+import com.practicum.playlistmaker.media.MediaPagerAdapter
+import com.practicum.playlistmaker.media.MediaViewModel
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -23,11 +32,30 @@ import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
     val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
+
+        // Навигация
+        factory<NaviInteractor> { (activity: Activity) ->
+            NaviInteractorImpl(activity)
+        }
+
+        // ViewModel для MainActivity
+        viewModel { (activity: Activity) ->
+            MainViewModel(get { parametersOf(activity) })
+        }
+
+        //Медиатека
+        factory { (activity: Activity) -> MediaPagerAdapter(activity as FragmentActivity) }
+        viewModel { (activity: Activity) -> MediaViewModel(get { parametersOf(activity) }) }
+
+        //Фрагменты медиатеки
+        viewModel { FavoriteTracksViewModel() }
+        viewModel { PlaylistsViewModel() }
 
         // Настройки темы
         single<ThemeRepository> { ThemeRepositoryImpl(get()) }
@@ -41,7 +69,7 @@ import org.koin.dsl.module
         single<SearchRepository> { SearchRepositoryImpl(get()) }
         single<SearchHistoryRepository> {
             SearchHistoryRepositoryImpl(
-                get() // Используем уже зарегистрированные SharedPreferences
+                get()
             )
         }
         single<SearchInteractor> { SearchInteractorImpl(get()) }

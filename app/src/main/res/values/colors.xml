@@ -46,4 +46,7 @@
     <color name="like_icon_color_active">#F56B6C</color>
     <color name="like_icon_color_inactive">#FFFFFF</color>
 
+    <color name="tab_indicator_light">@color/yp_red</color>
+    <color name="tab_indicator_dark">@color/yp_blue</color>
+
 </resources>

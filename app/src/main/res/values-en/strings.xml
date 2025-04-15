@@ -26,5 +26,9 @@
     <string name="clear_history">Очистить историю</string>
     <string name="toast_track_added">"%1$s" added to history</string>
     <string name="track_cover_description">Track cover</string>
-
+    <string name="favorite_tracks">Favorite tracks</string>
+    <string name="playlists">Playlists</string>
+    <string name="no_favorites_description">No favorite tracks</string>
+    <string name="you_didnt_create_any_list">You haven\'t created\nany playlists yet</string>
+    <string name="create_playlist">New playlist</string>
 </resources>
