@@ -16,7 +16,6 @@ tools:context=".settings.ui.SettingsFragment">
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
-    app:navigationIcon="@drawable/arrow_back_light_mode"
     app:title="@string/btn_settings" />
 
 <com.google.android.material.switchmaterial.SwitchMaterial

@@ -32,4 +32,11 @@
         <item name="colorSecondaryVariant">@color/yp_black</item>
     </style>
 
+
+    <style name="TabLayoutTheme" parent="Theme.MaterialComponents.DayNight">
+        <item name="tabIndicatorColor">@color/yp_white</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="tabTextColor">@color/yp_white</item>
+    </style>
+
 </resources>

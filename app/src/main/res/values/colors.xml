@@ -49,4 +49,8 @@
     <color name="tab_indicator_light">@color/yp_red</color>
     <color name="tab_indicator_dark">@color/yp_blue</color>
 
+    <color name="bottom_nav_icon_background">@color/yp_white</color>
+    <color name="bottom_nav_icon_tint">@color/nav_item_color_light</color>
+    <color name="bottom_nav_icon_text">@color/yp_black</color>
+
 </resources>

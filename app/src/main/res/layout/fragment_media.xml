@@ -18,8 +18,6 @@ tools:context=".media.MediaFragment">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/arrow_back_light_mode"
-        app:navigationIconTint="?attr/colorPrimary"
         app:title="@string/btn_media"
         app:titleTextColor="?attr/colorPrimary" />
 
@@ -27,12 +25,8 @@ tools:context=".media.MediaFragment">
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="?attr/colorSecondaryVariant"
-        app:tabIndicatorHeight="2dp"
-        app:tabIndicatorColor="?attr/colorPrimary"
-        app:tabTextColor="?attr/colorPrimary"
-        app:tabSelectedTextColor="?attr/colorPrimary"
-        app:tabTextAppearance="@style/TabLayoutTextAppearance"/>
+        app:tabTextAppearance="@style/TabLayoutTextAppearance"
+        style="@style/TabLayoutTheme" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
