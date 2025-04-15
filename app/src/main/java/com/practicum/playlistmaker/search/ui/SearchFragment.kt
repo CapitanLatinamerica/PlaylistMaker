@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -24,7 +25,9 @@ import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.TrackAdapter
+import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.search.data.dto.SearchScreenState
 import com.practicum.playlistmaker.search.data.dto.SearchScreenUiState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
@@ -172,8 +175,19 @@ class SearchFragment : Fragment() {
         }
     }
 
+    //Заменим this на requireContext
     private fun openAudioPlayer(track: Track) {
-        // Тут будет навигация к AudioPlayerActivity (пока оставляем как есть)
+        startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+            putExtra(Constants.Extra.TRACK_NAME, track.trackName)
+            putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
+            putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
+            putExtra(Constants.Extra.ALBUM_COVER, track.getArtworkUrl512())
+            putExtra(Constants.Extra.COLLECTION_NAME, track.collectionName ?: "")
+            putExtra(Constants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
+            putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
+            putExtra(Constants.Extra.COUNTRY, track.country ?: "")
+            putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
+        })
     }
 
     private fun hideKeyboard() {
