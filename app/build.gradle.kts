@@ -57,11 +57,10 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation (libs.koin.android)
-    implementation ("androidx.viewpager2:viewpager2:1.1.0")
-    implementation ("com.google.android.material:material:1.8.0")
-    implementation ("androidx.fragment:fragment-ktx:1.8.6")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
     implementation ("androidx.fragment:fragment-ktx:1.8.6")
     implementation ("androidx.viewpager2:viewpager2:1.1.0")
     implementation ("com.google.android.material:material:1.8.0")
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
 }

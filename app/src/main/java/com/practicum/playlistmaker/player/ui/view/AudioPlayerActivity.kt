@@ -38,6 +38,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Log.e("AudioPlayer", "AudioPlayer created")
         // Инициализация ViewBinding
         binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -176,15 +177,22 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
-    // Форматирование времени из миллисекунд в строку MM:SS  @param millis Время в миллисекундах @return Отформатированная строка
+    // Форматирование времени из миллисекунд в строку MM:SS
     private fun formatTime(millis: Long): String {
         val minutes = millis / 60000
         val seconds = (millis % 60000) / 1000
         return String.format("%02d:%02d", minutes, seconds)
     }
 
-    //Создание объекта Track из данных Intent @return Объект Track или null при ошибке
+    //Создание объекта Track из данных Intent
     private fun createTrackFromIntent(): Track? {
+        val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME)
+        val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME)
+        val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull()
+        val artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
+        val previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL)
+        Log.d("AudioPlayer", "Received data - TrackName: $trackName, ArtistName: $artistName, Time: $trackTimeMillis, Artwork: $artworkUrl100, PreviewUrl: $previewUrl")
+
         return try {
             Track(
                 trackId = -1,
@@ -196,6 +204,7 @@ class AudioPlayerActivity : AppCompatActivity() {
                 previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null
             )
         } catch (e: Exception) {
+            Log.e("AudioPlayer", "Error creating track", e)
             null
         }
     }

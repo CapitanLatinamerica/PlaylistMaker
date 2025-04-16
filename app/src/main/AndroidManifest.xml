@@ -17,34 +17,21 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_pm191"
         android:supportsRtl="true"
-        android:theme="@style/Base.Theme.PlaylistMaker"
+        android:theme="@style/Theme.PlaylistMaker"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity
-            android:name=".media.MediaActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="false"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"/>
         <activity
             android:name=".player.ui.view.AudioPlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false"
             android:theme="@style/Theme.PlaylistMaker" />
         <activity
-            android:name=".search.ui.SearchActivity"
+            android:name=".main.MainHostActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="false"
-            android:theme="@style/Theme.PlaylistMaker" />
-        <activity
-            android:name=".settings.ui.SettingsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.PlaylistMaker" />
-        <activity
-            android:name=".main.ui.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

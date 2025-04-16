@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
@@ -17,33 +18,47 @@ class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SearchScreenUiState())
+    // Добавляем сохранение истории в состоянии
+    private val _uiState = MutableStateFlow(
+        SearchScreenUiState(
+            screenState = SearchScreenState.HISTORY,
+            history = searchHistoryInteractor.getHistory() ?: emptyList()
+        )
+    )
     val uiState: StateFlow<SearchScreenUiState> = _uiState
 
     private var currentQuery: String = ""
     private var searchJob: Job? = null
+    private var isHistoryLoaded = false
+
+    // Храним состояние истории поиска
+    private val _history = MutableLiveData<List<Track>>()
 
     init {
         loadSearchHistory()
     }
 
-    fun loadSearchHistory() {
-        val history = searchHistoryInteractor.getHistory()
-        if (history.isNullOrEmpty()) {
-            _uiState.value = SearchScreenUiState(
-                isLoading = false,
+    fun loadInitialHistory() {
+        if (isHistoryLoaded) return
+
+        viewModelScope.launch {
+            val history = searchHistoryInteractor.getHistory()
+            _uiState.value = _uiState.value.copy(
                 screenState = SearchScreenState.HISTORY,
-                searchResults = emptyList(),
-                history = emptyList(),
-                errorMessage = null
-            )
-        } else {
-            _uiState.value = SearchScreenUiState(
-                isLoading = false,
-                screenState = SearchScreenState.HISTORY,
-                searchResults = emptyList(),
                 history = history,
-                errorMessage = null
+                isLoading = false
+            )
+            isHistoryLoaded = true
+        }
+    }
+
+    fun loadSearchHistory() {
+        viewModelScope.launch {
+            val history = searchHistoryInteractor.getHistory()
+            _uiState.value = _uiState.value.copy(
+                history = history,
+                screenState = if (history.isEmpty()) SearchScreenState.IDLE
+                else SearchScreenState.HISTORY
             )
         }
     }
@@ -115,12 +130,11 @@ class SearchViewModel(
     }
 
     fun clearSearchResults() {
-        _uiState.value = SearchScreenUiState(
-            isLoading = false,
-            screenState = SearchScreenState.HISTORY,
+        // Не очищаем историю, только результаты поиска
+        _uiState.value = _uiState.value.copy(
             searchResults = emptyList(),
-            history = emptyList(),
-            errorMessage = null
+            screenState = if (_uiState.value.history.isEmpty()) SearchScreenState.IDLE
+            else SearchScreenState.HISTORY
         )
     }
 }

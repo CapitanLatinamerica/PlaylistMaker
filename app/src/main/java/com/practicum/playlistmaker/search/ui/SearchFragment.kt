@@ -6,16 +6,18 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,24 +33,22 @@ import com.practicum.playlistmaker.search.data.dto.SearchScreenUiState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
-    // Получаем ViewModel через Koin
-    private val viewModel: SearchViewModel by viewModel()
+class SearchFragment : Fragment() {
 
-    private lateinit var imm: InputMethodManager
+    private val viewModel: SearchViewModel by viewModel()
+    private lateinit var trackAdapter: TrackAdapter
 
     // UI элементы
-    private lateinit var floatingContainer: ConstraintLayout
-    private lateinit var retryButton: Button
     private lateinit var inputEditText: EditText
     private lateinit var clearIcon: ImageView
     private lateinit var trackRecyclerView: RecyclerView
-    private lateinit var trackAdapter: TrackAdapter
+    private lateinit var progressBar: ProgressBar
     private lateinit var errorImage: ImageView
     private lateinit var errorMessage: TextView
+    private lateinit var retryButton: Button
     private lateinit var historyTitle: TextView
     private lateinit var clearHistoryButton: Button
-    private lateinit var progressBar: ProgressBar
+    private lateinit var floatingContainer: ConstraintLayout
 
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay: Long = 500
@@ -61,39 +61,47 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_search, container, false)
+    }
 
-        imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-
-        initViews()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViews(view)
         setupRecyclerView()
         setupListeners()
         observeViewModel()
+
+        // Загружаем историю только если это первый запуск
+        if (savedInstanceState == null) {
+            viewModel.loadInitialHistory()
+        }
     }
 
-    private fun initViews() {
-        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
-        floatingContainer = findViewById(R.id.floating_container)
-        inputEditText = findViewById(R.id.findEditText)
-        clearIcon = findViewById(R.id.clearTextIcon)
-        trackRecyclerView = findViewById(R.id.trackRecyclerView)
-        errorImage = findViewById(R.id.error_image)
-        errorMessage = findViewById(R.id.error_message)
-        retryButton = findViewById(R.id.retry_button)
-        historyTitle = findViewById(R.id.historyTitle)
-        clearHistoryButton = findViewById(R.id.clearHistoryButton)
-        progressBar = findViewById(R.id.progress_bar)
-
+    private fun initViews(view: View) {
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener {
-            finish()
         }
+
+        inputEditText = view.findViewById(R.id.findEditText)
+        clearIcon = view.findViewById(R.id.clearTextIcon)
+        trackRecyclerView = view.findViewById(R.id.trackRecyclerView)
+        progressBar = view.findViewById(R.id.progress_bar)
+        errorImage = view.findViewById(R.id.error_image)
+        errorMessage = view.findViewById(R.id.error_message)
+        retryButton = view.findViewById(R.id.retry_button)
+        historyTitle = view.findViewById(R.id.historyTitle)
+        clearHistoryButton = view.findViewById(R.id.clearHistoryButton)
+        floatingContainer = view.findViewById(R.id.floating_container)
     }
 
     private fun setupRecyclerView() {
         trackAdapter = TrackAdapter(mutableListOf())
-        trackRecyclerView.layoutManager = LinearLayoutManager(this)
+        trackRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         trackRecyclerView.adapter = trackAdapter
 
         trackAdapter.setOnItemClickListener { track ->
@@ -103,7 +111,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // Обработчики кликов
         clearIcon.setOnClickListener {
             clearInputText()
             viewModel.clearSearchResults()
@@ -119,22 +126,17 @@ class SearchActivity : AppCompatActivity() {
             viewModel.searchTracks(query)
         }
 
-        // Обработчик ввода текста с дебаунсом
         inputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.isVisible = !s.isNullOrEmpty()
                 handler.removeCallbacks(debounceRunnable)
-
                 if (!s.isNullOrEmpty()) {
                     historyTitle.isVisible = false
                     clearHistoryButton.isVisible = false
                 }
-
                 handler.postDelayed(debounceRunnable, debounceDelay)
             }
-
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -145,50 +147,6 @@ class SearchActivity : AppCompatActivity() {
                 render(state)
             }
         }
-    }
-
-    private fun openAudioPlayer(track: Track) {
-        startActivity(Intent(this, AudioPlayerActivity::class.java).apply {
-            putExtra(Constants.Extra.TRACK_NAME, track.trackName)
-            putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
-            putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
-            putExtra(Constants.Extra.ALBUM_COVER, track.getArtworkUrl512())
-            putExtra(Constants.Extra.COLLECTION_NAME, track.collectionName ?: "")
-            putExtra(Constants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
-            putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
-            putExtra(Constants.Extra.COUNTRY, track.country ?: "")
-            putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
-        })
-    }
-
-    private fun showError(message: String, imageRes: Int, showRetryButton: Boolean) {
-        floatingContainer.visibility = View.VISIBLE
-        errorImage.isVisible = true
-        errorMessage.isVisible = true
-        errorMessage.text = message
-        retryButton.isVisible = showRetryButton
-        trackRecyclerView.isVisible = false
-        Glide.with(this).load(imageRes).into(errorImage)
-    }
-
-    private fun hideError() {
-        floatingContainer.isVisible = false
-        errorImage.isVisible = false
-        errorMessage.isVisible = false
-        retryButton.isVisible = false
-    }
-
-    private fun clearInputText() {
-        inputEditText.text.clear()
-        inputEditText.clearFocus()
-        hideKeyboard()
-        viewModel.searchTracks("")
-        viewModel.loadSearchHistory()
-        clearIcon.isVisible = false
-    }
-
-    private fun hideKeyboard() {
-        imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
     }
 
     private fun render(state: SearchScreenUiState) {
@@ -215,9 +173,80 @@ class SearchActivity : AppCompatActivity() {
             SearchScreenState.ERROR -> {
                 showError(getString(R.string.no_internet_message), R.drawable.ic_no_connection, true)
             }
-            SearchScreenState.IDLE -> {
-                // Ничего не делаем
-            }
+            SearchScreenState.IDLE -> {}
+        }
+    }
+
+    //Заменим this на requireContext
+    private fun openAudioPlayer(track: Track) {
+        startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+            putExtra(Constants.Extra.TRACK_NAME, track.trackName)
+            putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
+            putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
+            putExtra(Constants.Extra.ALBUM_COVER, track.getArtworkUrl512())
+            putExtra(Constants.Extra.COLLECTION_NAME, track.collectionName ?: "")
+            putExtra(Constants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
+            putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
+            putExtra(Constants.Extra.COUNTRY, track.country ?: "")
+            putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
+        })
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(InputMethodManager::class.java)
+        imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+    }
+
+    private fun clearInputText() {
+        inputEditText.text.clear()
+        inputEditText.clearFocus()
+        hideKeyboard()
+        viewModel.searchTracks("")
+//        viewModel.loadSearchHistory()
+        clearIcon.isVisible = false
+    }
+
+    private fun showError(message: String, imageRes: Int, showRetryButton: Boolean) {
+        floatingContainer.visibility = View.VISIBLE
+        errorImage.isVisible = true
+        errorMessage.isVisible = true
+        errorMessage.text = message
+        retryButton.isVisible = showRetryButton
+        trackRecyclerView.isVisible = false
+        Glide.with(this).load(imageRes).into(errorImage)
+    }
+
+    private fun hideError() {
+        floatingContainer.isVisible = false
+        errorImage.isVisible = false
+        errorMessage.isVisible = false
+        retryButton.isVisible = false
+    }
+
+    // Сохранение состояния (например, текст введённого запроса)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val query = inputEditText.text.toString()
+        outState.putString("searchQuery", query)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        val query = savedInstanceState?.getString("searchQuery") ?: ""
+
+        if (query.isNotEmpty()) {
+            inputEditText.setText(query)
+            viewModel.searchTracks(query)
+        } else {
+            viewModel.loadSearchHistory()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Обновляем историю только если поле поиска пустое
+        if (inputEditText.text.isNullOrEmpty()) {
+            viewModel.loadSearchHistory()
         }
     }
 }

@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/frag_playlists"
-    android:theme="@style/Theme.PlaylistMaker">
+    android:id="@+id/frag_playlists">
 
     <Button
         android:id="@+id/createPlaylist"

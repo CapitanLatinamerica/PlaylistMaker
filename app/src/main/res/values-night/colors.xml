@@ -5,4 +5,8 @@
     <color name="tab_indicator_light">@color/yp_blue</color>
     <color name="tab_indicator_dark">@color/yp_red</color>
 
+    <color name="bottom_nav_icon_background">@color/yp_black</color>
+    <color name="bottom_nav_icon_tint">@color/nav_item_color_dark</color>
+    <color name="bottom_nav_icon_text">@color/yp_white</color>
+
 </resources>
