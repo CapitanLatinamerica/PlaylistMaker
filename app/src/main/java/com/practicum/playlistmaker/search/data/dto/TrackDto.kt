@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.search.data.dto
 
 import com.google.gson.annotations.SerializedName
-import com.practicum.playlistmaker.player.domain.Track
 
 data class TrackDto(
     @SerializedName("trackId") val trackId: Long,
@@ -15,19 +14,5 @@ data class TrackDto(
     @SerializedName("country") val country: String? = null,         // Страна исполнителя
     @SerializedName("previewUrl") val previewUrl: String? = null      // Ссылка на отрывок трека
 ) {
-    fun toDomain(): Track {
-        return Track(
-            trackId = this.trackId,
-            trackName = this.trackName,
-            artistName = this.artistName,
-            trackTimeMillis = this.trackTimeMillis,
-            artworkUrl100 = this.artworkUrl100,
-            collectionName = this.collectionName,
-            releaseDate = this.releaseDate,
-            primaryGenreName = this.primaryGenreName,
-            country = this.country,
-            previewUrl = this.previewUrl
-        )
-    }
 }
 

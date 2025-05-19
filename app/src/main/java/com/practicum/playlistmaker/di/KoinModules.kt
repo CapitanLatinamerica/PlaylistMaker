@@ -33,7 +33,6 @@ val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
 
-
         // Медиатека - УПРОЩЕННАЯ ВЕРСИЯ
         viewModel { MediaViewModel() } // Без параметров
 

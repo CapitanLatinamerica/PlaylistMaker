@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.search.domain.interactor
 
-import android.util.Log
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
 
@@ -12,7 +11,6 @@ class SearchHistoryInteractor(private val searchHistoryRepository: SearchHistory
 
     fun getHistory(): List<Track> {
         val historyLoaded = searchHistoryRepository.getHistory()
-        Log.d("SearchHistoryRepo", "Loaded history: $historyLoaded")
         return historyLoaded  // Получаем историю
     }
 
