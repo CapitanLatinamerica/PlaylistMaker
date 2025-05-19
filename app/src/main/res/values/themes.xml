@@ -12,11 +12,10 @@
         <item name="clear_icon_color">@color/clear_icon_color_light</item>
     </style>
 
-    <style name="Awesome.Theme.PlaylistMaker" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Awesome.Theme.PlaylistMaker" parent="Theme.MaterialComponents">
         <item name="android:statusBarColor">@color/yp_black</item>
         <item name="colorPrimary">@color/yp_black</item>
         <item name="colorSecondaryVariant">@color/yp_white</item>
     </style>
-
 
 </resources>

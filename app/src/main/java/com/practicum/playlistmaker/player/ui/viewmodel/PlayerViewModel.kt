@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.player.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -13,16 +14,6 @@ import kotlinx.coroutines.launch
 class PlayerViewModel(
     private val playerRepository: PlayerRepository
 ) : ViewModel() {
-
-    // Возможные состояния плеера
-    sealed class PlayerState {
-        object IDLE : PlayerState()            // Плеер ничего не делает
-        object PREPARING : PlayerState()       // Идёт подготовка (загрузка) трека
-        object PLAYING : PlayerState()         // Трек воспроизводится
-        object PAUSED : PlayerState()          // Воспроизведение приостановлено
-        object FINISHED : PlayerState()        // Воспроизведение завершено
-        data class ERROR(val message: String) : PlayerState() // Ошибка воспроизведения
-    }
 
     private val HARDCODED_DURATION_MS = 30_000
 

@@ -8,8 +8,4 @@ class MediaViewModel : ViewModel() {
 
     private val _currentTab = MutableLiveData<Int>(0)
     val currentTab: LiveData<Int> get() = _currentTab
-
-    fun setCurrentTab(tabPosition: Int) {
-        _currentTab.value = tabPosition
-    }
 }

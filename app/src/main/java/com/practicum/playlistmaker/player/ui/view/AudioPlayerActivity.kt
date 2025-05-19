@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.data.Constants
+import com.practicum.playlistmaker.player.domain.model.PlayerState
 
 class AudioPlayerActivity : AppCompatActivity() {
 
@@ -121,16 +122,16 @@ class AudioPlayerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.playerState.collect { state ->
                 when (state) {
-                    PlayerViewModel.PlayerState.PLAYING ->
+                    PlayerState.PLAYING ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_pause)
 
-                    PlayerViewModel.PlayerState.PAUSED ->
+                    PlayerState.PAUSED ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_play)
 
-                    PlayerViewModel.PlayerState.IDLE ->
+                    PlayerState.IDLE ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_play)
 
-                    is PlayerViewModel.PlayerState.ERROR ->
+                    is PlayerState.ERROR ->
                         Toast.makeText(
                             this@AudioPlayerActivity,
                             "Ошибка: ${state.message}",
@@ -155,18 +156,18 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding.buttonPlay.setOnClickListener {
             viewModel.playerState.value?.let { state ->
                 when (state) {
-                    PlayerViewModel.PlayerState.IDLE -> {
+                    PlayerState.IDLE -> {
                         track?.let {
                             viewModel.playTrack(it)
                         }
                     }
-                    PlayerViewModel.PlayerState.PLAYING -> {
+                    PlayerState.PLAYING -> {
                         viewModel.togglePlayPause()
                     }
-                    PlayerViewModel.PlayerState.PAUSED -> {
+                    PlayerState.PAUSED -> {
                         viewModel.togglePlayPause()
                     }
-                    PlayerViewModel.PlayerState.PREPARING -> {
+                    PlayerState.PREPARING -> {
                         // Ничего не делаем во время подготовки
                     }
                     else -> {}

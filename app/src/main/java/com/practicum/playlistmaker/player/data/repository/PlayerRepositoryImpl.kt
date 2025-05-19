@@ -16,7 +16,8 @@ class PlayerRepositoryImpl(
 ) : PlayerRepository {
 
     private var progressJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     private val _progressFlow = MutableSharedFlow<Int>(replay = 1)
 
     override fun preparePlayer(url: String, onPrepared: () -> Unit, onError: (Exception) -> Unit) {

@@ -17,7 +17,6 @@ class MediaFragment : Fragment() {
     private val viewModel: MediaViewModel by viewModel()
     private lateinit var pagerAdapter: MediaPagerAdapter
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,8 +32,6 @@ class MediaFragment : Fragment() {
 
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
         val tabLayout = view.findViewById<TabLayout>(R.id.tabs)
-        tabLayout?.setSelectedTabIndicatorColor(ContextCompat.getColor(requireContext(), R.color.tab_indicator_color))
-
 
         viewPager.adapter = pagerAdapter
 
