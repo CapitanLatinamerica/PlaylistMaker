@@ -23,11 +23,13 @@ tools:context=".media.MediaFragment">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
+        style="@style/tablayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?attr/colorSecondaryVariant"
-        app:tabIndicatorHeight="2dp"
-        style="@style/TabLayoutInvertedTheme"
+        app:tabIndicatorHeight="4dp"
+        app:tabTextColor="?attr/colorPrimary"
+        app:tabSelectedTextColor="?attr/colorPrimary"
         app:tabTextAppearance="@style/TabLayoutTextAppearance"/>
 
     <androidx.viewpager2.widget.ViewPager2
