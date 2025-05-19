@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
@@ -11,35 +10,36 @@ import com.practicum.playlistmaker.search.domain.interactor.SearchInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val searchInteractor: SearchInteractor,
-    private val searchHistoryInteractor: SearchHistoryInteractor
+    private val searchInteractor: SearchInteractor,                         // Для выполнения поиска
+    private val searchHistoryInteractor: SearchHistoryInteractor            // Для работы с историей поиска
 ) : ViewModel() {
 
-    // Добавляем сохранение истории в состоянии
+    // Хранилище текущего UI-состояния экрана
     private val _uiState = MutableStateFlow(
         SearchScreenUiState(
-            screenState = SearchScreenState.HISTORY,
-            history = searchHistoryInteractor.getHistory() ?: emptyList()
+            screenState = SearchScreenState.HISTORY,                // По умолчанию показываем историю
+            history = searchHistoryInteractor.getHistory()         // Загружаем текущую историю
         )
     )
-    val uiState: StateFlow<SearchScreenUiState> = _uiState
 
-    private var currentQuery: String = ""
-    private var searchJob: Job? = null
-    private var isHistoryLoaded = false
+    val uiState: StateFlow<SearchScreenUiState> = _uiState        // Публичное неизменяемое состояние
 
-    // Храним состояние истории поиска
-    private val _history = MutableLiveData<List<Track>>()
+    private var currentQuery: String = ""                         // Последний введённый поисковый запрос
+    private var searchJob: Job? = null                            // Активная coroutine job для поиска
+    private var isHistoryLoaded = false                           // Флаг, чтобы не загружать историю повторно
 
     init {
-        loadSearchHistory()
+        loadSearchHistory()                                       // При создании ViewModel загружаем историю
     }
 
+    // Метод для загрузки истории один раз (при первом запуске)
     fun loadInitialHistory() {
-        if (isHistoryLoaded) return
+        if (isHistoryLoaded) return                               // Защита от повторной загрузки
 
         viewModelScope.launch {
             val history = searchHistoryInteractor.getHistory()
@@ -52,6 +52,7 @@ class SearchViewModel(
         }
     }
 
+    // Загружаем историю поиска
     fun loadSearchHistory() {
         viewModelScope.launch {
             val history = searchHistoryInteractor.getHistory()
@@ -63,14 +64,17 @@ class SearchViewModel(
         }
     }
 
+    // Выполнение поиска треков по запросу
     fun searchTracks(query: String) {
         currentQuery = query
 
+        // Если строка пустая — показываем историю
         if (query.isBlank()) {
             loadSearchHistory()
             return
         }
 
+        // Показываем прогресс (загрузка)
         _uiState.value = SearchScreenUiState(
             isLoading = true,
             screenState = SearchScreenState.IDLE,
@@ -79,49 +83,66 @@ class SearchViewModel(
             errorMessage = null
         )
 
+        // Отменяем предыдущий поиск (если он был)
         searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            try {
-                val tracks = searchInteractor.searchTracks(query)
-
-                if (tracks.isEmpty()) {
+        searchJob = viewModelScope.launch {                                     // Запускаем новый поиск
+            searchInteractor.searchTracks(query)
+                .catch { exception ->
                     _uiState.value = SearchScreenUiState(
                         isLoading = false,
-                        screenState = SearchScreenState.EMPTY_RESULTS,
+                        screenState = SearchScreenState.ERROR,
                         searchResults = emptyList(),
                         history = emptyList(),
-                        errorMessage = "NO_RESULTS"
-                    )
-                } else {
-                    _uiState.value = SearchScreenUiState(
-                        isLoading = false,
-                        screenState = SearchScreenState.RESULTS,
-                        searchResults = tracks,
-                        history = emptyList(),
-                        errorMessage = null
+                        errorMessage = "NETWORK_ERROR"
                     )
                 }
-            } catch (e: Exception) {
-                _uiState.value = SearchScreenUiState(
-                    isLoading = false,
-                    screenState = SearchScreenState.ERROR,
-                    searchResults = emptyList(),
-                    history = emptyList(),
-                    errorMessage = "NETWORK_ERROR"
-                )
-            }
+                .collectLatest { result ->
+                    // Получаем результат из потока Flow<Result<List<Track>>>
+                    result.fold(
+                        onSuccess = { tracks ->
+                            // Пустой результат
+                            if (tracks.isEmpty()) {
+                                _uiState.value = SearchScreenUiState(
+                                    isLoading = false,
+                                    screenState = SearchScreenState.EMPTY_RESULTS,
+                                    searchResults = emptyList(),
+                                    history = emptyList(),
+                                    errorMessage = "NO_RESULTS"
+                                )
+                            } else {
+                                // Успешный поиск
+                                _uiState.value = SearchScreenUiState(
+                                    isLoading = false,
+                                    screenState = SearchScreenState.RESULTS,
+                                    searchResults = tracks,
+                                    history = emptyList(),
+                                    errorMessage = null
+                                )
+                            }
+                        },
+                        onFailure = {
+                            // Ошибка при получении результатов
+                            _uiState.value = SearchScreenUiState(
+                                isLoading = false,
+                                screenState = SearchScreenState.ERROR,
+                                searchResults = emptyList(),
+                                history = emptyList(),
+                                errorMessage = "NETWORK_ERROR"
+                            )
+                        }
+                    )
+                }
         }
     }
 
+    // Сохранение трека в историю
     fun saveTrackToHistory(track: Track) {
         viewModelScope.launch {
-            try {
                 searchHistoryInteractor.saveTrack(track)
-            } catch (e: Exception) {
-            }
         }
     }
 
+    // Очистка истории поиска
     fun clearSearchHistory() {
         viewModelScope.launch {
             searchHistoryInteractor.clearHistory()

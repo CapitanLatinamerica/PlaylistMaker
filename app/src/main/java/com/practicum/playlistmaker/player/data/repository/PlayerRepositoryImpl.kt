@@ -2,10 +2,22 @@ package com.practicum.playlistmaker.player.data.repository
 
 import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class PlayerRepositoryImpl(
     private val mediaPlayer: MediaPlayer
 ) : PlayerRepository {
+
+    private var progressJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val _progressFlow = MutableSharedFlow<Int>(replay = 1)
 
     override fun preparePlayer(url: String, onPrepared: () -> Unit, onError: (Exception) -> Unit) {
         try {
@@ -46,4 +58,23 @@ class PlayerRepositoryImpl(
     }
 
     override fun getDuration(): Int = mediaPlayer.duration
+
+    override fun isPlaying(): Boolean = mediaPlayer.isPlaying
+
+    override fun observeProgress(): Flow<Int> = _progressFlow
+
+    private fun startProgressTracking() {
+        if (progressJob?.isActive == true) return
+        progressJob = scope.launch {
+            while (isPlaying()) {
+                _progressFlow.emit(getCurrentPosition())
+                delay(300L)
+            }
+        }
+    }
+
+    override fun stopProgressTracking() {
+        progressJob?.cancel()
+        progressJob = null
+    }
 }

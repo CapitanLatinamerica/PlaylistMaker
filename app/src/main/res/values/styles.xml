@@ -192,4 +192,13 @@
         <item name="tabIndicatorFullWidth">true</item>
         <item name="android:background">?attr/colorSecondaryVariant</item>  <!-- Подложка вкладки -->
     </style>
+
+    <style name="tablayoutStyle">
+        <item name="tabIndicatorColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <style name="tablayoutTextStyle">
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">14dp</item>
+    </style>
 </resources>

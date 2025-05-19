@@ -9,7 +9,6 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/yp_white</item>
         <item name="colorOnSecondary">@color/yp_black</item>
-        <item name="android:background">@color/white</item>
         <item name="clear_icon_color">@color/clear_icon_color_light</item>
     </style>
 

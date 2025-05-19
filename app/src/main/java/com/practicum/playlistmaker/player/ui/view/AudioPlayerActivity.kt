@@ -38,7 +38,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.e("AudioPlayer", "AudioPlayer created")
         // Инициализация ViewBinding
         binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -121,7 +120,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         // Наблюдатель за состоянием плеера
         lifecycleScope.launch {
             viewModel.playerState.collect { state ->
-                Log.d("PLAYER_DEBUG", "Player state changed: $state")
                 when (state) {
                     PlayerViewModel.PlayerState.PLAYING ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_pause)
