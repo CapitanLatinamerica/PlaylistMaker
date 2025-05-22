@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
 import com.practicum.playlistmaker.media.MediaViewModel
-import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
@@ -28,6 +27,13 @@ import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import androidx.room.Room
+import com.practicum.playlistmaker.db.data.AppDatabase
+import com.practicum.playlistmaker.db.data.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
+import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
+import com.practicum.playlistmaker.db.domain.FavoriteTracksRepository
+
 
 val appModule = module {
         // Общие зависимости
@@ -63,7 +69,22 @@ val appModule = module {
         single<SearchHistoryInteractor> { SearchHistoryInteractor(get()) }
         single { ITunesService.create() } // Retrofit сервис
 
-        // ViewModel для Settings
+        // Room база данных (синглтон для AppDatabase, который будет управляться Room)
+        single {
+            Room.databaseBuilder(
+                get(),                         // Context
+                AppDatabase::class.java,       // Класс базы данных
+                "playlistmaker.db"       // Имя файла базы данных
+            ).build()
+        }
+
+        single { get<AppDatabase>().favoriteTrackDao() }
+
+        single<FavoriteTracksRepository> { FavoriteTracksRepositoryImpl(get()) }
+        single<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
+        viewModel { FavoriteTracksViewModel(get()) }
+
+    // ViewModel для Settings
         viewModel {
             SettingsViewModel(
                 sharingInteractor = get(),

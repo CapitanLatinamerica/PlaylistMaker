@@ -16,6 +16,7 @@ class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapte
 
     private var onItemClickListener: ((Track) -> Unit)? = null
 
+    // Устанавливаем обработчик клика для элемента
     fun setOnItemClickListener(listener: (Track) -> Unit) {
         onItemClickListener = listener
     }
@@ -23,9 +24,9 @@ class TrackAdapter(private val tracks: MutableList<Track>) : RecyclerView.Adapte
     // Обновление списка треков
     fun updateTracks(newTracks: List<Track>) {
         if (tracks == newTracks) return
-        tracks.clear()
-        tracks.addAll(newTracks)
-        notifyDataSetChanged()
+        tracks.clear()  // Очищаем старые данные
+        tracks.addAll(newTracks)  // Добавляем новые
+        notifyDataSetChanged()  // Обновляем список
     }
 
     // Создание и возврат ViewHolder для каждого элемента списка
