@@ -29,10 +29,11 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import androidx.room.Room
 import com.practicum.playlistmaker.db.data.AppDatabase
-import com.practicum.playlistmaker.db.data.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.db.data.repository.FavoriteTracksRepositoryImpl
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
-import com.practicum.playlistmaker.db.domain.FavoriteTracksRepository
+import com.practicum.playlistmaker.db.domain.repository.FavoriteTracksRepository
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 
 
 val appModule = module {
@@ -44,7 +45,7 @@ val appModule = module {
 
         // Фрагменты медиатеки с параметрами
         viewModel { (fragment: Fragment) ->
-            FavoriteTracksViewModel(fragment)
+            FavoriteTracksViewModel(fragment as FavoriteTracksInteractor)
         }
         viewModel { (fragment: Fragment) ->
             PlaylistsViewModel(fragment)
