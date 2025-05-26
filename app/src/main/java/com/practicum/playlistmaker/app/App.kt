@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.practicum.playlistmaker.di.appModule
 import com.practicum.playlistmaker.di.databaseModule
+import com.practicum.playlistmaker.di.mediaModule
+import com.practicum.playlistmaker.di.settingsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
@@ -35,7 +37,10 @@ class App : Application(), KoinComponent {
         startKoin {
             androidContext(this@App)
             modules(appModule,
-                databaseModule)
+                databaseModule,
+                settingsModule,
+                mediaModule
+            )
         }
 
         val preferences: SharedPreferences = get()                                                  // Получаем SharedPreferences через Koin

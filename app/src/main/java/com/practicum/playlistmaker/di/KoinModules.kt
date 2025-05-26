@@ -40,25 +40,6 @@ val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
 
-        // Медиатека - УПРОЩЕННАЯ ВЕРСИЯ
-        viewModel { MediaViewModel() } // Без параметров
-
-        // Фрагменты медиатеки с параметрами
-        viewModel { (fragment: Fragment) ->
-            FavoriteTracksViewModel(fragment as FavoriteTracksInteractor)
-        }
-        viewModel { (fragment: Fragment) ->
-            PlaylistsViewModel(fragment)
-        }
-
-        // Настройки темы
-        single<ThemeRepository> { ThemeRepositoryImpl(get()) }
-        single<SettingsInteractor> { SettingsInteractorImpl(get()) }
-
-        // Sharing (кнопки)
-        single<SharingRepository> { SharingRepositoryImpl(get()) }                                  // Репозиторий
-        single<SharingInteractor> { SharingInteractorImpl(get()) }                                  // Интерактор
-
         // Поиск и история
         single<SearchRepository> { SearchRepositoryImpl(get()) }
         single<SearchHistoryRepository> {
@@ -69,31 +50,6 @@ val appModule = module {
         single<SearchInteractor> { SearchInteractorImpl(get()) }
         single<SearchHistoryInteractor> { SearchHistoryInteractor(get()) }
         single { ITunesService.create() } // Retrofit сервис
-
-        // Room база данных (синглтон для AppDatabase, который будет управляться Room)
-        single {
-            Room.databaseBuilder(
-                get(),                         // Context
-                AppDatabase::class.java,       // Класс базы данных
-                "playlistmaker.db"       // Имя файла базы данных
-            ).build()
-        }
-
-        single { get<AppDatabase>().favoriteTrackDao() }
-
-        single<FavoriteTracksRepository> { FavoriteTracksRepositoryImpl(get()) }
-        single<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
-        viewModel { FavoriteTracksViewModel(get()) }
-
-    // ViewModel для Settings
-        viewModel {
-            SettingsViewModel(
-                sharingInteractor = get(),
-                settingsInteractor = get(),
-                context = get()
-            )
-        }
-
         viewModel { SearchViewModel(get(), get()) }
     }
 
@@ -111,6 +67,39 @@ val databaseModule = module {
 
     single<FavoriteTracksRepository> { FavoriteTracksRepositoryImpl(get()) }
     single<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
+    viewModel { FavoriteTracksViewModel(get()) }
+}
+
+
+// Модуль настроек
+val settingsModule = module {
+    single<ThemeRepository> { ThemeRepositoryImpl(get()) }
+    single<SettingsInteractor> { SettingsInteractorImpl(get()) }
+
+    single<SharingRepository> { SharingRepositoryImpl(get()) }
+    single<SharingInteractor> { SharingInteractorImpl(get()) }
+
+    viewModel {
+        SettingsViewModel(
+            sharingInteractor = get(),
+            settingsInteractor = get(),
+            context = get()
+        )
+    }
+}
+
+// Модуль медиатеки
+val mediaModule = module {
+    // Медиатека - УПРОЩЕННАЯ ВЕРСИЯ
+    viewModel { MediaViewModel() } // Без параметров
+
+    // Фрагменты медиатеки с параметрами
+    viewModel { (fragment: Fragment) ->
+        FavoriteTracksViewModel(fragment as FavoriteTracksInteractor)
+    }
+    viewModel { (fragment: Fragment) ->
+        PlaylistsViewModel(fragment)
+    }
 }
 
 fun provideSharedPreferences(context: Context): SharedPreferences {                                 //Создает экземпляр SharedPreferences
