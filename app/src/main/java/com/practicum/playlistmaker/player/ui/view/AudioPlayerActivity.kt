@@ -42,6 +42,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     // Текущий трек
     private var track: Track? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -54,7 +55,10 @@ class AudioPlayerActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         // Создание трека из Intent
+
         track = createTrackFromIntent()
+        Log.d("MyAwesomeLikeButton", "Track received in Activity: $track")
+        viewModel.setTrack(track)
 
         // Проверка и инициализация UI
         track?.let {
@@ -153,11 +157,12 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
 
         //Слушаем кнопку лайк
-/*        viewModel.isLiked.observe(this) { isLiked ->
-            val icon = if (isLiked) R.drawable.ic_like_filled else R.drawable.ic_like_outline
-            binding.buttonLike.setImageResource(icon)
-        }*/
-
+        lifecycleScope.launch {
+            viewModel.isLiked.collect { isLiked ->
+                Log.d("MyAwesomeLikeButton", "Like button state received: $isLiked")
+                updateLikeButton(isLiked)
+            }
+        }
 
         // Наблюдатель за прогрессом воспроизведения
         lifecycleScope.launch {
@@ -190,7 +195,7 @@ class AudioPlayerActivity : AppCompatActivity() {
                 }
             }
         }
-
+        //Пользователь нажимает кнопку Лайк! Идём во ViewModel и там обработаем
         binding.buttonLike.setOnClickListener {
             viewModel.onLikeClicked()
         }
@@ -229,13 +234,11 @@ class AudioPlayerActivity : AppCompatActivity() {
             null
         }
     }
-    private fun setupLikeButton() {
-        binding.buttonLike.setOnClickListener {
-            track?.let {
-                it.isFavorite = !it.isFavorite
-                binding.buttonLike.setImageResource(R.drawable.like_button_background )
-                // Сюда можно вставить SharedPreferences
-            }
-        }
+
+    // Обновление иконки кнопки лайка
+    private fun updateLikeButton(isLiked: Boolean) {
+        Log.d("MyAwesomeLikeButton", "Updating like button, isLiked: $isLiked")
+        val iconRes = if (isLiked) R.drawable.ic_liked_song else R.drawable.ic_another_liked_song
+        binding.buttonLike.setImageResource(iconRes)
     }
 }

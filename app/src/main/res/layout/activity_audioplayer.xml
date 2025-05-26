@@ -126,11 +126,10 @@
                 android:layout_height="51dp"
                 android:scaleType="center"
                 android:background="@drawable/rounded_background_btn"
-                android:src="@drawable/like_button_background"
+                android:src="@drawable/ic_another_liked_song"
                 app:layout_constraintEnd_toEndOf="@id/guideline_end"
                 app:layout_constraintBottom_toBottomOf="@id/buttonPlay"
-                app:layout_constraintTop_toTopOf="@id/buttonPlay"
-                app:tint="@color/like_icon_color" />
+                app:layout_constraintTop_toTopOf="@id/buttonPlay"/>
 
             <!-- Текущее время трека -->
             <TextView

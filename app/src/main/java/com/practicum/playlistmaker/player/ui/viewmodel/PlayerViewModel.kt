@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.player.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
@@ -124,27 +123,28 @@ class PlayerViewModel(
         stopPlayback()
     }
 
-    fun toggleLike() {
-        val currentTrack = track ?: return
-        val newState = likeStorage.toggleLike(currentTrack.trackId)
-        _isLiked.value = newState
-    }
+    //Обраюотаем нажатие кнопки лайка
     fun onLikeClicked() {
-        when (_isLiked.value) {
-            true -> {
-                playerRepository.pausePlayer()
-                _playerState.value = PlayerState.PAUSED
-                stopProgressUpdater()
-            }
-            false -> {
-                playerRepository.startPlayer()
-                _playerState.value = PlayerState.PLAYING
-                startProgressUpdater()
-            }
-            else -> {}
-        }
-        // Тут вызвать интерактор: добавить или удалить из избранного
+        val currentTrack = track ?: return                                                          // Получаем текущий трек
+        Log.d("MyAwesomeLikeButton", "onLikeClicked called for track: ${currentTrack.trackName}, current like state: ${_isLiked.value}")
+        val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
+        Log.d("MyAwesomeLikeButton", "New like state: $newState")
+        _isLiked.value = newState                                                                   // Обновляем состояние лайка
+        Log.d("MyAwesomeLikeButton", "isLiked state updated: ${_isLiked.value}")
+        track?.isFavorite = newState                                                                // Обновляем состояние трека
+    }
 
+    fun setTrack(track: Track?) {
+        if (track != null) {
+            this.track = track
+            Log.d("MyAwesomeLikeButton", "Track set in ViewModel: ${track.trackName}, id: ${track.trackId}")
+
+            val isTrackLiked = likeStorage.isLiked(track.trackId)
+            _isLiked.value = isTrackLiked
+            Log.d("MyAwesomeLikeButton", "Initial isLiked state set to: $isTrackLiked")
+        } else {
+            Log.d("MyAwesomeLikeButton", "setTrack received null!")
+        }
     }
 
 }

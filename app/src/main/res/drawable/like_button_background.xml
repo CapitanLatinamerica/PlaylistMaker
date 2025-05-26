@@ -3,3 +3,4 @@
     <item android:drawable="@drawable/ic_liked_song" android:state_selected="true" />
     <item android:drawable="@drawable/ic_another_liked_song" />
 </selector>
+
