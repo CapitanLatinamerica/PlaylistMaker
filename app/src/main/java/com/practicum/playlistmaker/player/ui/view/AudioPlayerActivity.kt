@@ -21,16 +21,22 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.data.Constants
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.model.PlayerState
 
 class AudioPlayerActivity : AppCompatActivity() {
 
     // Binding для работы с layout
     private lateinit var binding: ActivityAudioplayerBinding
+    private val likeStorage: LikeStorage by lazy { LikeStorage(applicationContext) } // Инициализируем в самом Activity
 
     // ViewModel для управления логикой плеера
+    // Получаем ViewModel с передачей LikeStorage
     private val viewModel: PlayerViewModel by viewModels {
-        PlayerViewModelFactory(PlayerRepositoryImpl(MediaPlayer()))
+        PlayerViewModelFactory(
+            PlayerRepositoryImpl(MediaPlayer()),
+            likeStorage
+        )
     }
 
     // Текущий трек
@@ -56,6 +62,8 @@ class AudioPlayerActivity : AppCompatActivity() {
             viewModel.setInitialDuration() // Установка начальной длительности (30 сек)
             setupObservers() // Настройка наблюдателей
             setupListeners() // Настройка слушателей
+            it.isFavorite = likeStorage.isLiked(it.trackId)
+            binding.buttonLike.setImageResource(R.drawable.like_button_background )
         } ?: run {
             // Обработка ошибки загрузки трека
             Toast.makeText(this, "Ошибка загрузки трека", Toast.LENGTH_LONG).show()
@@ -71,6 +79,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
         val genre = intent.getStringExtra(Constants.Extra.GENRE)
         val country = intent.getStringExtra(Constants.Extra.COUNTRY)
+        val isFavorite = intent.getStringExtra(Constants.Extra.IS_FAVORITE)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -143,6 +152,13 @@ class AudioPlayerActivity : AppCompatActivity() {
             }
         }
 
+        //Слушаем кнопку лайк
+/*        viewModel.isLiked.observe(this) { isLiked ->
+            val icon = if (isLiked) R.drawable.ic_like_filled else R.drawable.ic_like_outline
+            binding.buttonLike.setImageResource(icon)
+        }*/
+
+
         // Наблюдатель за прогрессом воспроизведения
         lifecycleScope.launch {
             viewModel.progress.collectLatest { remainingTimeMs ->
@@ -174,6 +190,10 @@ class AudioPlayerActivity : AppCompatActivity() {
                 }
             }
         }
+
+        binding.buttonLike.setOnClickListener {
+            viewModel.onLikeClicked()
+        }
     }
 
     // Форматирование времени из миллисекунд в строку MM:SS
@@ -185,11 +205,13 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     //Создание объекта Track из данных Intent
     private fun createTrackFromIntent(): Track? {
+        Log.d("AudioPlayer", "createTrackFromIntent started")
         val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME)
         val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME)
         val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull()
         val artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
         val previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL)
+        val isFavorite = intent.getStringExtra(Constants.Extra.IS_FAVORITE)
         Log.d("AudioPlayer", "Received data - TrackName: $trackName, ArtistName: $artistName, Time: $trackTimeMillis, Artwork: $artworkUrl100, PreviewUrl: $previewUrl")
 
         return try {
@@ -205,6 +227,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("AudioPlayer", "Error creating track", e)
             null
+        }
+    }
+    private fun setupLikeButton() {
+        binding.buttonLike.setOnClickListener {
+            track?.let {
+                it.isFavorite = !it.isFavorite
+                binding.buttonLike.setImageResource(R.drawable.like_button_background )
+                // Сюда можно вставить SharedPreferences
+            }
         }
     }
 }

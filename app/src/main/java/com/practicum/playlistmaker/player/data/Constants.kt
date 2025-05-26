@@ -12,5 +12,6 @@ object Constants {
         const val GENRE = "genre"
         const val COUNTRY = "country"
         const val PREVIEW_URL = "preview_url"
+        const val IS_FAVORITE = "is_favorite"
     }
 }

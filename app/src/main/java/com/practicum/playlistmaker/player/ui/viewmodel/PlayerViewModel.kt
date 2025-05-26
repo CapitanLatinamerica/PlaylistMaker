@@ -1,7 +1,10 @@
 package com.practicum.playlistmaker.player.ui.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
@@ -12,7 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val likeStorage: LikeStorage
 ) : ViewModel() {
 
     private val HARDCODED_DURATION_MS = 30_000
@@ -24,6 +28,11 @@ class PlayerViewModel(
     // Оставшееся время воспроизведения трека (в миллисекундах)
     private val _progress = MutableStateFlow(0)
     val progress: StateFlow<Int> = _progress
+
+    private val _isLiked = MutableStateFlow<Boolean>(false)
+    var isLiked: StateFlow<Boolean> = _isLiked
+
+    private var track: Track? = null
 
     // Job-короутина, обновляющая прогресс воспроизведения
     private var playbackJob: Job? = null
@@ -114,4 +123,28 @@ class PlayerViewModel(
         super.onCleared()
         stopPlayback()
     }
+
+    fun toggleLike() {
+        val currentTrack = track ?: return
+        val newState = likeStorage.toggleLike(currentTrack.trackId)
+        _isLiked.value = newState
+    }
+    fun onLikeClicked() {
+        when (_isLiked.value) {
+            true -> {
+                playerRepository.pausePlayer()
+                _playerState.value = PlayerState.PAUSED
+                stopProgressUpdater()
+            }
+            false -> {
+                playerRepository.startPlayer()
+                _playerState.value = PlayerState.PLAYING
+                startProgressUpdater()
+            }
+            else -> {}
+        }
+        // Тут вызвать интерактор: добавить или удалить из избранного
+
+    }
+
 }

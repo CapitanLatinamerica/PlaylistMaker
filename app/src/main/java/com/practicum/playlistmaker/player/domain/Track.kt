@@ -13,7 +13,8 @@ data class Track(
     val releaseDate: String? = null,    // Год
     val primaryGenreName: String? = null, // Жанр
     val country: String? = null,         // Страна исполнителя
-    val previewUrl: String? = null      // Ссылка на отрывок трека
+    val previewUrl: String? = null,
+    var isFavorite: Boolean = false // состояние лайка
 ) {
 
     fun getArtworkUrl512(): String {

@@ -97,6 +97,22 @@ val appModule = module {
         viewModel { SearchViewModel(get(), get()) }
     }
 
+// Модуль для работы с Room
+val databaseModule = module {
+    single {
+        Room.databaseBuilder(
+            get(),
+            AppDatabase::class.java,
+            "playlistmaker.db"
+        ).build()
+    }
+
+    single { get<AppDatabase>().favoriteTrackDao() }
+
+    single<FavoriteTracksRepository> { FavoriteTracksRepositoryImpl(get()) }
+    single<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
+}
+
 fun provideSharedPreferences(context: Context): SharedPreferences {                                 //Создает экземпляр SharedPreferences
     return context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 }
