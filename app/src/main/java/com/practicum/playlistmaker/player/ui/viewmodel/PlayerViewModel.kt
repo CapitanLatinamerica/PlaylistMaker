@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.player.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.player.domain.model.AudioPlayerUiState
@@ -17,8 +18,10 @@ import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val playerRepository: PlayerRepository,
-    private val likeStorage: LikeStorage
+    private val likeStorage: LikeStorage,
+    private val favoriteTracksViewModel: FavoriteTracksViewModel
 ) : ViewModel() {
+
 
     private val HARDCODED_DURATION_MS = 30_000
 
@@ -132,24 +135,25 @@ class PlayerViewModel(
     //Обраюотаем нажатие кнопки лайка
     fun onLikeClicked() {
         val currentTrack = track ?: return                                                          // Получаем текущий трек
-        Log.d("MyAwesomeLikeButton", "onLikeClicked called for track: ${currentTrack.trackName}, current like state: ${_isLiked.value}")
         val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
-        Log.d("MyAwesomeLikeButton", "New like state: $newState")
         _isLiked.value = newState                                                                   // Обновляем состояние лайка
-        Log.d("MyAwesomeLikeButton", "isLiked state updated: ${_isLiked.value}")
         track?.isFavorite = newState                                                                // Обновляем состояние трека
+
+        if (newState) {
+            // Добавляем трек в избранное, если он добавлен в избранное
+            favoriteTracksViewModel.addTrackToFavorites(currentTrack)
+        } else {
+            // Удаляем трек из избранного, если он удален из избранного
+            favoriteTracksViewModel.removeTrackFromFavorites(currentTrack)
+        }
     }
 
     fun setTrack(track: Track?) {
         if (track != null) {
             this.track = track
-            Log.d("MyAwesomeLikeButton", "Track set in ViewModel: ${track.trackName}, id: ${track.trackId}")
-
             val isTrackLiked = likeStorage.isLiked(track.trackId)
             _isLiked.value = isTrackLiked
-            Log.d("MyAwesomeLikeButton", "Initial isLiked state set to: $isTrackLiked")
         } else {
-            Log.d("MyAwesomeLikeButton", "setTrack received null!")
         }
     }
 

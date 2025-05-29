@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.db.data.repository
 
+import android.util.Log
 import com.practicum.playlistmaker.db.data.FavoriteTrackDao
 import com.practicum.playlistmaker.db.domain.model.FavoriteTrackEntity
 import com.practicum.playlistmaker.db.domain.repository.FavoriteTracksRepository
@@ -12,19 +13,19 @@ class FavoriteTracksRepositoryImpl(
 ) : FavoriteTracksRepository {
 
     override suspend fun addTrackToFavorites(track: Track) {
-        // Преобразуем Track в FavoriteTrackEntity и добавляем в базу данных
+        Log.d("FavoriteTracksRepositoryImpl", "Inserting track into database: ${track.trackName}")
         favoriteTracksDao.insertTrack(FavoriteTrackEntity.fromTrack(track))
     }
 
     override suspend fun removeTrackFromFavorites(track: Track) {
-        // Преобразуем Track в FavoriteTrackEntity и удаляем из базы данных
+        Log.d("FavoriteTracksRepositoryImpl", "Deleting track from database: ${track.trackName}")
         favoriteTracksDao.deleteTrack(FavoriteTrackEntity.fromTrack(track))
     }
 
     override suspend fun getAllFavoriteTracks(): Flow<List<Track>> {
-        // Получаем все записи из базы и преобразуем их в Track
         return favoriteTracksDao.getAllTracks().map { entities ->
-            entities.map { it.toTrack() } // Преобразуем каждую сущность в Track
+            entities.map { it.toTrack() }
         }
     }
 }
+

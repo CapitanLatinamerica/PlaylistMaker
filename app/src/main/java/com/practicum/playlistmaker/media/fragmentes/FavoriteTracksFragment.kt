@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.media.fragmentes
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,10 +56,13 @@ class FavoriteTracksFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.favoriteTracks.collect { tracks ->
+
                     if (tracks.isNullOrEmpty()) {
+                        Log.d("FavoriteTracksFragment", "Favorite tracks list is empty.")
                         emptyPlaceholder.visibility = View.VISIBLE
                         recyclerView.visibility = View.GONE
                     } else {
+                        Log.d("FavoriteTracksFragment", "Favorite tracks count: ${tracks.size}")
                         emptyPlaceholder.visibility = View.GONE
                         recyclerView.visibility = View.VISIBLE
                         adapter.submitList(tracks)

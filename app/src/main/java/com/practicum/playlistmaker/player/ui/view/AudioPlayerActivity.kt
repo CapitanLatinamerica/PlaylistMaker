@@ -21,6 +21,7 @@ import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.model.PlayerState
+import org.koin.android.ext.android.get
 
 class AudioPlayerActivity : AppCompatActivity() {
 
@@ -32,8 +33,9 @@ class AudioPlayerActivity : AppCompatActivity() {
     // Получаем ViewModel с передачей LikeStorage
     private val viewModel: PlayerViewModel by viewModels {
         PlayerViewModelFactory(
-            PlayerRepositoryImpl(MediaPlayer()),
-            likeStorage
+            playerRepository = PlayerRepositoryImpl(MediaPlayer()),
+            likeStorage = likeStorage,
+            favoriteTracksViewModel = get() // Передаем зависимость FavoriteTracksViewModel через Koin
         )
     }
 

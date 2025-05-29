@@ -1,9 +1,12 @@
 package com.practicum.playlistmaker.db.data
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.practicum.playlistmaker.db.domain.model.FavoriteTrackEntity
 import kotlinx.coroutines.flow.Flow
-
 
 @Dao
 interface FavoriteTrackDao {

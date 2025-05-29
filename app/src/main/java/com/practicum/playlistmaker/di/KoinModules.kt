@@ -31,7 +31,7 @@ import androidx.room.Room
 import com.practicum.playlistmaker.db.data.AppDatabase
 import com.practicum.playlistmaker.db.data.repository.FavoriteTracksRepositoryImpl
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
-import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
+import com.practicum.playlistmaker.db.data.FavoriteTracksInteractorImpl
 import com.practicum.playlistmaker.db.domain.repository.FavoriteTracksRepository
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 
