@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.player.ui.view
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,7 +10,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.Track
@@ -42,7 +40,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     // Текущий трек
     private var track: Track? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,13 +48,10 @@ class AudioPlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Настройка toolbar (кнопка "назад")
-        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
-        toolbar.setNavigationOnClickListener { finish() }
+        setupToolbar()
 
         // Создание трека из Intent
-
         track = createTrackFromIntent()
-        Log.d("MyAwesomeLikeButton", "Track received in Activity: $track")
         viewModel.setTrack(track)
 
         // Проверка и инициализация UI
@@ -67,7 +61,6 @@ class AudioPlayerActivity : AppCompatActivity() {
             setupObservers() // Настройка наблюдателей
             setupListeners() // Настройка слушателей
             it.isFavorite = likeStorage.isLiked(it.trackId)
-            binding.buttonLike.setImageResource(R.drawable.like_button_background )
         } ?: run {
             // Обработка ошибки загрузки трека
             Toast.makeText(this, "Ошибка загрузки трека", Toast.LENGTH_LONG).show()
@@ -83,7 +76,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
         val genre = intent.getStringExtra(Constants.Extra.GENRE)
         val country = intent.getStringExtra(Constants.Extra.COUNTRY)
-        val isFavorite = intent.getStringExtra(Constants.Extra.IS_FAVORITE)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -119,6 +111,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener { finish() }
+    }
     //Настройка основных элементов UI @param track Трек для отображения
     private fun setupUI(track: Track) {
         binding.trackName.setText(track.trackName)
@@ -159,8 +154,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         //Слушаем кнопку лайк
         lifecycleScope.launch {
             viewModel.isLiked.collect { isLiked ->
-                Log.d("MyAwesomeLikeButton", "Like button state received: $isLiked")
-                updateLikeButton(isLiked)
+                val icon = if (isLiked) R.drawable.ic_liked_song else R.drawable.ic_unliked_song
+                binding.buttonLike.setImageResource(icon)
             }
         }
 
@@ -210,18 +205,9 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     //Создание объекта Track из данных Intent
     private fun createTrackFromIntent(): Track? {
-        Log.d("AudioPlayer", "createTrackFromIntent started")
-        val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME)
-        val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME)
-        val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull()
-        val artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
-        val previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL)
-        val isFavorite = intent.getStringExtra(Constants.Extra.IS_FAVORITE)
-        Log.d("AudioPlayer", "Received data - TrackName: $trackName, ArtistName: $artistName, Time: $trackTimeMillis, Artwork: $artworkUrl100, PreviewUrl: $previewUrl")
-
         return try {
             Track(
-                trackId = -1,
+                trackId = intent.getLongExtra(Constants.Extra.TRACK_ID, -1),
                 trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: return null,
                 artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: return null,
                 trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
@@ -230,15 +216,7 @@ class AudioPlayerActivity : AppCompatActivity() {
                 previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null
             )
         } catch (e: Exception) {
-            Log.e("AudioPlayer", "Error creating track", e)
             null
         }
-    }
-
-    // Обновление иконки кнопки лайка
-    private fun updateLikeButton(isLiked: Boolean) {
-        Log.d("MyAwesomeLikeButton", "Updating like button, isLiked: $isLiked")
-        val iconRes = if (isLiked) R.drawable.ic_liked_song else R.drawable.ic_another_liked_song
-        binding.buttonLike.setImageResource(iconRes)
     }
 }

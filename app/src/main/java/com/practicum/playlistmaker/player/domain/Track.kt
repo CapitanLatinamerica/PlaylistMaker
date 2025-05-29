@@ -1,8 +1,11 @@
 package com.practicum.playlistmaker.player.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Parcelize
 data class Track(
     val trackId: Long,
     val trackName: String,
@@ -15,7 +18,7 @@ data class Track(
     val country: String? = null,         // Страна исполнителя
     val previewUrl: String? = null,
     var isFavorite: Boolean = false // состояние лайка
-) {
+) : Parcelable {
 
     fun getArtworkUrl512(): String {
         return artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg")

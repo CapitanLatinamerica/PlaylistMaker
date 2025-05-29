@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.domain.model.AudioPlayerUiState
 import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
@@ -30,6 +32,10 @@ class PlayerViewModel(
 
     private val _isLiked = MutableStateFlow<Boolean>(false)
     var isLiked: StateFlow<Boolean> = _isLiked
+
+    private val _uiState = MutableStateFlow(AudioPlayerUiState())
+    val uiState: StateFlow<AudioPlayerUiState> = _uiState
+
 
     private var track: Track? = null
 
@@ -147,4 +153,10 @@ class PlayerViewModel(
         }
     }
 
+    fun checkIfFavorite(trackId: Long) {
+        viewModelScope.launch {
+            val isFavorite = likeStorage.isLiked(trackId)
+            _uiState.update { it.copy(isFavorite = isFavorite) }
+        }
+    }
 }

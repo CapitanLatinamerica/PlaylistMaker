@@ -180,6 +180,7 @@ class SearchFragment : Fragment() {
     //Заменим this на requireContext
     private fun openAudioPlayer(track: Track) {
         startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+            putExtra(Constants.Extra.TRACK_ID, track.trackId)
             putExtra(Constants.Extra.TRACK_NAME, track.trackName)
             putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
             putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
