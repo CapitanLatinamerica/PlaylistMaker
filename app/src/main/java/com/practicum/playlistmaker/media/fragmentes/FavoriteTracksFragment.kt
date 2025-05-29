@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.media.fragmentes
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 import com.practicum.playlistmaker.player.TrackAdapter
+import com.practicum.playlistmaker.player.data.Constants
+import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -52,6 +56,9 @@ class FavoriteTracksFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        setupRecyclerView()
+
+
         // Наблюдение за StateFlow
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -71,5 +78,32 @@ class FavoriteTracksFragment : Fragment() {
             }
         }
     }
+
+    private fun setupRecyclerView() {
+        adapter = TrackAdapter(mutableListOf())
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        adapter.setOnItemClickListener { track ->
+            openAudioPlayer(track)
+        }
+    }
+
+
+    private fun openAudioPlayer(track: Track) {
+        startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+            putExtra(Constants.Extra.TRACK_ID, track.trackId)
+            putExtra(Constants.Extra.TRACK_NAME, track.trackName)
+            putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
+            putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
+            putExtra(Constants.Extra.ALBUM_COVER, track.getArtworkUrl512())
+            putExtra(Constants.Extra.COLLECTION_NAME, track.collectionName ?: "")
+            putExtra(Constants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
+            putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
+            putExtra(Constants.Extra.COUNTRY, track.country ?: "")
+            putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
+        })
+    }
+
 }
 
