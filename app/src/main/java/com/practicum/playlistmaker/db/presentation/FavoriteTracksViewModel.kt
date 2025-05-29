@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.practicum.playlistmaker.player.domain.Track
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
 
 class FavoriteTracksViewModel(
     private val favoriteTracksInteractor: FavoriteTracksInteractor
@@ -14,6 +16,14 @@ class FavoriteTracksViewModel(
 
     // Метод для загрузки всех избранных треков
     val favoriteTracksLiveData = MutableLiveData<List<Track>>()
+
+    // Получаем Flow<List<Track>>
+    private val _favoriteTracks = MutableStateFlow<List<Track>>(emptyList())
+    val favoriteTracks: StateFlow<List<Track>> = _favoriteTracks
+
+    init {
+        observeFavoriteTracks()
+    }
 
     fun loadFavoriteTracks() {
         viewModelScope.launch {
@@ -38,6 +48,14 @@ class FavoriteTracksViewModel(
     fun removeTrackFromFavorites(track: Track) {
         viewModelScope.launch {
             favoriteTracksInteractor.removeTrackFromFavorites(track)
+        }
+    }
+
+    private fun observeFavoriteTracks() {
+        viewModelScope.launch {
+            favoriteTracksInteractor.getAllFavoriteTracks().collectLatest { tracks ->
+                _favoriteTracks.value = tracks
+            }
         }
     }
 }

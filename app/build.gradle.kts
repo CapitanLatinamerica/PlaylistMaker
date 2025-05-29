@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    kotlin("plugin.serialization") version "2.1.0"
+    kotlin("plugin.serialization") version "2.1.20"
     id ("kotlin-parcelize")
+    id ("kotlin-kapt")
 }
 
 android {
@@ -66,4 +67,5 @@ dependencies {
     implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
     implementation("androidx.room:room-runtime:2.7.1")
     implementation("androidx.room:room-ktx:2.7.1")
+    kapt ("androidx.room:room-compiler:2.7.1")
 }

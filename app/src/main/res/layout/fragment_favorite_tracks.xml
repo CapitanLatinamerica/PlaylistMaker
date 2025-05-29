@@ -32,6 +32,7 @@ android:id="@+id/frag_fav_track">
         android:textColor="?attr/colorOnSecondary"
         android:layout_marginTop="16dp"
         style="@style/MessageTextStyle"/>
+
 </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favorites"

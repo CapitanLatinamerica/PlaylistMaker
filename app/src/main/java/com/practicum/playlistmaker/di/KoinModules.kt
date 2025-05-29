@@ -33,6 +33,7 @@ import com.practicum.playlistmaker.db.data.repository.FavoriteTracksRepositoryIm
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
 import com.practicum.playlistmaker.db.domain.repository.FavoriteTracksRepository
+import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
 
 
 val appModule = module {
@@ -61,12 +62,7 @@ val databaseModule = module {
             "playlistmaker.db"
         ).build()
     }
-
     single { get<AppDatabase>().favoriteTrackDao() }
-
-    single<FavoriteTracksRepository> { FavoriteTracksRepositoryImpl(get()) }
-    single<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
-    viewModel { FavoriteTracksViewModel(get()) }
 }
 
 
@@ -93,12 +89,16 @@ val mediaModule = module {
     viewModel { MediaViewModel() } // Без параметров
 
     // Фрагменты медиатеки с параметрами
-    viewModel { (fragment: Fragment) ->
-        FavoriteTracksViewModel(fragment as FavoriteTracksInteractor)
+    single<FavoriteTracksRepository> {
+        FavoriteTracksRepositoryImpl(get())
     }
-    viewModel { (fragment: Fragment) ->
-        PlaylistsViewModel(fragment)
+
+    single<FavoriteTracksInteractor> {
+        FavoriteTracksInteractorImpl(get())
     }
+
+    viewModel { FavoriteTracksViewModel(get()) }
+    viewModel { PlaylistsViewModel(get()) }
 }
 
 fun provideSharedPreferences(context: Context): SharedPreferences {                                 //Создает экземпляр SharedPreferences
