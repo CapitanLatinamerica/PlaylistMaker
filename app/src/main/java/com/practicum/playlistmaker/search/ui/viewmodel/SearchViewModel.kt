@@ -42,7 +42,7 @@ class SearchViewModel(
         if (isHistoryLoaded) return                               // Защита от повторной загрузки
 
         viewModelScope.launch {
-            val history = searchHistoryInteractor.getHistory()
+            val history = searchHistoryInteractor.getHistory().sortedByDescending { it.isFavorite }
             _uiState.value = _uiState.value.copy(
                 screenState = SearchScreenState.HISTORY,
                 history = history,
@@ -55,7 +55,7 @@ class SearchViewModel(
     // Загружаем историю поиска
     fun loadSearchHistory() {
         viewModelScope.launch {
-            val history = searchHistoryInteractor.getHistory()
+            val history = searchHistoryInteractor.getHistory().sortedByDescending { it.isFavorite }
             _uiState.value = _uiState.value.copy(
                 history = history,
                 screenState = if (history.isEmpty()) SearchScreenState.IDLE

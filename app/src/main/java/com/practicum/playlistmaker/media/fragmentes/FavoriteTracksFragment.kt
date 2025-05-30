@@ -2,31 +2,27 @@ package com.practicum.playlistmaker.media.fragmentes
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
+import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
 import com.practicum.playlistmaker.player.TrackAdapter
 import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class FavoriteTracksFragment : Fragment() {
 
     private val viewModel: FavoriteTracksViewModel by viewModel()
-
 
     private lateinit var adapter: TrackAdapter
     private lateinit var recyclerView: RecyclerView
@@ -58,18 +54,15 @@ class FavoriteTracksFragment : Fragment() {
 
         setupRecyclerView()
 
-
         // Наблюдение за StateFlow
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.favoriteTracks.collect { tracks ->
 
                     if (tracks.isNullOrEmpty()) {
-                        Log.d("FavoriteTracksFragment", "Favorite tracks list is empty.")
                         emptyPlaceholder.visibility = View.VISIBLE
                         recyclerView.visibility = View.GONE
                     } else {
-                        Log.d("FavoriteTracksFragment", "Favorite tracks count: ${tracks.size}")
                         emptyPlaceholder.visibility = View.GONE
                         recyclerView.visibility = View.VISIBLE
                         adapter.submitList(tracks)
@@ -89,7 +82,6 @@ class FavoriteTracksFragment : Fragment() {
         }
     }
 
-
     private fun openAudioPlayer(track: Track) {
         startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
             putExtra(Constants.Extra.TRACK_ID, track.trackId)
@@ -102,8 +94,8 @@ class FavoriteTracksFragment : Fragment() {
             putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
             putExtra(Constants.Extra.COUNTRY, track.country ?: "")
             putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
+            putExtra(Constants.Extra.IS_FAVORITE, track.isFavorite)
         })
     }
-
 }
 

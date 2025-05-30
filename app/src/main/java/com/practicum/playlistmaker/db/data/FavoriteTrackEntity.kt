@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.db.domain.model
+package com.practicum.playlistmaker.db.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

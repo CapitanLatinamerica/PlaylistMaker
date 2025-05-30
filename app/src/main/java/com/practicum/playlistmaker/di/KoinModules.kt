@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
 import com.practicum.playlistmaker.media.MediaViewModel
 import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
@@ -32,19 +31,21 @@ import com.practicum.playlistmaker.db.data.AppDatabase
 import com.practicum.playlistmaker.db.data.repository.FavoriteTracksRepositoryImpl
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.practicum.playlistmaker.db.data.FavoriteTracksInteractorImpl
-import com.practicum.playlistmaker.db.domain.repository.FavoriteTracksRepository
-import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
+import com.practicum.playlistmaker.db.domain.FavoriteTracksRepository
+import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
 
 
 val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
+        single<LikeStorage> { LikeStorage(get()) }
 
         // Поиск и история
         single<SearchRepository> { SearchRepositoryImpl(get()) }
         single<SearchHistoryRepository> {
             SearchHistoryRepositoryImpl(
-                get()
+                get(), get()
             )
         }
         single<SearchInteractor> { SearchInteractorImpl(get()) }

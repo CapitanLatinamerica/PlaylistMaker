@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.practicum.playlistmaker.db.domain.model.FavoriteTrackEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

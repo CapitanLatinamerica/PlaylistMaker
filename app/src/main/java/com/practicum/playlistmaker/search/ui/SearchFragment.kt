@@ -189,6 +189,7 @@ class SearchFragment : Fragment() {
             putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
             putExtra(Constants.Extra.COUNTRY, track.country ?: "")
             putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
+            putExtra(Constants.Extra.IS_FAVORITE, track.isFavorite)
         })
     }
 

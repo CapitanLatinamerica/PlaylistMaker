@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.app
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.practicum.playlistmaker.di.appModule
 import com.practicum.playlistmaker.di.databaseModule
@@ -11,8 +10,8 @@ import com.practicum.playlistmaker.di.settingsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
 import org.koin.core.component.KoinComponent
-import org.koin.core.context.startKoin
 import org.koin.core.component.get
+import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
 const val PREFERENCE_NAME = "user_preferences"
@@ -46,7 +45,6 @@ class App : Application(), KoinComponent {
             )
             logger(AndroidLogger(Level.DEBUG)) // Включите логи Koin
         }
-        Log.d("KoinInit", "Modules initialized")
 
         val preferences: SharedPreferences = get()                                                  // Получаем SharedPreferences через Koin
         val isDarkTheme = preferences.getBoolean(PREFERENCE_THEME_KEY, false)

@@ -2,8 +2,6 @@ package com.practicum.playlistmaker.player.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
-import com.practicum.playlistmaker.player.domain.Track
 
 class LikeStorage(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("likes", Context.MODE_PRIVATE)
@@ -23,17 +21,15 @@ class LikeStorage(context: Context) {
         return newState
     }
 
-    // Метод для добавления трека в избранное
-    fun addToFavorites(track: Track) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("track_${track.trackId}", true) // Помечаем как избранное
-        editor.apply()
+    fun trackExists(trackId: Long): Boolean {
+        return sharedPreferences.contains("track_$trackId") && isLiked(trackId)
     }
 
-    // Метод для удаления трека из избранного
-    fun removeFromFavorites(track: Track) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("track_${track.trackId}", false) // Убираем отметку избранного
-        editor.apply()
+    fun getAllLikedTrackIds(): Set<Long> {
+        return sharedPreferences.all
+            .filter { it.key.startsWith("track_") && it.value == true }
+            .mapNotNull { it.key.removePrefix("track_").toLongOrNull() }
+            .toSet()
     }
+
 }

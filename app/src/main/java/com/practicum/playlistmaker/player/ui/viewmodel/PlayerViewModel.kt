@@ -1,19 +1,16 @@
 package com.practicum.playlistmaker.player.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.media.fragmentes.viewmodel.FavoriteTracksViewModel
+import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
-import com.practicum.playlistmaker.player.domain.model.AudioPlayerUiState
 import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
@@ -21,7 +18,6 @@ class PlayerViewModel(
     private val likeStorage: LikeStorage,
     private val favoriteTracksViewModel: FavoriteTracksViewModel
 ) : ViewModel() {
-
 
     private val HARDCODED_DURATION_MS = 30_000
 
@@ -35,10 +31,6 @@ class PlayerViewModel(
 
     private val _isLiked = MutableStateFlow<Boolean>(false)
     var isLiked: StateFlow<Boolean> = _isLiked
-
-    private val _uiState = MutableStateFlow(AudioPlayerUiState())
-    val uiState: StateFlow<AudioPlayerUiState> = _uiState
-
 
     private var track: Track? = null
 
@@ -137,7 +129,7 @@ class PlayerViewModel(
         val currentTrack = track ?: return                                                          // Получаем текущий трек
         val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
         _isLiked.value = newState                                                                   // Обновляем состояние лайка
-        track?.isFavorite = newState                                                                // Обновляем состояние трека
+        currentTrack.isFavorite = newState                                                                // Обновляем состояние трека
 
         if (newState) {
             // Добавляем трек в избранное, если он добавлен в избранное
@@ -154,13 +146,6 @@ class PlayerViewModel(
             val isTrackLiked = likeStorage.isLiked(track.trackId)
             _isLiked.value = isTrackLiked
         } else {
-        }
-    }
-
-    fun checkIfFavorite(trackId: Long) {
-        viewModelScope.launch {
-            val isFavorite = likeStorage.isLiked(trackId)
-            _uiState.update { it.copy(isFavorite = isFavorite) }
         }
     }
 }

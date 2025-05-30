@@ -64,16 +64,6 @@ class PlayerRepositoryImpl(
 
     override fun observeProgress(): Flow<Int> = _progressFlow
 
-    private fun startProgressTracking() {
-        if (progressJob?.isActive == true) return
-        progressJob = scope.launch {
-            while (isPlaying()) {
-                _progressFlow.emit(getCurrentPosition())
-                delay(300L)
-            }
-        }
-    }
-
     override fun stopProgressTracking() {
         progressJob?.cancel()
         progressJob = null
