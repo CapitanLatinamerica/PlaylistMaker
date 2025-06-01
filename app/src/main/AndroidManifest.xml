@@ -23,8 +23,7 @@
         <activity
             android:name=".player.ui.view.AudioPlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="false"
-            android:theme="@style/Theme.PlaylistMaker" />
+            android:exported="false" />
         <activity
             android:name=".main.MainHostActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"

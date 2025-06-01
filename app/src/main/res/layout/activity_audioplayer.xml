@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.PlaylistMaker"
+    android:background="?attr/colorPrimary"
     tools:context=".player.ui.view.AudioPlayerActivity">
 
     <!-- Тулбар -->
@@ -102,8 +103,7 @@
                 android:src="@drawable/list_adding_icon"
                 app:layout_constraintStart_toStartOf="@id/guideline_start"
                 app:layout_constraintBottom_toBottomOf="@id/buttonPlay"
-                app:layout_constraintTop_toTopOf="@id/buttonPlay"
-                app:tint="?attr/colorPrimary" />
+                app:layout_constraintTop_toTopOf="@id/buttonPlay" />
 
             <!-- Кнопка "Play/Pause" -->
             <ImageButton

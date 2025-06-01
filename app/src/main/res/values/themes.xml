@@ -2,6 +2,7 @@
 
     <!-- для светлой темы -->
     <style name="Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/yp_white</item>
         <item name="colorPrimary">@color/yp_white</item>
         <item name="colorPrimaryDark">@color/yp_black</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
