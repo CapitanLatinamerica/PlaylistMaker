@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.Track
@@ -55,14 +56,17 @@ class SearchViewModel(
     // Загружаем историю поиска
     fun loadSearchHistory() {
         viewModelScope.launch {
+            Log.d("SearchViewModel", "Loading search history")  // Логируем загрузку истории
             val history = searchHistoryInteractor.getHistory().sortedByDescending { it.isFavorite }
             _uiState.value = _uiState.value.copy(
                 history = history,
                 screenState = if (history.isEmpty()) SearchScreenState.IDLE
                 else SearchScreenState.HISTORY
             )
+            Log.d("SearchViewModel", "Search history loaded, history size: ${history.size}")
         }
     }
+
 
     // Выполнение поиска треков по запросу
     fun searchTracks(query: String) {
@@ -145,10 +149,13 @@ class SearchViewModel(
     // Очистка истории поиска
     fun clearSearchHistory() {
         viewModelScope.launch {
+            Log.d("SearchViewModel", "Clearing search history")  // Логируем начало очистки истории
             searchHistoryInteractor.clearHistory()
             loadSearchHistory()
+            Log.d("SearchViewModel", "Search history cleared")
         }
     }
+
 
     fun clearSearchResults() {
         // Не очищаем историю, только результаты поиска
