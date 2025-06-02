@@ -78,6 +78,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
         val genre = intent.getStringExtra(Constants.Extra.GENRE)
         val country = intent.getStringExtra(Constants.Extra.COUNTRY)
+        val localId = intent.getStringExtra(Constants.Extra.LOCAL_ID)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -215,7 +216,8 @@ class AudioPlayerActivity : AppCompatActivity() {
                 trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
                 artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
                     ?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
-                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null
+                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null,
+                localId = intent.getLongExtra(Constants.Extra.LOCAL_ID, 0)
             )
         } catch (e: Exception) {
             null
