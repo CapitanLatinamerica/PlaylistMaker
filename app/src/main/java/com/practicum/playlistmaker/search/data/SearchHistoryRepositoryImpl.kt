@@ -2,15 +2,18 @@ package com.practicum.playlistmaker.search.data
 
 import android.content.SharedPreferences
 import android.util.Log
+import com.practicum.playlistmaker.db.data.FavoriteTrackDao
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SearchHistoryRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
-    private val likeStorage: LikeStorage
+    private val likeStorage: LikeStorage,
+    private val favoriteTrackDao: FavoriteTrackDao // добавляем зависимость от DAO
 ) : SearchHistoryRepository {
 
     companion object {
@@ -27,6 +30,7 @@ class SearchHistoryRepositoryImpl(
         return jsonFormat.encodeToString(tracks)
     }
 
+
     fun fromJsonList(json: String?): List<Track> {
         return try {
             jsonFormat.decodeFromString(json ?: "")
@@ -40,14 +44,31 @@ class SearchHistoryRepositoryImpl(
     override fun saveTrack(track: Track) {
             val history = getHistory().toMutableList()
         if (history.size >= 10) {
-                history.removeAt(0)                                                           // Убираем самый старый элемент, если их больше 10
+                history.removeAt(history.size - 1)                                                           // Убираем самый старый элемент, если их больше 10
             }
+
 
         history.removeAll { existingTrack -> existingTrack.trackId == track.trackId }
         history.add(0, track)                                                             // Добавляем трек в начало списка
 
-        val sortedHistory = history.sortedByDescending { likeStorage.trackExists(it.trackId) }
+        // Назначаем localId для всех треков
+/*        val historyWithLocalIds = history.mapIndexed { index, updatedTrack ->
+            updatedTrack.copy(localId = (index + 1).toLong()) // Назначаем localId начиная с 1
+        }*/
+        val historyWithLocalIds = history.mapIndexed { index, updatedTrack ->
+            val newTrack = updatedTrack.copy(localId = (index + 1).toLong()) // Назначаем localId начиная с 1
 
+            // Логируем каждый трек и его localId
+            Log.d(TAG, "Track: ${newTrack.trackName}, localId: ${newTrack.localId}")
+
+            newTrack
+        }
+
+        val sortedHistory = historyWithLocalIds
+            .sortedWith(compareByDescending<Track> { likeStorage.trackExists(it.trackId) }
+                .thenBy { it.localId })
+
+        Log.d(TAG, "Sorted History: ${sortedHistory.map { it.trackName }}")
         sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(sortedHistory)).apply()            // Сохраняем историю в SharedPreferences
     }
 

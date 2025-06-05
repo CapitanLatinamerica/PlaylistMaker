@@ -21,13 +21,14 @@ import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.model.PlayerState
+import kotlinx.coroutines.flow.Flow
 import org.koin.android.ext.android.get
 
 class AudioPlayerActivity : AppCompatActivity() {
 
     // Binding для работы с layout
     private lateinit var binding: ActivityAudioplayerBinding
-    private val likeStorage: LikeStorage by lazy { LikeStorage(applicationContext) } // Инициализируем в самом Activity
+    private val likeStorage: LikeStorage by lazy { get() } // Инициализируем в самом Activity
 
     // ViewModel для управления логикой плеера
     // Получаем ViewModel с передачей LikeStorage

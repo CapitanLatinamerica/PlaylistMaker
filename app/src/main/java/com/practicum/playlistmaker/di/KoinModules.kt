@@ -29,7 +29,7 @@ import org.koin.dsl.module
 import androidx.room.Room
 import com.practicum.playlistmaker.db.data.AppDatabase
 import com.practicum.playlistmaker.db.data.MIGRATION_1_2
-import com.practicum.playlistmaker.db.data.repository.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.db.data.FavoriteTracksRepositoryImpl
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
 import com.practicum.playlistmaker.db.domain.FavoriteTracksRepository
@@ -40,13 +40,14 @@ import com.practicum.playlistmaker.player.data.repository.LikeStorage
 val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
-        single<LikeStorage> { LikeStorage(get()) }
+    single { LikeStorage(androidContext(), get()) }
 
-        // Поиск и история
+
+    // Поиск и история
         single<SearchRepository> { SearchRepositoryImpl(get()) }
         single<SearchHistoryRepository> {
             SearchHistoryRepositoryImpl(
-                get(), get()
+                get(), get(), get()
             )
         }
         single<SearchInteractor> { SearchInteractorImpl(get()) }

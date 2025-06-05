@@ -21,4 +21,8 @@ interface FavoriteTrackDao {
 
     @Query("SELECT trackId FROM favorite_tracks")
     suspend fun getAllTrackIds(): List<Long>            //возвращает только идентификаторы избранных треков
+
+    @Query("SELECT * FROM favorite_tracks WHERE trackId = :trackId LIMIT 1")
+    fun getTrackById(trackId: Long): FavoriteTrackEntity?
+
 }

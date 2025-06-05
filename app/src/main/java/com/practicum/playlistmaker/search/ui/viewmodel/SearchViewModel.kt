@@ -43,7 +43,9 @@ class SearchViewModel(
         if (isHistoryLoaded) return                               // Защита от повторной загрузки
 
         viewModelScope.launch {
-            val history = searchHistoryInteractor.getHistory().sortedByDescending { it.isFavorite }
+            val history = searchHistoryInteractor.getHistory()
+                .sortedWith(compareByDescending<Track> { it.isFavorite }
+                .thenBy { it.localId })
             _uiState.value = _uiState.value.copy(
                 screenState = SearchScreenState.HISTORY,
                 history = history,
@@ -57,7 +59,9 @@ class SearchViewModel(
     fun loadSearchHistory() {
         viewModelScope.launch {
             Log.d("SearchViewModel", "Loading search history")  // Логируем загрузку истории
-            val history = searchHistoryInteractor.getHistory().sortedByDescending { it.isFavorite }
+            val history = searchHistoryInteractor.getHistory()
+                .sortedWith(compareByDescending<Track> { it.isFavorite }
+                    .thenBy { it.localId })
             _uiState.value = _uiState.value.copy(
                 history = history,
                 screenState = if (history.isEmpty()) SearchScreenState.IDLE
@@ -149,13 +153,10 @@ class SearchViewModel(
     // Очистка истории поиска
     fun clearSearchHistory() {
         viewModelScope.launch {
-            Log.d("SearchViewModel", "Clearing search history")  // Логируем начало очистки истории
             searchHistoryInteractor.clearHistory()
             loadSearchHistory()
-            Log.d("SearchViewModel", "Search history cleared")
         }
     }
-
 
     fun clearSearchResults() {
         // Не очищаем историю, только результаты поиска
