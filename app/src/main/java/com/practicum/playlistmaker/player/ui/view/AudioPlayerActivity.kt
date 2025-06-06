@@ -21,7 +21,6 @@ import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.data.Constants
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.model.PlayerState
-import kotlinx.coroutines.flow.Flow
 import org.koin.android.ext.android.get
 
 class AudioPlayerActivity : AppCompatActivity() {
@@ -218,7 +217,7 @@ class AudioPlayerActivity : AppCompatActivity() {
                 artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
                     ?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
                 previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null,
-                localId = intent.getLongExtra(Constants.Extra.LOCAL_ID, 0)
+                addedAt = intent.getLongExtra(Constants.Extra.LOCAL_ID, 0)
             )
         } catch (e: Exception) {
             null

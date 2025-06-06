@@ -28,7 +28,7 @@ class SearchRepositoryImpl(
                     primaryGenreName = it.primaryGenreName,
                     country = it.country,
                     previewUrl = it.previewUrl,
-                    localId = 0
+                    addedAt = 0
                 )
             }
             emit(Result.success(tracks))

@@ -16,7 +16,7 @@ data class FavoriteTrackEntity(
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?,
-    val localId: Long? = null
+    val addedAt: Long = 0
 ) {
     // Функция для преобразования в Track
     fun toTrack(): Track {
@@ -31,7 +31,7 @@ data class FavoriteTrackEntity(
             primaryGenreName = primaryGenreName,
             country = country,
             previewUrl = previewUrl,
-            localId = localId
+            addedAt = addedAt
         )
     }
 
@@ -49,7 +49,7 @@ data class FavoriteTrackEntity(
                 primaryGenreName = track.primaryGenreName,
                 country = track.country,
                 previewUrl = track.previewUrl,
-                localId = track.localId
+                addedAt = track.addedAt
             )
         }
     }

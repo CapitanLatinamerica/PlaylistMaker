@@ -18,7 +18,7 @@ data class Track(
     val country: String? = null,         // Страна исполнителя
     val previewUrl: String? = null,
     var isFavorite: Boolean = false, // состояние лайка
-    var localId: Long?
+    var addedAt: Long = 0
 ) : Parcelable {
 
     fun getArtworkUrl512(): String {

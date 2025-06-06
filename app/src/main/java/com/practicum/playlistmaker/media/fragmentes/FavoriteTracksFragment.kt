@@ -95,7 +95,7 @@ class FavoriteTracksFragment : Fragment() {
             putExtra(Constants.Extra.COUNTRY, track.country ?: "")
             putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
             putExtra(Constants.Extra.IS_FAVORITE, track.isFavorite)
-            putExtra(Constants.Extra.LOCAL_ID, track.localId)
+            putExtra(Constants.Extra.LOCAL_ID, track.addedAt)
         })
     }
 }

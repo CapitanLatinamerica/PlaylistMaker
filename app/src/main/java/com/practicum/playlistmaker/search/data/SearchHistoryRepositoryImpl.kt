@@ -43,30 +43,25 @@ class SearchHistoryRepositoryImpl(
     // Сохранение трека в историю
     override fun saveTrack(track: Track) {
             val history = getHistory().toMutableList()
-        if (history.size >= 10) {
-                history.removeAt(history.size - 1)                                                           // Убираем самый старый элемент, если их больше 10
-            }
-
+        if (history.size >= 10) { history.removeAt(history.size - 1) } // Убираем самый старый элемент, если их больше 10
 
         history.removeAll { existingTrack -> existingTrack.trackId == track.trackId }
         history.add(0, track)                                                             // Добавляем трек в начало списка
 
-        // Назначаем localId для всех треков
-/*        val historyWithLocalIds = history.mapIndexed { index, updatedTrack ->
-            updatedTrack.copy(localId = (index + 1).toLong()) // Назначаем localId начиная с 1
-        }*/
-        val historyWithLocalIds = history.mapIndexed { index, updatedTrack ->
-            val newTrack = updatedTrack.copy(localId = (index + 1).toLong()) // Назначаем localId начиная с 1
-
-            // Логируем каждый трек и его localId
-            Log.d(TAG, "Track: ${newTrack.trackName}, localId: ${newTrack.localId}")
-
-            newTrack
+        val historyWithAddedAt = history.map { updatedTrack ->
+            if (updatedTrack.isFavorite) {
+                Log.d("SearchHistoryRepo", "Track: ${updatedTrack.trackName}, addedAt before: ${updatedTrack.addedAt}")
+                updatedTrack.copy(addedAt = track.addedAt ?: System.currentTimeMillis()).also {
+                    Log.d("SearchHistoryRepo", "Track: ${updatedTrack.trackName}, addedAt after: ${it.addedAt}")
+                }
+            } else {
+                updatedTrack // Для треков, не добавленных в избранное, не меняем addedAt
+            }
         }
 
-        val sortedHistory = historyWithLocalIds
+        val sortedHistory = historyWithAddedAt
             .sortedWith(compareByDescending<Track> { likeStorage.trackExists(it.trackId) }
-                .thenBy { it.localId })
+                .thenBy { it.addedAt })
 
         Log.d(TAG, "Sorted History: ${sortedHistory.map { it.trackName }}")
         sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(sortedHistory)).apply()            // Сохраняем историю в SharedPreferences
@@ -79,9 +74,15 @@ class SearchHistoryRepositoryImpl(
 
             val likedTrackIds = likeStorage.getAllLikedTrackIds()
 
-            history.map { track ->
-                track.copy(isFavorite = likedTrackIds.contains(track.trackId))
+            Log.d(TAG, "History before favorite update: ${history.map { it.trackName }}")
+
+            val updatedHistory = history.map { track ->
+                track.copy(isFavorite = likedTrackIds.contains(track.trackId)).also {
+                    Log.d(TAG, "Track: ${it.trackName}, isFavorite: ${it.isFavorite}, addedAt: ${it.addedAt}")
+                }
             }
+
+            updatedHistory
         } catch (e: Exception) {
             emptyList()
         }

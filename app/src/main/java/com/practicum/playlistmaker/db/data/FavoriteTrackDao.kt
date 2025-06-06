@@ -25,4 +25,6 @@ interface FavoriteTrackDao {
     @Query("SELECT * FROM favorite_tracks WHERE trackId = :trackId LIMIT 1")
     fun getTrackById(trackId: Long): FavoriteTrackEntity?
 
+    @Query("UPDATE favorite_tracks SET addedAt = :addedAt WHERE trackId = :trackId")
+    suspend fun updateTrackAddedAt(trackId: Long, addedAt: Long)
 }

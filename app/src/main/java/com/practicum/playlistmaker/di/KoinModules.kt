@@ -28,7 +28,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import androidx.room.Room
 import com.practicum.playlistmaker.db.data.AppDatabase
-import com.practicum.playlistmaker.db.data.MIGRATION_1_2
 import com.practicum.playlistmaker.db.data.FavoriteTracksRepositoryImpl
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
@@ -63,7 +62,7 @@ val databaseModule = module {
             get(),
             AppDatabase::class.java,
             "playlistmaker.db"
-        ).addMigrations(MIGRATION_1_2)
+        ).fallbackToDestructiveMigration(true)
             .build()
     }
     single { get<AppDatabase>().favoriteTrackDao() }

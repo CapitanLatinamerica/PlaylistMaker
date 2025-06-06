@@ -45,7 +45,7 @@ class SearchViewModel(
         viewModelScope.launch {
             val history = searchHistoryInteractor.getHistory()
                 .sortedWith(compareByDescending<Track> { it.isFavorite }
-                .thenBy { it.localId })
+                .thenBy { it.addedAt })
             _uiState.value = _uiState.value.copy(
                 screenState = SearchScreenState.HISTORY,
                 history = history,
@@ -61,7 +61,7 @@ class SearchViewModel(
             Log.d("SearchViewModel", "Loading search history")  // Логируем загрузку истории
             val history = searchHistoryInteractor.getHistory()
                 .sortedWith(compareByDescending<Track> { it.isFavorite }
-                    .thenBy { it.localId })
+                    .thenBy { it.addedAt })
             _uiState.value = _uiState.value.copy(
                 history = history,
                 screenState = if (history.isEmpty()) SearchScreenState.IDLE

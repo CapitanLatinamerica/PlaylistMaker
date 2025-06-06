@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.player.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
@@ -127,16 +128,20 @@ class PlayerViewModel(
     //Обраюотаем нажатие кнопки лайка
     fun onLikeClicked() {
         val currentTrack = track ?: return                                                          // Получаем текущий трек
-        val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
-        _isLiked.value = newState                                                                   // Обновляем состояние лайка
-        currentTrack.isFavorite = newState                                                                // Обновляем состояние трека
+        viewModelScope.launch {
+            val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
+            _isLiked.value = newState                                                                   // Обновляем состояние лайка
+            currentTrack.isFavorite = newState                                                                // Обновляем состояние трека
+            val currentTime = System.currentTimeMillis() // Получаем текущее время
+            Log.d("PlayerViewModel", "Track ${currentTrack.trackName} like state changed to: $newState, addedAt: $currentTime")
 
-        if (newState) {
-            // Добавляем трек в избранное, если он добавлен в избранное
-            favoriteTracksViewModel.addTrackToFavorites(currentTrack)
-        } else {
-            // Удаляем трек из избранного, если он удален из избранного
-            favoriteTracksViewModel.removeTrackFromFavorites(currentTrack)
+            if (newState) {
+                // Добавляем трек в избранное, если он добавлен в избранное
+                favoriteTracksViewModel.addTrackToFavorites(currentTrack)
+            } else {
+                // Удаляем трек из избранного, если он удален из избранного
+                favoriteTracksViewModel.removeTrackFromFavorites(currentTrack)
+            }
         }
     }
 
