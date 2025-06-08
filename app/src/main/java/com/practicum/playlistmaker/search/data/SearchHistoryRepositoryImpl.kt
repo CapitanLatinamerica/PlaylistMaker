@@ -49,7 +49,7 @@ class SearchHistoryRepositoryImpl(
         history.add(0, track)                                                             // Добавляем трек в начало списка
 
         val historyWithAddedAt = history.map { updatedTrack ->
-            if (updatedTrack.isFavorite) {
+            if ((updatedTrack.isFavorite)&&(updatedTrack.trackId == track.trackId)) {
                 Log.d("SearchHistoryRepo", "Track: ${updatedTrack.trackName}, addedAt before: ${updatedTrack.addedAt}")
                 updatedTrack.copy(addedAt = track.addedAt ?: System.currentTimeMillis()).also {
                     Log.d("SearchHistoryRepo", "Track: ${updatedTrack.trackName}, addedAt after: ${it.addedAt}")
@@ -61,7 +61,7 @@ class SearchHistoryRepositoryImpl(
 
         val sortedHistory = historyWithAddedAt
             .sortedWith(compareByDescending<Track> { likeStorage.trackExists(it.trackId) }
-                .thenBy { it.addedAt })
+                .thenByDescending { it.addedAt })
 
         Log.d(TAG, "Sorted History: ${sortedHistory.map { it.trackName }}")
         sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(sortedHistory)).apply()            // Сохраняем историю в SharedPreferences
