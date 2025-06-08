@@ -35,7 +35,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         PlayerViewModelFactory(
             playerRepository = PlayerRepositoryImpl(MediaPlayer()),
             likeStorage = likeStorage,
-            favoriteTracksViewModel = get() // Передаем зависимость FavoriteTracksViewModel через Koin
+            favoriteTracksViewModel = get(),
+            searchHistoryInteractor = get()
         )
     }
 

@@ -28,13 +28,6 @@ class LikeStorage(
         val isCurrentlyLiked = isLiked(trackId)
         val newState = !isCurrentlyLiked
 
-        // Проверяем, изменилось ли состояние лайка, и только в этом случае выполняем действия
-        if (newState) {
-            Log.d("LikeStorage", "Adding track $trackId to favorites at $currentTime")
-        } else {
-            Log.d("LikeStorage", "Removing track $trackId from favorites")
-        }
-
         val editor = sharedPreferences.edit()
         editor.putBoolean("track_$trackId", newState)
 

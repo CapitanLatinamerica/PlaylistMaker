@@ -77,7 +77,7 @@ class SearchHistoryRepositoryImpl(
             Log.d(TAG, "History before favorite update: ${history.map { it.trackName }}")
 
             val updatedHistory = history.map { track ->
-                track.copy(isFavorite = likedTrackIds.contains(track.trackId)).also {
+                track.copy(isFavorite = likedTrackIds.contains(track.trackId), addedAt = if (likedTrackIds.contains(track.trackId)) track.addedAt else 0L).also {
                     Log.d(TAG, "Track: ${it.trackName}, isFavorite: ${it.isFavorite}, addedAt: ${it.addedAt}")
                 }
             }
