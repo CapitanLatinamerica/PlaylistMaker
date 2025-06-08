@@ -2,18 +2,14 @@ package com.practicum.playlistmaker.player.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
-import com.practicum.playlistmaker.db.data.FavoriteTrackDao
 
 class LikeStorage(
-    context: Context,
-    private val favoriteTrackDao: FavoriteTrackDao // добавляем зависимость от DAO
+    context: Context
 ) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("likes", Context.MODE_PRIVATE)
 
     fun isLiked(trackId: Long): Boolean {
         val isLiked = sharedPreferences.getBoolean("track_$trackId", false)
-        Log.d("LikeStorage", "isLiked for trackId $trackId: $isLiked")
         return isLiked
     }
 
@@ -39,7 +35,6 @@ class LikeStorage(
             editor.putLong("track_${trackId}_addedAt", 0L)
         }
         editor.apply()
-
         return newState
     }
 
@@ -52,13 +47,5 @@ class LikeStorage(
             .filter { it.key.startsWith("track_") && it.value == true }
             .mapNotNull { it.key.removePrefix("track_").toLongOrNull() }
             .toSet()
-    }
-
-    fun getTrackAddedAt(trackId: Long): Long?{
-        return try {
-            favoriteTrackDao.getTrackById(trackId)?.addedAt
-        } catch (e: Exception) {
-            null
-        }
     }
 }

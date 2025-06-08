@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.player.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
@@ -134,14 +133,10 @@ class PlayerViewModel(
             val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
             _isLiked.value = newState                                                                   // Обновляем состояние лайка
             currentTrack.isFavorite = newState                                                                // Обновляем состояние трека
-
             val currentTime = System.currentTimeMillis() // Получаем текущее время
-            Log.d("PlayerViewModel", "Track ${currentTrack.trackName} like state changed to: $newState, addedAt: $currentTime")
-
             // Устанавливаем addedAt в зависимости от текущего состояния
             currentTrack.addedAt = if (currentTrack.addedAt == 0L) currentTime else 0
 
-//            track = currentTrack
             searchHistoryInteractor.saveTrack(currentTrack)
 
             if (newState) {

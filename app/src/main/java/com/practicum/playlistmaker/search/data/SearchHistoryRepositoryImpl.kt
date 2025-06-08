@@ -2,18 +2,15 @@ package com.practicum.playlistmaker.search.data
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.practicum.playlistmaker.db.data.FavoriteTrackDao
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
-import kotlinx.coroutines.flow.first
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SearchHistoryRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
-    private val likeStorage: LikeStorage,
-    private val favoriteTrackDao: FavoriteTrackDao // добавляем зависимость от DAO
+    private val likeStorage: LikeStorage
 ) : SearchHistoryRepository {
 
     companion object {
@@ -50,10 +47,7 @@ class SearchHistoryRepositoryImpl(
 
         val historyWithAddedAt = history.map { updatedTrack ->
             if ((updatedTrack.isFavorite)&&(updatedTrack.trackId == track.trackId)) {
-                Log.d("SearchHistoryRepo", "Track: ${updatedTrack.trackName}, addedAt before: ${updatedTrack.addedAt}")
-                updatedTrack.copy(addedAt = track.addedAt ?: System.currentTimeMillis()).also {
-                    Log.d("SearchHistoryRepo", "Track: ${updatedTrack.trackName}, addedAt after: ${it.addedAt}")
-                }
+                updatedTrack.copy(addedAt = track.addedAt)
             } else {
                 updatedTrack // Для треков, не добавленных в избранное, не меняем addedAt
             }
@@ -62,8 +56,6 @@ class SearchHistoryRepositoryImpl(
         val sortedHistory = historyWithAddedAt
             .sortedWith(compareByDescending<Track> { likeStorage.trackExists(it.trackId) }
                 .thenByDescending { it.addedAt })
-
-        Log.d(TAG, "Sorted History: ${sortedHistory.map { it.trackName }}")
         sharedPreferences.edit().putString(HISTORY_KEY, toJsonList(sortedHistory)).apply()            // Сохраняем историю в SharedPreferences
     }
 
@@ -73,13 +65,8 @@ class SearchHistoryRepositoryImpl(
             val history = fromJsonList(json)
 
             val likedTrackIds = likeStorage.getAllLikedTrackIds()
-
-            Log.d(TAG, "History before favorite update: ${history.map { it.trackName }}")
-
             val updatedHistory = history.map { track ->
-                track.copy(isFavorite = likedTrackIds.contains(track.trackId), addedAt = if (likedTrackIds.contains(track.trackId)) track.addedAt else 0L).also {
-                    Log.d(TAG, "Track: ${it.trackName}, isFavorite: ${it.isFavorite}, addedAt: ${it.addedAt}")
-                }
+                track.copy(isFavorite = likedTrackIds.contains(track.trackId), addedAt = if (likedTrackIds.contains(track.trackId)) track.addedAt else 0L)
             }
 
             updatedHistory

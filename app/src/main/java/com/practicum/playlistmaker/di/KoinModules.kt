@@ -39,14 +39,14 @@ import com.practicum.playlistmaker.player.data.repository.LikeStorage
 val appModule = module {
         // Общие зависимости
         single<SharedPreferences> { provideSharedPreferences(androidContext()) }
-    single { LikeStorage(androidContext(), get()) }
+    single { LikeStorage(androidContext()) }
 
 
     // Поиск и история
         single<SearchRepository> { SearchRepositoryImpl(get()) }
         single<SearchHistoryRepository> {
             SearchHistoryRepositoryImpl(
-                get(), get(), get()
+                get(), get()
             )
         }
         single<SearchInteractor> { SearchInteractorImpl(get()) }
