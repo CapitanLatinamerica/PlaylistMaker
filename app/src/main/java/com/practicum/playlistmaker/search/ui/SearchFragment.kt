@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -118,8 +119,10 @@ class SearchFragment : Fragment() {
         }
 
         clearHistoryButton.setOnClickListener {
+            Log.d("SearchFragment", "Clear history button clicked")
             viewModel.clearSearchHistory()
         }
+
 
         retryButton.setOnClickListener {
             val query = inputEditText.text.toString()
@@ -150,36 +153,48 @@ class SearchFragment : Fragment() {
     }
 
     private fun render(state: SearchScreenUiState) {
+        Log.d("SearchFragment", "Rendering UI state: ${state.screenState}")  // Логируем текущий экран и его состояние
+
         progressBar.isVisible = state.isLoading
         trackRecyclerView.isVisible = !state.isLoading
         clearIcon.isVisible = inputEditText.text.isNotEmpty()
 
         when (state.screenState) {
             SearchScreenState.HISTORY -> {
+                Log.d("SearchFragment", "State is HISTORY, history size: ${state.history.size}")
                 trackAdapter.updateTracks(state.history)
                 historyTitle.isVisible = state.history.isNotEmpty()
                 clearHistoryButton.isVisible = state.history.isNotEmpty()
                 hideError()
             }
             SearchScreenState.RESULTS -> {
+                Log.d("SearchFragment", "State is RESULTS, searchResults size: ${state.searchResults.size}")
                 trackAdapter.updateTracks(state.searchResults)
                 historyTitle.isVisible = false
                 clearHistoryButton.isVisible = false
                 hideError()
             }
             SearchScreenState.EMPTY_RESULTS -> {
+                Log.d("SearchFragment", "State is EMPTY_RESULTS")
                 showError(getString(R.string.nothing_founded), R.drawable.ic_no_results, false)
             }
             SearchScreenState.ERROR -> {
+                Log.d("SearchFragment", "State is ERROR")
                 showError(getString(R.string.no_internet_message), R.drawable.ic_no_connection, true)
             }
-            SearchScreenState.IDLE -> {}
+            SearchScreenState.IDLE -> {
+                Log.d("SearchFragment", "State is IDLE")
+                trackAdapter.updateTracks(state.searchResults)
+                historyTitle.isVisible = false
+                clearHistoryButton.isVisible = false
+            }
         }
     }
 
-    //Заменим this на requireContext
+
     private fun openAudioPlayer(track: Track) {
         startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+            putExtra(Constants.Extra.TRACK_ID, track.trackId)
             putExtra(Constants.Extra.TRACK_NAME, track.trackName)
             putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
             putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
@@ -189,6 +204,8 @@ class SearchFragment : Fragment() {
             putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
             putExtra(Constants.Extra.COUNTRY, track.country ?: "")
             putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
+            putExtra(Constants.Extra.IS_FAVORITE, track.isFavorite)
+            putExtra(Constants.Extra.LOCAL_ID, track.addedAt)
         })
     }
 
@@ -202,7 +219,6 @@ class SearchFragment : Fragment() {
         inputEditText.clearFocus()
         hideKeyboard()
         viewModel.searchTracks("")
-//        viewModel.loadSearchHistory()
         clearIcon.isVisible = false
     }
 

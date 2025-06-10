@@ -4,10 +4,15 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.practicum.playlistmaker.di.appModule
+import com.practicum.playlistmaker.di.databaseModule
+import com.practicum.playlistmaker.di.mediaModule
+import com.practicum.playlistmaker.di.settingsModule
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.logger.AndroidLogger
 import org.koin.core.component.KoinComponent
-import org.koin.core.context.startKoin
 import org.koin.core.component.get
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 const val PREFERENCE_NAME = "user_preferences"
 const val PREFERENCE_THEME_KEY = "is_dark_theme_enabled"
@@ -33,7 +38,12 @@ class App : Application(), KoinComponent {
         // Стартуем Koin
         startKoin {
             androidContext(this@App)
-            modules(appModule)
+            modules(appModule,
+                databaseModule,
+                settingsModule,
+                mediaModule
+            )
+            logger(AndroidLogger(Level.DEBUG)) // Включите логи Koin
         }
 
         val preferences: SharedPreferences = get()                                                  // Получаем SharedPreferences через Koin

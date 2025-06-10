@@ -8,7 +8,6 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:theme="@style/Awesome.Theme.PlaylistMaker"
 android:orientation="vertical"
-android:background="?attr/colorSecondaryVariant"
 tools:context=".media.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -23,11 +22,12 @@ tools:context=".media.MediaFragment">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
-        style="@style/tablayoutStyle"
+        style="@style/TabLayoutTheme"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?attr/colorSecondaryVariant"
-        app:tabIndicatorHeight="4dp"
+        app:tabIndicatorHeight="2dp"
+        app:tabIndicatorColor="?attr/colorOnPrimary"
         app:tabTextColor="?attr/colorPrimary"
         app:tabSelectedTextColor="?attr/colorPrimary"
         app:tabTextAppearance="@style/TabLayoutTextAppearance"/>

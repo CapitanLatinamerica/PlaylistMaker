@@ -25,12 +25,23 @@ android:id="@+id/frag_fav_track">
         android:contentDescription="@string/no_favorites_description"/>
 
     <TextView
+        android:id="@+id/tv_no_results"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_favorites_description"
         android:textColor="?attr/colorOnSecondary"
         android:layout_marginTop="16dp"
         style="@style/MessageTextStyle"/>
+
 </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_favorites"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

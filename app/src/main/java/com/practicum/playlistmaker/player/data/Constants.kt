@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.player.data
 object Constants {
     // Ключи для передачи данных между экранами
     object Extra {
+        const val TRACK_ID = "track_id"
         const val TRACK_NAME = "track_name"
         const val ARTIST_NAME = "artist_name"
         const val TRACK_TIME = "track_time"
@@ -12,5 +13,8 @@ object Constants {
         const val GENRE = "genre"
         const val COUNTRY = "country"
         const val PREVIEW_URL = "preview_url"
+        const val IS_FAVORITE = "is_favorite"
+        const val LOCAL_ID = "LOCAL_ID"
+
     }
 }

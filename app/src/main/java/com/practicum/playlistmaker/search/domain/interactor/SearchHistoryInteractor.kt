@@ -10,7 +10,7 @@ class SearchHistoryInteractor(private val searchHistoryRepository: SearchHistory
     }
 
     fun getHistory(): List<Track> {
-        val historyLoaded = searchHistoryRepository.getHistory()
+        val historyLoaded = searchHistoryRepository.getHistory().sortedByDescending { it.isFavorite }
         return historyLoaded  // Получаем историю
     }
 

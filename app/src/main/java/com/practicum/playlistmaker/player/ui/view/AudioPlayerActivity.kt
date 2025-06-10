@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.player.ui.view
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,7 +10,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.Track
@@ -21,15 +19,25 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.data.Constants
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
+import com.practicum.playlistmaker.player.domain.model.PlayerState
+import org.koin.android.ext.android.get
 
 class AudioPlayerActivity : AppCompatActivity() {
 
     // Binding для работы с layout
     private lateinit var binding: ActivityAudioplayerBinding
+    private val likeStorage: LikeStorage by lazy { get() } // Инициализируем в самом Activity
 
     // ViewModel для управления логикой плеера
+    // Получаем ViewModel с передачей LikeStorage
     private val viewModel: PlayerViewModel by viewModels {
-        PlayerViewModelFactory(PlayerRepositoryImpl(MediaPlayer()))
+        PlayerViewModelFactory(
+            playerRepository = PlayerRepositoryImpl(MediaPlayer()),
+            likeStorage = likeStorage,
+            favoriteTracksViewModel = get(),
+            searchHistoryInteractor = get()
+        )
     }
 
     // Текущий трек
@@ -43,11 +51,11 @@ class AudioPlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Настройка toolbar (кнопка "назад")
-        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
-        toolbar.setNavigationOnClickListener { finish() }
+        setupToolbar()
 
         // Создание трека из Intent
         track = createTrackFromIntent()
+        viewModel.setTrack(track)
 
         // Проверка и инициализация UI
         track?.let {
@@ -55,6 +63,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             viewModel.setInitialDuration() // Установка начальной длительности (30 сек)
             setupObservers() // Настройка наблюдателей
             setupListeners() // Настройка слушателей
+            it.isFavorite = likeStorage.isLiked(it.trackId)
         } ?: run {
             // Обработка ошибки загрузки трека
             Toast.makeText(this, "Ошибка загрузки трека", Toast.LENGTH_LONG).show()
@@ -70,6 +79,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
         val genre = intent.getStringExtra(Constants.Extra.GENRE)
         val country = intent.getStringExtra(Constants.Extra.COUNTRY)
+        val localId = intent.getStringExtra(Constants.Extra.LOCAL_ID)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -105,6 +115,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener { finish() }
+    }
     //Настройка основных элементов UI @param track Трек для отображения
     private fun setupUI(track: Track) {
         binding.trackName.setText(track.trackName)
@@ -121,16 +134,16 @@ class AudioPlayerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.playerState.collect { state ->
                 when (state) {
-                    PlayerViewModel.PlayerState.PLAYING ->
+                    PlayerState.PLAYING ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_pause)
 
-                    PlayerViewModel.PlayerState.PAUSED ->
+                    PlayerState.PAUSED ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_play)
 
-                    PlayerViewModel.PlayerState.IDLE ->
+                    PlayerState.IDLE ->
                         binding.buttonPlay.setImageResource(R.drawable.ic_play)
 
-                    is PlayerViewModel.PlayerState.ERROR ->
+                    is PlayerState.ERROR ->
                         Toast.makeText(
                             this@AudioPlayerActivity,
                             "Ошибка: ${state.message}",
@@ -139,6 +152,14 @@ class AudioPlayerActivity : AppCompatActivity() {
 
                     else -> {}
                 }
+            }
+        }
+
+        //Слушаем кнопку лайк
+        lifecycleScope.launch {
+            viewModel.isLiked.collect { isLiked ->
+                val icon = if (isLiked) R.drawable.ic_liked_song else R.drawable.ic_unliked_song
+                binding.buttonLike.setImageResource(icon)
             }
         }
 
@@ -155,23 +176,27 @@ class AudioPlayerActivity : AppCompatActivity() {
         binding.buttonPlay.setOnClickListener {
             viewModel.playerState.value?.let { state ->
                 when (state) {
-                    PlayerViewModel.PlayerState.IDLE -> {
+                    PlayerState.IDLE -> {
                         track?.let {
                             viewModel.playTrack(it)
                         }
                     }
-                    PlayerViewModel.PlayerState.PLAYING -> {
+                    PlayerState.PLAYING -> {
                         viewModel.togglePlayPause()
                     }
-                    PlayerViewModel.PlayerState.PAUSED -> {
+                    PlayerState.PAUSED -> {
                         viewModel.togglePlayPause()
                     }
-                    PlayerViewModel.PlayerState.PREPARING -> {
+                    PlayerState.PREPARING -> {
                         // Ничего не делаем во время подготовки
                     }
                     else -> {}
                 }
             }
+        }
+        //Пользователь нажимает кнопку Лайк! Идём во ViewModel и там обработаем
+        binding.buttonLike.setOnClickListener {
+            viewModel.onLikeClicked()
         }
     }
 
@@ -184,25 +209,18 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     //Создание объекта Track из данных Intent
     private fun createTrackFromIntent(): Track? {
-        val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME)
-        val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME)
-        val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull()
-        val artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
-        val previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL)
-        Log.d("AudioPlayer", "Received data - TrackName: $trackName, ArtistName: $artistName, Time: $trackTimeMillis, Artwork: $artworkUrl100, PreviewUrl: $previewUrl")
-
         return try {
             Track(
-                trackId = -1,
+                trackId = intent.getLongExtra(Constants.Extra.TRACK_ID, -1),
                 trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: return null,
                 artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: return null,
                 trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
                 artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
                     ?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
-                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null
+                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null,
+                addedAt = intent.getLongExtra(Constants.Extra.LOCAL_ID, 0)
             )
         } catch (e: Exception) {
-            Log.e("AudioPlayer", "Error creating track", e)
             null
         }
     }

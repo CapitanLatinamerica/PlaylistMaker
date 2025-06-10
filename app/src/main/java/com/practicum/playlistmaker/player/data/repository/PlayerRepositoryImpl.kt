@@ -16,7 +16,8 @@ class PlayerRepositoryImpl(
 ) : PlayerRepository {
 
     private var progressJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     private val _progressFlow = MutableSharedFlow<Int>(replay = 1)
 
     override fun preparePlayer(url: String, onPrepared: () -> Unit, onError: (Exception) -> Unit) {
@@ -62,16 +63,6 @@ class PlayerRepositoryImpl(
     override fun isPlaying(): Boolean = mediaPlayer.isPlaying
 
     override fun observeProgress(): Flow<Int> = _progressFlow
-
-    private fun startProgressTracking() {
-        if (progressJob?.isActive == true) return
-        progressJob = scope.launch {
-            while (isPlaying()) {
-                _progressFlow.emit(getCurrentPosition())
-                delay(300L)
-            }
-        }
-    }
 
     override fun stopProgressTracking() {
         progressJob?.cancel()

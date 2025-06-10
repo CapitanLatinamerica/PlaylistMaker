@@ -2,8 +2,12 @@ package com.practicum.playlistmaker.player.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.domain.repository.PlayerRepository
+import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,18 +15,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val likeStorage: LikeStorage,
+    private val favoriteTracksViewModel: FavoriteTracksViewModel,
+    private val searchHistoryInteractor: SearchHistoryInteractor
 ) : ViewModel() {
-
-    // Возможные состояния плеера
-    sealed class PlayerState {
-        object IDLE : PlayerState()            // Плеер ничего не делает
-        object PREPARING : PlayerState()       // Идёт подготовка (загрузка) трека
-        object PLAYING : PlayerState()         // Трек воспроизводится
-        object PAUSED : PlayerState()          // Воспроизведение приостановлено
-        object FINISHED : PlayerState()        // Воспроизведение завершено
-        data class ERROR(val message: String) : PlayerState() // Ошибка воспроизведения
-    }
 
     private val HARDCODED_DURATION_MS = 30_000
 
@@ -33,6 +30,11 @@ class PlayerViewModel(
     // Оставшееся время воспроизведения трека (в миллисекундах)
     private val _progress = MutableStateFlow(0)
     val progress: StateFlow<Int> = _progress
+
+    private val _isLiked = MutableStateFlow<Boolean>(false)
+    var isLiked: StateFlow<Boolean> = _isLiked
+
+    private var track: Track? = null
 
     // Job-короутина, обновляющая прогресс воспроизведения
     private var playbackJob: Job? = null
@@ -122,5 +124,35 @@ class PlayerViewModel(
     override fun onCleared() {
         super.onCleared()
         stopPlayback()
+    }
+
+    //Обраюотаем нажатие кнопки лайка
+    fun onLikeClicked() {
+        val currentTrack = track ?: return                                                          // Получаем текущий трек
+        viewModelScope.launch {
+            val newState = likeStorage.toggleLike(currentTrack.trackId)                                 // Переключаем состояние лайка (добавление/удаление из избранного)
+            _isLiked.value = newState                                                                   // Обновляем состояние лайка
+            currentTrack.isFavorite = newState                                                                // Обновляем состояние трека
+            val currentTime = System.currentTimeMillis() // Получаем текущее время
+            // Устанавливаем addedAt в зависимости от текущего состояния
+            currentTrack.addedAt = if (currentTrack.addedAt == 0L) currentTime else 0
+
+            searchHistoryInteractor.saveTrack(currentTrack)
+
+            if (newState) {
+                favoriteTracksViewModel.addTrackToFavorites(currentTrack)
+            } else {
+                favoriteTracksViewModel.removeTrackFromFavorites(currentTrack)
+            }
+        }
+    }
+
+    fun setTrack(track: Track?) {
+        if (track != null) {
+            this.track = track
+            val isTrackLiked = likeStorage.isLiked(track.trackId)
+            _isLiked.value = isTrackLiked
+        } else {
+        }
     }
 }
