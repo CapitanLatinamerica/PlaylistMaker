@@ -101,7 +101,7 @@
 
         android:text="@string/new_pl_create"
         android:textColor="@color/yp_white"
-        android:backgroundTint="@color/new_pl_creator_button"
+        android:backgroundTint="@drawable/button_playlist_creator_selector"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
