@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Awesome.Theme.PlaylistMaker"
+    android:orientation="vertical"
+    tools:context=".media.fragmentes.PlaylistCreatorFragment">
+
+    <!-- Тулбар -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        style="@style/MyAwesomeToolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/arrow_back_light_mode"
+        app:title="@string/create_playlist" />
+
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/new_pl_shape"
+        android:clickable="true"
+        android:scaleType="center"
+        android:src="@drawable/new_pl_image_placeholder"
+        android:cropToPadding="true"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/newPlaylistName"
+        style="?attr/textInputOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="26dp"
+        android:hint="@string/new_pl_name"
+        android:textColorHint="?attr/colorPrimary"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize = "19sp"
+        app:boxStrokeColor="?attr/colorOnPrimary"
+        app:boxStrokeWidthFocused="1dp"
+        app:hintTextColor="@color/yp_blue"
+        app:layout_constraintTop_toBottomOf="@id/poster">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/newPlaylistEditName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="20"
+            android:fontFamily="@font/ys_display_regular"
+            android:textSize= "16sp"
+            android:textColor="?attr/colorOnPrimary"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/playlistDescription"
+        style="?attr/textInputOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:hint="@string/new_pl_descr"
+        android:textColorHint="?attr/colorPrimary"
+        app:boxStrokeColor="@color/box_stroke_light"
+        app:boxStrokeWidthFocused="1dp"
+        android:fontFamily="@font/ys_display_regular"
+        android:textSize = "19sp"
+        app:hintTextColor="@color/yp_blue"
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistName">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/playlistDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="?attr/colorOnPrimary"
+            android:fontFamily="@font/ys_display_regular"
+            android:textSize = "16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_button"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="@dimen/bottom_element_padding"
+        android:layout_marginEnd="@dimen/bottom_element_padding"
+        android:layout_marginBottom="32dp"
+        android:enabled="false"
+
+        android:text="@string/new_pl_create"
+        android:textColor="@color/yp_white"
+        android:backgroundTint="@color/new_pl_creator_button"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:cornerRadius="8dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
