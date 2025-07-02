@@ -2,6 +2,8 @@ package com.practicum.playlistmaker.db.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.practicum.playlistmaker.db.data.favorites.FavoriteTrackDao
+import com.practicum.playlistmaker.db.data.favorites.FavoriteTrackEntity
 
 @Database(
     entities = [FavoriteTrackEntity::class],        //список всех таблиц в БД

@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
 import com.practicum.playlistmaker.media.MediaViewModel
-import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
+import com.practicum.playlistmaker.media.fragmentes.playlists.ui.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -28,11 +28,14 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import androidx.room.Room
 import com.practicum.playlistmaker.db.data.AppDatabase
-import com.practicum.playlistmaker.db.data.FavoriteTracksRepositoryImpl
-import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
-import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
-import com.practicum.playlistmaker.db.domain.FavoriteTracksRepository
+import com.practicum.playlistmaker.db.data.favorites.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksInteractor
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksInteractorImpl
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksRepository
 import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
+import com.practicum.playlistmaker.media.fragmentes.creator.viewmodel.PlaylistCreatorViewModel
+import com.practicum.playlistmaker.media.fragmentes.playlists.data.PlaylistsRepositoryImpl
+import com.practicum.playlistmaker.media.fragmentes.playlists.domain.PlaylistsRepository
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 
 
@@ -100,8 +103,13 @@ val mediaModule = module {
         FavoriteTracksInteractorImpl(get())
     }
 
+    single<PlaylistsRepository> {
+        PlaylistsRepositoryImpl(get())
+    }
+
     viewModel { FavoriteTracksViewModel(get()) }
-    viewModel { PlaylistsViewModel(get()) }
+    viewModel { PlaylistsViewModel() }
+    viewModel { PlaylistCreatorViewModel(get()) }
 }
 
 fun provideSharedPreferences(context: Context): SharedPreferences {                                 //Создает экземпляр SharedPreferences

@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.media.fragmentes
+package com.practicum.playlistmaker.media.fragmentes.playlists.ui.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -99,4 +99,3 @@ class FavoriteTracksFragment : Fragment() {
         })
     }
 }
-
