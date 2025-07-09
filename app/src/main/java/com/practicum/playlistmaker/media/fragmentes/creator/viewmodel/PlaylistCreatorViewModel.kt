@@ -11,26 +11,23 @@ class PlaylistCreatorViewModel(
     private val playlistsRepository: PlaylistsRepository
 ) : ViewModel() {
 
-    private val _playlistName = MutableLiveData<String>()
-    val playlistName: LiveData<String> = _playlistName
+    private val _shouldCloseScreen = MutableLiveData(false)
+    val shouldCloseScreen: LiveData<Boolean> = _shouldCloseScreen
 
-    private val _playlistDescription = MutableLiveData<String>()
-    val playlistDescription: LiveData<String> = _playlistDescription
+    private var imageSelected = false
 
-    fun setPlaylistName(name: String) {
-        _playlistName.value = name
+    fun setImageSelected(selected: Boolean) {
+        imageSelected = selected
     }
+    fun isImageSelected(): Boolean = imageSelected
 
-    fun setPlaylistDescription(description: String) {
-        _playlistDescription.value = description
-    }
-
-    fun createPlaylist() {
-        val name = _playlistName.value ?: return
-        val description = _playlistDescription.value ?: return
-
-        viewModelScope.launch {
-            playlistsRepository.createPlaylist(name, description)
+    fun onBackPressed(title: String, description: String, isImageSet: Boolean) {
+        val isAllEmpty = title.isBlank() && description.isBlank() && !isImageSet
+        if (isAllEmpty) {
+            _shouldCloseScreen.value = true
+        } else {
+            // Позже можно показать диалог — сейчас просто ничего не делаем
         }
     }
+
 }

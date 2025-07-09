@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragmentes.creator.viewmodel.PlaylistCreatorViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistCreatorFragment : Fragment() {
 
@@ -17,14 +19,10 @@ class PlaylistCreatorFragment : Fragment() {
         fun newInstance() = PlaylistCreatorFragment()
     }
 
-    private lateinit var viewModel: PlaylistCreatorViewModel
+    private val viewModel: PlaylistCreatorViewModel by viewModel()
+    private lateinit var navController: NavController
     private lateinit var binding: FragmentPlaylistCreatorBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +38,8 @@ class PlaylistCreatorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        navController = findNavController()
+
         val nameField = binding.newPlaylistEditName
         val descriptionField = binding.playlistDescriptionEditText
 
@@ -51,8 +51,24 @@ class PlaylistCreatorFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         }
 
+        // Назад по кнопке в тулбаре
+        binding.toolbar.setNavigationOnClickListener {
+            viewModel.onBackPressed(
+                title = nameField.text.toString(),
+                description = descriptionField.text.toString(),
+                isImageSet = viewModel.isImageSelected()
+            )
+        }
+
+        viewModel.shouldCloseScreen.observe(viewLifecycleOwner) { shouldClose ->
+            if (shouldClose) {
+                navController.popBackStack()
+            }
+        }
+
         nameField.addTextChangedListener(watcher)
         descriptionField.addTextChangedListener(watcher)
+
     }
 
 

@@ -69,6 +69,7 @@ val databaseModule = module {
             .build()
     }
     single { get<AppDatabase>().favoriteTrackDao() }
+    single { get<AppDatabase>().playlistDao() }
 }
 
 
@@ -104,7 +105,7 @@ val mediaModule = module {
     }
 
     single<PlaylistsRepository> {
-        PlaylistsRepositoryImpl(get())
+        PlaylistsRepositoryImpl(get(), get())
     }
 
     viewModel { FavoriteTracksViewModel(get()) }

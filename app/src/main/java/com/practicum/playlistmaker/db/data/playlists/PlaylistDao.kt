@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaylistDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+/*    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(playlist: Playlist)
 
     @Query("SELECT * FROM playlists")
-    fun getAllPlaylists(): Flow<List<Playlist>>
+    fun getAllPlaylists(): Flow<List<Playlist>>*/
 }
