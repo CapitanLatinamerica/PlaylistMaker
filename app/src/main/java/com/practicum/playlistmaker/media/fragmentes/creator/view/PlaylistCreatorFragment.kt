@@ -14,9 +14,10 @@ import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragmentes.creator.viewmodel.PlaylistCreatorViewModel
+import com.practicum.playlistmaker.navigation.NavigationGuard
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PlaylistCreatorFragment : Fragment() {
+class PlaylistCreatorFragment : Fragment(), NavigationGuard {
 
     companion object {
         fun newInstance() = PlaylistCreatorFragment()
@@ -88,14 +89,31 @@ class PlaylistCreatorFragment : Fragment() {
     private fun showExitConfirmationDialog() {
         AlertDialog.Builder(requireContext(), R.style.MyAwesomeAlertDialogTheme)
 
-            .setTitle("Завершить создание плейлиста?")
-            .setMessage("Все несохраненные данные будут потеряны")
-            .setPositiveButton("Завершить") { _, _ ->
+            .setTitle(R.string.alert_dialog_title)
+            .setMessage(R.string.alert_dialog_message)
+            .setPositiveButton(R.string.alert_dialog_positive) { _, _ ->
                 viewModel.confirmExit()
             }
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(R.string.alert_dialog_negative, null)
             .show()
     }
+    override fun shouldBlockNavigation(): Boolean {
+        val name = binding.newPlaylistEditName.text.toString()
+        val description = binding.playlistDescriptionEditText.text.toString()
+        val imageSet = viewModel.isImageSelected()
 
+        return name.isNotBlank() || description.isNotBlank() || imageSet
+    }
+
+    override fun requestExitConfirmation(onConfirm: () -> Unit) {
+        AlertDialog.Builder(requireContext(), R.style.MyAwesomeAlertDialogTheme)
+            .setTitle(R.string.alert_dialog_title)
+            .setMessage(R.string.alert_dialog_message)
+            .setPositiveButton(R.string.alert_dialog_positive) { _, _ ->
+                viewModel.confirmExit()
+            }
+            .setNegativeButton(R.string.alert_dialog_negative, null)
+            .show()
+    }
 }
 

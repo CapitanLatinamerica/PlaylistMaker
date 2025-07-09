@@ -37,4 +37,9 @@
     <string name="new_pl_name">Name*</string>
     <string name="new_pl_update">Update</string>
     <string name="new_pl_create">Create</string>
+
+    <string name="alert_dialog_title">Finish creating the playlist?</string>
+    <string name="alert_dialog_message">All unsaved data will be lost</string>
+    <string name="alert_dialog_positive">Finish</string>
+    <string name="alert_dialog_negative">Cancel</string>
 </resources>

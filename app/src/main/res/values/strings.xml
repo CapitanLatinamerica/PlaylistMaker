@@ -51,5 +51,9 @@
     <string name="new_pl_create">Создать</string>
 
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="alert_dialog_title">Завершить создание плейлиста?</string>
+    <string name="alert_dialog_message">Все несохраненные данные будут потеряны</string>
+    <string name="alert_dialog_positive">Завершить</string>
+    <string name="alert_dialog_negative">Отмена</string>
 
 </resources>
