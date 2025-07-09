@@ -1,14 +1,17 @@
 package com.practicum.playlistmaker.media.fragmentes.creator.view
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragmentes.creator.viewmodel.PlaylistCreatorViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -69,6 +72,10 @@ class PlaylistCreatorFragment : Fragment() {
         nameField.addTextChangedListener(watcher)
         descriptionField.addTextChangedListener(watcher)
 
+        viewModel.showExitDialog.observe(viewLifecycleOwner) {
+            showExitConfirmationDialog()
+        }
+
     }
 
 
@@ -77,5 +84,18 @@ class PlaylistCreatorFragment : Fragment() {
         val description = binding.playlistDescriptionEditText.text.toString().isNotEmpty()
         binding.createButton.isEnabled = name && description
     }
+
+    private fun showExitConfirmationDialog() {
+        AlertDialog.Builder(requireContext(), R.style.MyAwesomeAlertDialogTheme)
+
+            .setTitle("Завершить создание плейлиста?")
+            .setMessage("Все несохраненные данные будут потеряны")
+            .setPositiveButton("Завершить") { _, _ ->
+                viewModel.confirmExit()
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
 }
 
