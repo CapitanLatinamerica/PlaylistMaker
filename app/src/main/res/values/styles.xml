@@ -224,4 +224,24 @@
         <item name="android:background">?attr/colorBackgroundFloating</item>
     </style>
 
+    <style name="MyAwesomeTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="android:layout_marginHorizontal">16dp</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+
+        <!-- Цвет рамки без фокуса -->
+        <item name="colorControlNormal">?attr/colorControlNormal</item>
+
+        <!-- Текстовая стилизация -->
+        <item name="hintTextColor">@color/yp_blue</item>
+        <item name="android:textColorHint">?attr/colorOnPrimary</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
 </resources>
