@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragmentes.creator.viewmodel.PlaylistCreatorViewModel
@@ -43,6 +44,7 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
         super.onViewCreated(view, savedInstanceState)
 
         navController = findNavController()
+
 
         val nameField = binding.newPlaylistEditName
         val descriptionField = binding.playlistDescriptionEditText
