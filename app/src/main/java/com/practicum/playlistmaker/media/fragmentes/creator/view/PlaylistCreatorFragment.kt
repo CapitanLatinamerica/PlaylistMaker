@@ -51,6 +51,8 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
                 imageUri?.let {
                     selectedImageUri = it
                     binding.poster.setImageURI(it)
+                    // Убираем фон, если изображение выбрано
+                    binding.poster.background = null
                 }
             }
         }
@@ -144,10 +146,15 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
     }
 
     private fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.type = "image/*"
-        pickImageLauncher.launch(intent)
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+
+        val chooser = Intent.createChooser(intent, getString(R.string.choose_image_from))
+        pickImageLauncher.launch(chooser)
     }
+
 
 }
 

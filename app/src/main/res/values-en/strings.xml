@@ -42,4 +42,7 @@
     <string name="alert_dialog_message">All unsaved data will be lost</string>
     <string name="alert_dialog_positive">Finish</string>
     <string name="alert_dialog_negative">Cancel</string>
+
+
+    <string name="choose_image_from">Upload image...</string>
 </resources>

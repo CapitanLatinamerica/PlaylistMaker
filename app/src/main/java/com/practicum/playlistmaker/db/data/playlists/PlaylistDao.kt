@@ -3,13 +3,21 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaylistDao {
-/*    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(playlist: Playlist)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlaylist(playlist: Playlist)
+
+    @Update
+    suspend fun updatePlaylist(playlist: Playlist)
 
     @Query("SELECT * FROM playlists")
-    fun getAllPlaylists(): Flow<List<Playlist>>*/
+    suspend fun getAllPlaylists(): List<Playlist>
+
+    @Query("SELECT * FROM playlists WHERE id = :playlistId")
+    suspend fun getPlaylistById(playlistId: Int): Playlist?
 }
