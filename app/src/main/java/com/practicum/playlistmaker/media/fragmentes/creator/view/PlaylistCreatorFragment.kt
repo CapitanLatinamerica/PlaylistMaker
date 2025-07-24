@@ -1,12 +1,18 @@
 package com.practicum.playlistmaker.media.fragmentes.creator.view
 
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -27,6 +33,9 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
     private val viewModel: PlaylistCreatorViewModel by viewModel()
     private lateinit var navController: NavController
     private lateinit var binding: FragmentPlaylistCreatorBinding
+    private lateinit var pickImageLauncher: ActivityResultLauncher<Intent>
+    private var selectedImageUri: Uri? = null
+
 
 
     override fun onCreateView(
@@ -34,6 +43,17 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val imageUri = data?.data
+                imageUri?.let {
+                    selectedImageUri = it
+                    binding.poster.setImageURI(it)
+                }
+            }
+        }
 
         binding = FragmentPlaylistCreatorBinding.inflate(inflater, container, false)
         return binding.root
@@ -79,6 +99,11 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
             showExitConfirmationDialog()
         }
 
+        binding.poster.setOnClickListener {
+            openImagePicker()
+        }
+
+
     }
 
 
@@ -117,5 +142,12 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
             .setNegativeButton(R.string.alert_dialog_negative, null)
             .show()
     }
+
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        pickImageLauncher.launch(intent)
+    }
+
 }
 
