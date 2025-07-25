@@ -1,12 +1,10 @@
-package com.practicum.playlistmaker.media.fragmentes.creator.viewmodel
+package com.practicum.playlistmaker.media.fragments.creator.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.app.SingleLiveEvent
-import com.practicum.playlistmaker.media.fragmentes.playlists.domain.PlaylistsRepository
-import kotlinx.coroutines.launch
+import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
 
 class PlaylistCreatorViewModel(
     private val playlistsRepository: PlaylistsRepository
@@ -38,5 +36,15 @@ class PlaylistCreatorViewModel(
     fun confirmExit() {
         _shouldCloseScreen.value = true
     }
+
+    suspend fun createPlaylist(name: String, description: String, coverPath: String?) {
+        playlistsRepository.createPlaylist(
+            name = name,
+            description = description,
+            coverPath = coverPath
+        )
+        _shouldCloseScreen.value = true
+    }
+
 
 }

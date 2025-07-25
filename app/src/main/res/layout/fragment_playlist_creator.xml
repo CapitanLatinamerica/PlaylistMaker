@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@style/Theme.PlaylistMaker"
-    tools:context=".media.fragmentes.creator.view.PlaylistCreatorFragment">
+    tools:context=".media.fragments.creator.view.PlaylistCreatorFragment">
 
     <!-- Тулбар -->
     <com.google.android.material.appbar.MaterialToolbar

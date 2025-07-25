@@ -1,6 +1,6 @@
 package com.practicum.playlistmaker.player.data
 
-object Constants {
+object PlayerConstants {
     // Ключи для передачи данных между экранами
     object Extra {
         const val TRACK_ID = "track_id"

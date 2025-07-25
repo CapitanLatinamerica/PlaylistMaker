@@ -18,7 +18,7 @@ import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
-import com.practicum.playlistmaker.player.data.Constants
+import com.practicum.playlistmaker.player.data.PlayerConstants
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.model.PlayerState
 import org.koin.android.ext.android.get
@@ -71,15 +71,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
 
         // Получение данных о треке из Intent
-        val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: "Unknown"
-        val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: "Unknown"
-        val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0
-        val albumCover = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
-        val collectionName = intent.getStringExtra(Constants.Extra.COLLECTION_NAME)
-        val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
-        val genre = intent.getStringExtra(Constants.Extra.GENRE)
-        val country = intent.getStringExtra(Constants.Extra.COUNTRY)
-        val localId = intent.getStringExtra(Constants.Extra.LOCAL_ID)
+        val trackName = intent.getStringExtra(PlayerConstants.Extra.TRACK_NAME) ?: "Unknown"
+        val artistName = intent.getStringExtra(PlayerConstants.Extra.ARTIST_NAME) ?: "Unknown"
+        val trackTimeMillis = intent.getStringExtra(PlayerConstants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0
+        val albumCover = intent.getStringExtra(PlayerConstants.Extra.ALBUM_COVER)
+        val collectionName = intent.getStringExtra(PlayerConstants.Extra.COLLECTION_NAME)
+        val releaseYear = intent.getStringExtra(PlayerConstants.Extra.RELEASE_YEAR)
+        val genre = intent.getStringExtra(PlayerConstants.Extra.GENRE)
+        val country = intent.getStringExtra(PlayerConstants.Extra.COUNTRY)
+        val localId = intent.getStringExtra(PlayerConstants.Extra.LOCAL_ID)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -211,14 +211,14 @@ class AudioPlayerActivity : AppCompatActivity() {
     private fun createTrackFromIntent(): Track? {
         return try {
             Track(
-                trackId = intent.getLongExtra(Constants.Extra.TRACK_ID, -1),
-                trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: return null,
-                artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: return null,
-                trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
-                artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
+                trackId = intent.getLongExtra(PlayerConstants.Extra.TRACK_ID, -1),
+                trackName = intent.getStringExtra(PlayerConstants.Extra.TRACK_NAME) ?: return null,
+                artistName = intent.getStringExtra(PlayerConstants.Extra.ARTIST_NAME) ?: return null,
+                trackTimeMillis = intent.getStringExtra(PlayerConstants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
+                artworkUrl100 = intent.getStringExtra(PlayerConstants.Extra.ALBUM_COVER)
                     ?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
-                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null,
-                addedAt = intent.getLongExtra(Constants.Extra.LOCAL_ID, 0)
+                previewUrl = intent.getStringExtra(PlayerConstants.Extra.PREVIEW_URL) ?: return null,
+                addedAt = intent.getLongExtra(PlayerConstants.Extra.LOCAL_ID, 0)
             )
         } catch (e: Exception) {
             null

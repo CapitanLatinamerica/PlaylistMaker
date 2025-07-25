@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.media.fragmentes.playlists.ui.view
+package com.practicum.playlistmaker.media.fragments.playlists.ui.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
 import com.practicum.playlistmaker.player.TrackAdapter
-import com.practicum.playlistmaker.player.data.Constants
+import com.practicum.playlistmaker.player.data.PlayerConstants
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import kotlinx.coroutines.launch
@@ -84,18 +84,18 @@ class FavoriteTracksFragment : Fragment() {
 
     private fun openAudioPlayer(track: Track) {
         startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
-            putExtra(Constants.Extra.TRACK_ID, track.trackId)
-            putExtra(Constants.Extra.TRACK_NAME, track.trackName)
-            putExtra(Constants.Extra.ARTIST_NAME, track.artistName)
-            putExtra(Constants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
-            putExtra(Constants.Extra.ALBUM_COVER, track.getArtworkUrl512())
-            putExtra(Constants.Extra.COLLECTION_NAME, track.collectionName ?: "")
-            putExtra(Constants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
-            putExtra(Constants.Extra.GENRE, track.primaryGenreName ?: "")
-            putExtra(Constants.Extra.COUNTRY, track.country ?: "")
-            putExtra(Constants.Extra.PREVIEW_URL, track.previewUrl)
-            putExtra(Constants.Extra.IS_FAVORITE, track.isFavorite)
-            putExtra(Constants.Extra.LOCAL_ID, track.addedAt)
+            putExtra(PlayerConstants.Extra.TRACK_ID, track.trackId)
+            putExtra(PlayerConstants.Extra.TRACK_NAME, track.trackName)
+            putExtra(PlayerConstants.Extra.ARTIST_NAME, track.artistName)
+            putExtra(PlayerConstants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
+            putExtra(PlayerConstants.Extra.ALBUM_COVER, track.getArtworkUrl512())
+            putExtra(PlayerConstants.Extra.COLLECTION_NAME, track.collectionName ?: "")
+            putExtra(PlayerConstants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
+            putExtra(PlayerConstants.Extra.GENRE, track.primaryGenreName ?: "")
+            putExtra(PlayerConstants.Extra.COUNTRY, track.country ?: "")
+            putExtra(PlayerConstants.Extra.PREVIEW_URL, track.previewUrl)
+            putExtra(PlayerConstants.Extra.IS_FAVORITE, track.isFavorite)
+            putExtra(PlayerConstants.Extra.LOCAL_ID, track.addedAt)
         })
     }
 }

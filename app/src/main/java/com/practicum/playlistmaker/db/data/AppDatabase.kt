@@ -4,11 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.practicum.playlistmaker.db.data.favorites.FavoriteTrackDao
 import com.practicum.playlistmaker.db.data.favorites.FavoriteTrackEntity
-import com.practicum.playlistmaker.db.data.playlists.Playlist
+import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.db.data.playlists.PlaylistDao
 
 @Database(
-    entities = [FavoriteTrackEntity::class, Playlist::class],        //список всех таблиц в БД
+    entities = [FavoriteTrackEntity::class, PlaylistEntity::class],        //список всех таблиц в БД
     version = 2,                                    //текущая версия БД
     exportSchema = false                            //схему не создаём
 )

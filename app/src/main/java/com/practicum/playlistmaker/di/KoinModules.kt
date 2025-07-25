@@ -12,10 +12,10 @@ import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksRepository
 import com.practicum.playlistmaker.db.domain.playlists.PlaylistInteractor
 import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
 import com.practicum.playlistmaker.media.MediaViewModel
-import com.practicum.playlistmaker.media.fragmentes.creator.viewmodel.PlaylistCreatorViewModel
-import com.practicum.playlistmaker.media.fragmentes.playlists.data.PlaylistsRepositoryImpl
-import com.practicum.playlistmaker.media.fragmentes.playlists.domain.PlaylistsRepository
-import com.practicum.playlistmaker.media.fragmentes.playlists.ui.viewmodel.PlaylistsViewModel
+import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
+import com.practicum.playlistmaker.media.fragments.playlists.data.PlaylistsRepositoryImpl
+import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
+import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
