@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.db.domain.playlists.PlaylistInteractor
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import kotlinx.coroutines.launch

@@ -1,9 +1,8 @@
 package com.practicum.playlistmaker.media.fragments.playlists.data
 
-import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.db.data.playlists.PlaylistDao
+import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
-import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistItem
 
 class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepository {
     override suspend fun createPlaylist(name: String, description: String?, coverPath: String?) {
