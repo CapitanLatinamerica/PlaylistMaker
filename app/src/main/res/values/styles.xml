@@ -243,5 +243,9 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="PlaylistImageRoundedCorner" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">4dp</item>
+    </style>
 
 </resources>

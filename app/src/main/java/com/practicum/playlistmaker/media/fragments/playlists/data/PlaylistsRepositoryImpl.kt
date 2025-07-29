@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.media.fragments.playlists.data
 import com.practicum.playlistmaker.db.data.playlists.PlaylistDao
 import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
+import kotlinx.coroutines.flow.Flow
 
 class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepository {
     override suspend fun createPlaylist(name: String, description: String?, coverPath: String?) {
@@ -24,11 +25,11 @@ class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepositor
         dao.updatePlaylist(playlist)
     }
 
-    override suspend fun getAllPlaylists(): List<PlaylistEntity> {
-        return dao.getAllPlaylists()
-    }
-
     override suspend fun getPlaylistById(id: Int): PlaylistEntity? {
         return dao.getPlaylistById(id)
     }
+    override suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>> {
+        return dao.getAllPlaylistsFlow()
+    }
+
 }

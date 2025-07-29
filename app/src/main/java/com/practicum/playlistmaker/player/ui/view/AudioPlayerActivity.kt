@@ -35,6 +35,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         PlayerViewModelFactory(
             playerRepository = PlayerRepositoryImpl(MediaPlayer()),
             likeStorage = likeStorage,
+            playlistInteractor = get(),
             favoriteTracksViewModel = get(),
             searchHistoryInteractor = get()
         )
