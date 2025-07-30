@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 
 class AddToPlaylistAdapter(
@@ -18,7 +17,7 @@ class AddToPlaylistAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_playlist_bottom, parent, false)
+            .inflate(R.layout.item_add_to_playlist, parent, false)
         return PlaylistViewHolder(view)
     }
 
@@ -35,29 +34,23 @@ class AddToPlaylistAdapter(
     }
 
     inner class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val cover: ImageView = itemView.findViewById(R.id.itemImagePL)
-        private val name: TextView = itemView.findViewById(R.id.itemNamePL)
-        private val count: TextView = itemView.findViewById(R.id.itemCountPL)
+        private val cover: ImageView = itemView.findViewById(R.id.ivCover)
+        private val name: TextView = itemView.findViewById(R.id.tvName)
+        private val count: TextView = itemView.findViewById(R.id.tvCount)
 
-        fun bind(item: PlaylistUi) {
-            name.text = item.name
-            count.text = "${item.trackCount} треков"
+        fun bind(playlist: PlaylistUi) {
+            name.text = playlist.name
+            count.text = "${playlist.trackCount} треков"
 
             Glide.with(itemView)
-                .load(item.coverPath)
+                .load(playlist.coverPath)
                 .placeholder(R.drawable.playlist_cover_placeholder)
                 .centerCrop()
-                .transform(RoundedCorners(dpToPx(4)))
                 .into(cover)
 
             itemView.setOnClickListener {
-                onClick(item)
+                onClick(playlist)
             }
-        }
-
-        private fun dpToPx(dp: Int): Int {
-            val scale = itemView.resources.displayMetrics.density
-            return (dp * scale + 0.5f).toInt()
         }
     }
 }

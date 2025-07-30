@@ -3,6 +3,8 @@ package com.practicum.playlistmaker.player.ui.view
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -10,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.Track
@@ -27,7 +30,10 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     // Binding для работы с layout
     private lateinit var binding: ActivityAudioplayerBinding
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private val likeStorage: LikeStorage by lazy { get() } // Инициализируем в самом Activity
+    private lateinit var addToPlaylistBtn: ImageButton
+
 
     // ViewModel для управления логикой плеера
     // Получаем ViewModel с передачей LikeStorage
@@ -50,6 +56,12 @@ class AudioPlayerActivity : AppCompatActivity() {
         // Инициализация ViewBinding
         binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val bottomSheet = findViewById<LinearLayout>(R.id.playlists_bottom_sheet)
+        val overlay = findViewById<View>(R.id.overlay)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
 
         // Настройка toolbar (кнопка "назад")
         setupToolbar()
@@ -114,6 +126,33 @@ class AudioPlayerActivity : AppCompatActivity() {
                 trackInfoContainer.addView(row)
             }
         }
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                overlay.visibility = if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                overlay.alpha = slideOffset
+            }
+        })
+
+        // Создание кнопки добавления в плейлист
+        addToPlaylistBtn = findViewById(R.id.buttonAdd)
+        addToPlaylistBtn.setOnClickListener {
+            val fragment = AddToPlaylistBottomSheetFragment.newInstance(track)
+            fragment.show(supportFragmentManager, AddToPlaylistBottomSheetFragment.TAG)
+        }
+
+
+        //Слушаем кнопку добавления в плейлист
+        binding.buttonAdd.setOnClickListener {
+            val currentTrack = viewModel.track
+            if (currentTrack != null) {
+                AddToPlaylistBottomSheetFragment.newInstance(currentTrack)
+                    .show(supportFragmentManager, AddToPlaylistBottomSheetFragment.TAG)
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -163,6 +202,8 @@ class AudioPlayerActivity : AppCompatActivity() {
                 binding.buttonLike.setImageResource(icon)
             }
         }
+
+
 
         // Наблюдатель за прогрессом воспроизведения
         lifecycleScope.launch {
@@ -225,4 +266,11 @@ class AudioPlayerActivity : AppCompatActivity() {
             null
         }
     }
+
+
+    companion object {
+        const val TRACK_KEY = "track_key"
+    }
+
+
 }

@@ -15,8 +15,10 @@ import com.practicum.playlistmaker.media.MediaViewModel
 import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
 import com.practicum.playlistmaker.media.fragments.playlists.data.PlaylistsRepositoryImpl
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
+import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.AddToPlaylistViewModel
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
+import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -116,6 +118,9 @@ val mediaModule = module {
     viewModel { FavoriteTracksViewModel(get()) }
     viewModel { PlaylistsViewModel(get()) }
     viewModel { PlaylistCreatorViewModel(get()) }
+    viewModel { (track: Track) -> AddToPlaylistViewModel(get(), track) }
+    factory { (track: Track) -> AddToPlaylistViewModel(get(), track) }
+
 }
 
 fun provideSharedPreferences(context: Context): SharedPreferences {                                 //Создает экземпляр SharedPreferences

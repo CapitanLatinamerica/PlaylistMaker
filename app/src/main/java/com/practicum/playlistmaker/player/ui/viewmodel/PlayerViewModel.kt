@@ -2,9 +2,7 @@ package com.practicum.playlistmaker.player.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.db.domain.playlists.PlaylistInteractor
 import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
-import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.player.domain.model.PlayerState
@@ -14,13 +12,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val playerRepository: PlayerRepository,
-    private val playlistInteractor: PlaylistInteractor,
     private val likeStorage: LikeStorage,
     private val favoriteTracksViewModel: FavoriteTracksViewModel,
     private val searchHistoryInteractor: SearchHistoryInteractor
@@ -39,7 +34,7 @@ class PlayerViewModel(
     private val _isLiked = MutableStateFlow<Boolean>(false)
     var isLiked: StateFlow<Boolean> = _isLiked
 
-    private var track: Track? = null
+    internal var track: Track? = null
 
     // Job-короутина, обновляющая прогресс воспроизведения
     private var playbackJob: Job? = null

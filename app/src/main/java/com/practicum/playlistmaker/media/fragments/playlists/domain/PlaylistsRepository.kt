@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.media.fragments.playlists.domain
 
 import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
+import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistsRepository {
@@ -9,4 +10,6 @@ interface PlaylistsRepository {
     suspend fun updatePlaylist(playlist: PlaylistEntity)
     suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>>
     suspend fun getPlaylistById(id: Int): PlaylistEntity?
+    suspend fun addTrackToPlaylist(playlistId: Int, track: Track): Boolean
+
 }

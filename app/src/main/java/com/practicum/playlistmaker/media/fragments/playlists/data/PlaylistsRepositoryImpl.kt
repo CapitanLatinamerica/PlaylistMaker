@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.media.fragments.playlists.data
 import com.practicum.playlistmaker.db.data.playlists.PlaylistDao
 import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
+import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.Flow
 
 class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepository {
@@ -30,6 +31,23 @@ class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepositor
     }
     override suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>> {
         return dao.getAllPlaylistsFlow()
+    }
+
+    override suspend fun addTrackToPlaylist(playlistId: Int, track: Track): Boolean {
+        val playlist = dao.getPlaylistById(playlistId) ?: return false
+        val trackId = track.trackId.toString()
+
+        // Допустим, playlist.tracks — это список ID треков в виде строки
+        val existingTrackIds = playlist.trackIds.split(",").toMutableList()
+        if (trackId in existingTrackIds) return false // уже есть
+
+        existingTrackIds.add(trackId)
+        val updatedTrackIds = existingTrackIds.joinToString(",")
+        val updatedTrackCount = existingTrackIds.size
+
+        dao.updateTracks(playlistId, updatedTrackIds, updatedTrackCount)
+
+        return true
     }
 
 }

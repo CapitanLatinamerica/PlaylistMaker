@@ -18,7 +18,8 @@ class PlayerViewModelFactory(
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PlayerViewModel::class.java)) {
-            return PlayerViewModel(playerRepository, playlistInteractor, likeStorage, favoriteTracksViewModel, searchHistoryInteractor) as T
+            return PlayerViewModel(playerRepository,
+                likeStorage, favoriteTracksViewModel, searchHistoryInteractor) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

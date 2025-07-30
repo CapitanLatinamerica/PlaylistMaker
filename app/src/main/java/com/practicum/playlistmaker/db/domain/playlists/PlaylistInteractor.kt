@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.db.domain.playlists
 
 import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
+import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.Flow
 
 class PlaylistInteractor(private val repository: PlaylistsRepository) {
@@ -20,4 +21,9 @@ class PlaylistInteractor(private val repository: PlaylistsRepository) {
     suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>> {
         return repository.getAllPlaylistsFlow()
     }
+
+    suspend fun addTrackToPlaylist(playlistId: Int, track: Track): Boolean {
+        return repository.addTrackToPlaylist(playlistId, track)
+    }
+
 }
