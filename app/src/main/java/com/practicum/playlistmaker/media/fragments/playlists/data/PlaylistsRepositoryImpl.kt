@@ -12,7 +12,7 @@ class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepositor
            name = name,
            description = description.toString(),
            coverPath = coverPath,
-           trackIds = "[]",
+           trackIds = "",
            trackCount = 0
         )
         dao.insertPlaylist(newPlaylist)
@@ -37,8 +37,13 @@ class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepositor
         val playlist = dao.getPlaylistById(playlistId) ?: return false
         val trackId = track.trackId.toString()
 
-        // Допустим, playlist.tracks — это список ID треков в виде строки
-        val existingTrackIds = playlist.trackIds.split(",").toMutableList()
+        // 🛠️ Чистим строку и проверяем на пустоту
+        val existingTrackIds = if (playlist.trackIds.isBlank()) {
+            mutableListOf()
+        } else {
+            playlist.trackIds.split(",").toMutableList()
+        }
+
         if (trackId in existingTrackIds) return false // уже есть
 
         existingTrackIds.add(trackId)

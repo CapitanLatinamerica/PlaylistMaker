@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textview.MaterialTextView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.media.fragments.playlists.ui.AddToPlaylistAdapter
+import com.practicum.playlistmaker.media.fragments.playlists.ui.view.AddToPlaylistAdapter
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.AddToPlaylistViewModel
 import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.collectLatest
@@ -23,7 +21,7 @@ import org.koin.core.parameter.parametersOf
 
 class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
-    // Получаем Track из аргументов (или через другое хранилище)
+    // Получаем Track
     private lateinit var track: Track
 
     private val viewModel: AddToPlaylistViewModel by viewModel {
@@ -33,6 +31,7 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var adapter: AddToPlaylistAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var createPlaylistBtn: MaterialTextView
+    private var isTrackAdding = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +53,16 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         var onCreatePlaylistClicked: (() -> Unit)? = null
 
-
         adapter = AddToPlaylistAdapter { playlist ->
+
+            if (isTrackAdding) return@AddToPlaylistAdapter
+            isTrackAdding = true
+
             viewModel.addTrackToPlaylist(playlist.id) { success ->
                 val msg = if (success) "Трек добавлен в плейлист" else "Трек уже есть в плейлисте"
                 Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 if (success) dismiss()
+                isTrackAdding = false
             }
         }
 
@@ -73,7 +76,6 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
             onCreatePlaylistClicked?.invoke()
         }
 
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.playlists.collectLatest { playlists ->
                 adapter.submitList(playlists)
@@ -82,6 +84,7 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
         viewModel.loadPlaylists()
     }
+
 
     companion object {
         const val TAG = "AddToPlaylistBottomSheetFragment"

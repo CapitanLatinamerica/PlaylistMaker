@@ -1,10 +1,10 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel
 
-import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.db.domain.playlists.PlaylistInteractor
+import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,15 +44,9 @@ class AddToPlaylistViewModel(
         viewModelScope.launch {
             val result = playlistInteractor.addTrackToPlaylist(playlistId, trackToAdd)
             onResult(result)
+            Log.d("AddToPlaylistVM", "Adding track ${trackToAdd.trackName} to playlist $playlistId")
         }
     }
 
-    private fun PlaylistEntity.toUi() = PlaylistUi(
-        id = id,
-        name = name,
-        description = description,
-        coverPath = coverPath,
-        trackCount = trackCount
-    )
 }
 

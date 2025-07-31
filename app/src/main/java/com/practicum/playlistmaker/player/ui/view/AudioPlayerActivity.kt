@@ -203,8 +203,6 @@ class AudioPlayerActivity : AppCompatActivity() {
             }
         }
 
-
-
         // Наблюдатель за прогрессом воспроизведения
         lifecycleScope.launch {
             viewModel.progress.collectLatest { remainingTimeMs ->
@@ -266,11 +264,4 @@ class AudioPlayerActivity : AppCompatActivity() {
             null
         }
     }
-
-
-    companion object {
-        const val TRACK_KEY = "track_key"
-    }
-
-
 }

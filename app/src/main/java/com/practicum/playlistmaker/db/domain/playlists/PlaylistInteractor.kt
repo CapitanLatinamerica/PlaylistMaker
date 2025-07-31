@@ -15,7 +15,7 @@ class PlaylistInteractor(private val repository: PlaylistsRepository) {
     }
 
     suspend fun getPlaylist(id: Int): PlaylistEntity? {
-        return repository.getPlaylistById(id)
+        return repository.getPlaylistById(id)           //это потом
     }
 
     suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>> {

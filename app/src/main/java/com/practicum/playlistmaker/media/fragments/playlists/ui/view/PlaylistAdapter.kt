@@ -39,13 +39,27 @@ class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>
 
         fun bind(playlist: PlaylistUi) {
             titleText.text = playlist.name
-            descriptionText.text = "${playlist.trackCount} треков"
+            descriptionText.text = "${getTrackCountText(playlist.trackCount)}"
 
             if (!playlist.coverPath.isNullOrEmpty()) {
                 coverImage.setImageURI(Uri.parse(playlist.coverPath))
             } else {
                 coverImage.setImageResource(R.drawable.playlist_cover_placeholder)
             }
+        }
+
+        fun getTrackCountText(count: Int): String {
+            val remainder10 = count % 10
+            val remainder100 = count % 100
+
+            val word = when {
+                remainder100 in 11..14 -> "треков"
+                remainder10 == 1 -> "трек"
+                remainder10 in 2..4 -> "трека"
+                else -> "треков"
+            }
+
+            return "$count $word"
         }
     }
 }

@@ -11,7 +11,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.practicum.playlistmaker.R
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
 class MediaFragment : Fragment() {
     private val viewModel: MediaViewModel by viewModel()
     private lateinit var pagerAdapter: MediaPagerAdapter
