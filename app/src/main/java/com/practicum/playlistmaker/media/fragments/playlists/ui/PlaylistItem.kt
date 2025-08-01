@@ -5,13 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.practicum.playlistmaker.app.ARG_PARAM1
-import com.practicum.playlistmaker.app.ARG_PARAM2
 import com.practicum.playlistmaker.R
 
 class PlaylistItem : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
+
+    companion object {
+        private const val ARG_PARAM1 = "param1"
+        private const val ARG_PARAM2 = "param2"
+
+        // Фабричный метод для создания фрагмента с аргументами
+        fun newInstance(param1: String, param2: String): PlaylistItem {
+            return PlaylistItem().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

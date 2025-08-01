@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,7 +31,7 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var adapter: AddToPlaylistAdapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var createPlaylistBtn: MaterialTextView
+    private lateinit var createPlaylistBtn: Button
     private var isTrackAdding = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
