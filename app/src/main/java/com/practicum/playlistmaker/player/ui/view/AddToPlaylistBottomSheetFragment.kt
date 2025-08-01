@@ -60,7 +60,7 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
             isTrackAdding = true
 
             viewModel.addTrackToPlaylist(playlist.id) { success ->
-                val msg = if (success) "Трек добавлен в плейлист" else "Трек уже есть в плейлисте"
+                val msg = if (success) "Трек добавлен в плейлист ${playlist.name}" else "Трек уже есть в плейлисте ${playlist.name}"
                 Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 if (success) dismiss()
                 isTrackAdding = false

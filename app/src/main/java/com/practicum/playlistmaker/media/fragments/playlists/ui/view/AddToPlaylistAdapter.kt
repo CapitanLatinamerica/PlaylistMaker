@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
+import com.practicum.playlistmaker.util.getTrackCountText
 
 class AddToPlaylistAdapter(
     private val onClick: (PlaylistUi) -> Unit
@@ -41,7 +42,7 @@ class AddToPlaylistAdapter(
 
         fun bind(playlist: PlaylistUi) {
             name.text = playlist.name
-            count.text = "${getTrackCountText(playlist.trackCount)}"
+            count.text = getTrackCountText(playlist.trackCount)
 
             Glide.with(itemView)
                 .load(playlist.coverPath)
@@ -52,20 +53,6 @@ class AddToPlaylistAdapter(
             itemView.setOnClickListener {
                 onClick(playlist)
             }
-        }
-
-        fun getTrackCountText(count: Int): String {
-            val remainder10 = count % 10
-            val remainder100 = count % 100
-
-            val word = when {
-                remainder100 in 11..14 -> "треков"
-                remainder10 == 1 -> "трек"
-                remainder10 in 2..4 -> "трека"
-                else -> "треков"
-            }
-
-            return "$count $word"
         }
     }
 }
