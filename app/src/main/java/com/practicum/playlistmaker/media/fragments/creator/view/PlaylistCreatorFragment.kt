@@ -10,7 +10,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -23,6 +22,8 @@ import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCre
 import com.practicum.playlistmaker.navigation.NavigationGuard
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.core.widget.addTextChangedListener
+
 
 class PlaylistCreatorFragment : Fragment(), NavigationGuard {
 
@@ -35,8 +36,6 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
     private lateinit var binding: FragmentPlaylistCreatorBinding
     private lateinit var pickImageLauncher: ActivityResultLauncher<Intent>
     private var selectedImageUri: Uri? = null
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,7 +66,6 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
 
         navController = findNavController()
 
-
         val nameField = binding.newPlaylistEditName
         val descriptionField = binding.playlistDescriptionEditText
 
@@ -94,11 +92,11 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
             }
         }
 
-        nameField.addTextChangedListener(watcher)
-        descriptionField.addTextChangedListener(watcher)
+        nameField.addTextChangedListener { updateButtonState() }
+        descriptionField.addTextChangedListener { updateButtonState() }
 
         viewModel.showExitDialog.observe(viewLifecycleOwner) {
-            showExitConfirmationDialog()
+            showExitDialog()
         }
 
         binding.poster.setOnClickListener {
@@ -118,46 +116,21 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
                 )
             }
 
-            Toast.makeText(requireContext(), "Плейлист создан", Toast.LENGTH_SHORT).show()
-
         }
     }
 
-
     private fun updateButtonState() {
-        val name = binding.newPlaylistEditName.text.toString().isNotEmpty()
-        val description = binding.playlistDescriptionEditText.text.toString().isNotEmpty()
-        binding.createButton.isEnabled = name && description
+        binding.createButton.isEnabled = binding.newPlaylistEditName.text
+            .toString()
+            .isNotEmpty() // Кнопка "Создать" будет активна сразу как только текст появится в поле "Название"
     }
 
-    private fun showExitConfirmationDialog() {
-        AlertDialog.Builder(requireContext(), R.style.MyAwesomeAlertDialogTheme)
-
-            .setTitle(R.string.alert_dialog_title)
-            .setMessage(R.string.alert_dialog_message)
-            .setPositiveButton(R.string.alert_dialog_positive) { _, _ ->
-                viewModel.confirmExit()
-            }
-            .setNegativeButton(R.string.alert_dialog_negative, null)
-            .show()
-    }
     override fun shouldBlockNavigation(): Boolean {
-        val name = binding.newPlaylistEditName.text.toString()
-        val description = binding.playlistDescriptionEditText.text.toString()
-        val imageSet = viewModel.isImageSelected()
-
-        return name.isNotBlank() || description.isNotBlank() || imageSet
+        return binding.newPlaylistEditName.text.toString().isNotBlank()         //Проверяем только наличие текста в поле "Название"
     }
 
     override fun requestExitConfirmation(onConfirm: () -> Unit) {
-        AlertDialog.Builder(requireContext(), R.style.MyAwesomeAlertDialogTheme)
-            .setTitle(R.string.alert_dialog_title)
-            .setMessage(R.string.alert_dialog_message)
-            .setPositiveButton(R.string.alert_dialog_positive) { _, _ ->
-                viewModel.confirmExit()
-            }
-            .setNegativeButton(R.string.alert_dialog_negative, null)
-            .show()
+        showExitDialog()
     }
 
     private fun openImagePicker() {
@@ -169,5 +142,17 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
         val chooser = Intent.createChooser(intent, getString(R.string.choose_image_from))
         pickImageLauncher.launch(chooser)
     }
+
+    private fun showExitDialog(onConfirm: (() -> Unit)? = null) {
+        AlertDialog.Builder(requireContext(), R.style.MyAwesomeAlertDialogTheme)
+            .setTitle(R.string.alert_dialog_title)
+            .setMessage(R.string.alert_dialog_message)
+            .setPositiveButton(R.string.alert_dialog_positive) { _, _ ->
+                onConfirm?.invoke() ?: viewModel.confirmExit()
+            }
+            .setNegativeButton(R.string.alert_dialog_negative, null)
+            .show()
+    }
+
 }
 

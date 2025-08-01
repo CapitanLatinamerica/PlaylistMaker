@@ -18,9 +18,6 @@ class PlaylistCreatorViewModel(
 
     private var imageSelected = false
 
-    fun setImageSelected(selected: Boolean) {
-        imageSelected = selected
-    }
     fun isImageSelected(): Boolean = imageSelected
 
     fun onBackPressed(title: String, description: String, isImageSet: Boolean) {
@@ -28,7 +25,6 @@ class PlaylistCreatorViewModel(
         if (isAllEmpty) {
             _shouldCloseScreen.value = true
         } else {
-            // Позже можно показать диалог — сейчас просто ничего не делаем
             _showExitDialog.value = Unit
         }
     }
@@ -37,7 +33,7 @@ class PlaylistCreatorViewModel(
         _shouldCloseScreen.value = true
     }
 
-    suspend fun createPlaylist(name: String, description: String, coverPath: String?) {
+    suspend fun createPlaylist(name: String, description: String?, coverPath: String?) {
         playlistsRepository.createPlaylist(
             name = name,
             description = description,
@@ -45,6 +41,4 @@ class PlaylistCreatorViewModel(
         )
         _shouldCloseScreen.value = true
     }
-
-
 }
