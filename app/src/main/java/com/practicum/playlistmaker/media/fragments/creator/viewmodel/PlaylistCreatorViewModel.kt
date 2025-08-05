@@ -33,6 +33,10 @@ class PlaylistCreatorViewModel(
         _shouldCloseScreen.value = true
     }
 
+    fun resetCloseFlag() {
+        _shouldCloseScreen.value = false
+    }
+
     suspend fun createPlaylist(name: String, description: String?, coverPath: String?): Long {
         return playlistsRepository.createPlaylist(
             name = name,

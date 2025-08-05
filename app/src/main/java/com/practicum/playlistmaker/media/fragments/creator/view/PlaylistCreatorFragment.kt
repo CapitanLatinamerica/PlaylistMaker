@@ -4,14 +4,18 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.bundle.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +26,9 @@ import com.practicum.playlistmaker.navigation.NavigationGuard
 import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.core.graphics.drawable.toDrawable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
@@ -33,8 +40,9 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         super.onCreate(savedInstanceState)
 
         // Определяем, был ли фрагмент открыт как диалог
-        isOpenedAsDialog = arguments?.getBoolean("is_dialog", false) ?: false
+        isOpenedAsDialog = arguments?.getBoolean("is_dialog", false) == true
         setStyle(STYLE_NORMAL, R.style.FullScreenDialog)
+
         trackToAdd = arguments?.getParcelable("track_to_add")
     }
 
@@ -86,15 +94,6 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         val nameField = binding.newPlaylistEditName
         val descriptionField = binding.playlistDescriptionEditText
 
-        // Назад по кнопке в тулбаре
-/*        binding.toolbar.setNavigationOnClickListener {
-            viewModel.onBackPressed(
-                title = binding.newPlaylistEditName.text.toString(),
-                description = binding.playlistDescriptionEditText.text.toString(),
-                isImageSet = viewModel.isImageSelected()
-            )
-        }*/
-
         binding.toolbar.setNavigationOnClickListener {
             handleBackPressed()
         }
@@ -104,12 +103,13 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
         // Наблюдатель для закрытия диалога
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) { shouldClose ->
-            if (shouldClose) {
+            if (shouldClose && isAdded) {  // Добавляем проверку isAdded
                 if (isOpenedAsDialog) {
-                    dismiss()
+                    dismissAllowingStateLoss()  // Используем этот метод вместо dismiss()
                 } else {
                     parentFragmentManager.popBackStack()
                 }
+                viewModel.resetCloseFlag()  // Сбрасываем флаг после закрытия
             }
         }
 
@@ -123,23 +123,30 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
         binding.createButton.setOnClickListener {
             val name = binding.newPlaylistEditName.text.toString()
-            val description = binding.playlistDescriptionEditText.text.toString()
-            val coverUri = selectedImageUri?.toString()
+            if (name.isEmpty()) return@setOnClickListener
 
             viewLifecycleOwner.lifecycleScope.launch {
                 val newPlaylistId = viewModel.createPlaylist(
                     name = name,
-                    description = description,
-                    coverPath = coverUri
+                    description = binding.playlistDescriptionEditText.text.toString(),
+                    coverPath = selectedImageUri?.toString()
                 )
 
-                val result = Bundle().apply {
-                    putParcelable("track_to_add", trackToAdd)
-                    putLong("created_playlist_id", newPlaylistId)
+                withContext(Dispatchers.Main) {
+                    parentFragmentManager.setFragmentResult(
+                        "playlist_created_result",
+                        bundleOf(
+                            "track_to_add" to trackToAdd,
+                            "created_playlist_id" to newPlaylistId
+                        )
+                    )
+
+                    if (isOpenedAsDialog) {
+                        dismissAllowingStateLoss()
+                    } else {
+                        parentFragmentManager.popBackStack()
+                    }
                 }
-                parentFragmentManager.setFragmentResult("playlist_created_result", result)
-                // Закрываем текущий фрагмент
-                parentFragmentManager.popBackStack()
             }
         }
     }
@@ -159,23 +166,17 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        // Применяем параметры окна для всех случаев
-        dialog.window?.apply {
-            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            setBackgroundDrawableResource(android.R.color.white)
-        }
+        val dialog = super.onCreateDialog(savedInstanceState).apply {
+            window?.apply {
+                // Важные параметры окна
+                setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
 
-        if (isOpenedAsDialog) {
-            dialog.setOnKeyListener { _, keyCode, event ->
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                    handleBackPressed()
-                    true
-                } else {
-                    false
-                }
+                // Разрешаем касания внутри диалога
+                clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
             }
         }
+
         return dialog
     }
 
