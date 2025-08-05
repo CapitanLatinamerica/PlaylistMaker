@@ -54,8 +54,6 @@ class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>
             }
 
         }
-
-
     }
 }
 

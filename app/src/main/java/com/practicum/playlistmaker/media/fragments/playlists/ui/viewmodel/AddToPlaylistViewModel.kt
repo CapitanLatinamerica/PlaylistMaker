@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.db.domain.playlists.PlaylistInteractor
@@ -44,9 +43,7 @@ class AddToPlaylistViewModel(
         viewModelScope.launch {
             val result = playlistInteractor.addTrackToPlaylist(playlistId, trackToAdd)
             onResult(result)
-            Log.d("AddToPlaylistVM", "Adding track ${trackToAdd.trackName} to playlist $playlistId")
         }
     }
-
 }
 

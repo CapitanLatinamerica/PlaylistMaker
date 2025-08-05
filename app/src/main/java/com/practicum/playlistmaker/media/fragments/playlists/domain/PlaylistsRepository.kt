@@ -5,7 +5,7 @@ import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistsRepository {
-    suspend fun createPlaylist(name: String, description: String?, coverPath: String?)
+    suspend fun createPlaylist(name: String, description: String?, coverPath: String?): Long
     suspend fun insertPlaylist(playlist: PlaylistEntity)
     suspend fun updatePlaylist(playlist: PlaylistEntity)
     suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>>

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlaylist(playlist: PlaylistEntity)
+    suspend fun insertPlaylist(playlist: PlaylistEntity): Long
 
     @Update
     suspend fun updatePlaylist(playlist: PlaylistEntity)

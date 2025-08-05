@@ -7,15 +7,15 @@ import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.Flow
 
 class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepository {
-    override suspend fun createPlaylist(name: String, description: String?, coverPath: String?) {
-       val newPlaylist = PlaylistEntity(
-           name = name,
-           description = description.toString(),
-           coverPath = coverPath,
-           trackIds = "",
-           trackCount = 0
+    override suspend fun createPlaylist(name: String, description: String?, coverPath: String?): Long {
+        val newPlaylist = PlaylistEntity(
+            name = name,
+            description = description.toString(),
+            coverPath = coverPath,
+            trackIds = "",
+            trackCount = 0
         )
-        dao.insertPlaylist(newPlaylist)
+        return dao.insertPlaylist(newPlaylist)
     }
 
     override suspend fun insertPlaylist(playlist: PlaylistEntity) {

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -25,6 +26,20 @@ class MediaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        childFragmentManager.setFragmentResultListener(
+            "open_playlist_creator",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            // Получаем NavController
+            val navController = findNavController()
+
+            // Навигация с передачей параметров
+            navController.navigate(
+                R.id.action_mediaFragment_to_playlistCreatorFragment,
+                bundle
+            )
+        }
 
         pagerAdapter = MediaPagerAdapter(this) // Инициализируем здесь
 

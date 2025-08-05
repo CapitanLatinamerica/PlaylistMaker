@@ -5,13 +5,13 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -20,15 +20,23 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
 import com.practicum.playlistmaker.navigation.NavigationGuard
+import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.core.widget.addTextChangedListener
 
 
-class PlaylistCreatorFragment : Fragment(), NavigationGuard {
+class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
+
+    private var trackToAdd: Track? = null
 
     companion object {
-        fun newInstance() = PlaylistCreatorFragment()
+        fun newInstance(track: Track?): PlaylistCreatorFragment {
+            return PlaylistCreatorFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable("track_to_add", track)
+                }
+            }
+        }
     }
 
     private val viewModel: PlaylistCreatorViewModel by viewModel()
@@ -63,19 +71,10 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        navController = findNavController()
+        trackToAdd = arguments?.getParcelable("track_to_add")
 
         val nameField = binding.newPlaylistEditName
         val descriptionField = binding.playlistDescriptionEditText
-
-        val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                updateButtonState()
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        }
 
         // Назад по кнопке в тулбаре
         binding.toolbar.setNavigationOnClickListener {
@@ -109,13 +108,21 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
             val coverUri = selectedImageUri?.toString()
 
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.createPlaylist(
+                val newPlaylistId = viewModel.createPlaylist(
                     name = name,
                     description = description,
                     coverPath = coverUri
                 )
-            }
 
+                val result = Bundle().apply {
+                    putParcelable("track_to_add", trackToAdd)
+                    putLong("created_playlist_id", newPlaylistId)
+                }
+                parentFragmentManager.setFragmentResult("playlist_created_result", result)
+                // Закрываем текущий фрагмент
+                parentFragmentManager.popBackStack()
+                dismiss()
+            }
         }
     }
 
@@ -153,6 +160,9 @@ class PlaylistCreatorFragment : Fragment(), NavigationGuard {
             .setNegativeButton(R.string.alert_dialog_negative, null)
             .show()
     }
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        trackToAdd = arguments?.getParcelable("track_to_add")
+    }
 }
 

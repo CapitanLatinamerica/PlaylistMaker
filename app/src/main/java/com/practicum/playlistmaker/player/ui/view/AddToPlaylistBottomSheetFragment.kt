@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.textview.MaterialTextView
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.media.fragments.creator.view.PlaylistCreatorFragment
 import com.practicum.playlistmaker.media.fragments.playlists.ui.view.AddToPlaylistAdapter
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.AddToPlaylistViewModel
 import com.practicum.playlistmaker.player.domain.Track
@@ -28,6 +28,7 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
     private val viewModel: AddToPlaylistViewModel by viewModel {
         parametersOf(track)
     }
+
 
     private lateinit var adapter: AddToPlaylistAdapter
     private lateinit var recyclerView: RecyclerView
@@ -52,7 +53,6 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var onCreatePlaylistClicked: (() -> Unit)? = null
 
         adapter = AddToPlaylistAdapter { playlist ->
 
@@ -73,8 +73,12 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
         createPlaylistBtn = view.findViewById(R.id.button_new_playlist)
         createPlaylistBtn.setOnClickListener {
+            track.let { trackToAdd ->
+                // Используем родительский FragmentManager для открытия PlaylistCreatorFragment
+                PlaylistCreatorFragment.newInstance(trackToAdd)
+                    .show(parentFragmentManager, "playlist_creator")
+            }
             dismiss()
-            onCreatePlaylistClicked?.invoke()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -85,7 +89,6 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
 
         viewModel.loadPlaylists()
     }
-
 
     companion object {
         const val TAG = "AddToPlaylistBottomSheetFragment"

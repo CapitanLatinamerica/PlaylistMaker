@@ -21,6 +21,7 @@ import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.media.fragments.creator.view.PlaylistCreatorFragment
 import com.practicum.playlistmaker.player.data.PlayerConstants
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.model.PlayerState
@@ -144,7 +145,6 @@ class AudioPlayerActivity : AppCompatActivity() {
             fragment.show(supportFragmentManager, AddToPlaylistBottomSheetFragment.TAG)
         }
 
-
         //Слушаем кнопку добавления в плейлист
         binding.buttonAdd.setOnClickListener {
             val currentTrack = viewModel.track
@@ -264,4 +264,5 @@ class AudioPlayerActivity : AppCompatActivity() {
             null
         }
     }
+
 }
