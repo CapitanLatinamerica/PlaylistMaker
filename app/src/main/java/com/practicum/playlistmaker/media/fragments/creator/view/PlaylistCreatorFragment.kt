@@ -2,9 +2,11 @@ package com.practicum.playlistmaker.media.fragments.creator.view
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +14,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
@@ -28,19 +27,29 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
     private var trackToAdd: Track? = null
+    private var isOpenedAsDialog = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Определяем, был ли фрагмент открыт как диалог
+        isOpenedAsDialog = arguments?.getBoolean("is_dialog", false) ?: false
+        setStyle(STYLE_NORMAL, R.style.FullScreenDialog)
+        trackToAdd = arguments?.getParcelable("track_to_add")
+    }
 
     companion object {
-        fun newInstance(track: Track?): PlaylistCreatorFragment {
+        fun newInstance(track: Track?, isDialog: Boolean = false): PlaylistCreatorFragment {
             return PlaylistCreatorFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable("track_to_add", track)
+                    putBoolean("is_dialog", isDialog)
                 }
             }
         }
     }
 
     private val viewModel: PlaylistCreatorViewModel by viewModel()
-    private lateinit var navController: NavController
     private lateinit var binding: FragmentPlaylistCreatorBinding
     private lateinit var pickImageLauncher: ActivityResultLauncher<Intent>
     private var selectedImageUri: Uri? = null
@@ -50,6 +59,16 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
+        binding = FragmentPlaylistCreatorBinding.inflate(inflater, container, false)
+        return binding.root
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        trackToAdd = arguments?.getParcelable("track_to_add")
 
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -64,35 +83,35 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
             }
         }
 
-        binding = FragmentPlaylistCreatorBinding.inflate(inflater, container, false)
-        return binding.root
-
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        trackToAdd = arguments?.getParcelable("track_to_add")
-
         val nameField = binding.newPlaylistEditName
         val descriptionField = binding.playlistDescriptionEditText
 
         // Назад по кнопке в тулбаре
-        binding.toolbar.setNavigationOnClickListener {
+/*        binding.toolbar.setNavigationOnClickListener {
             viewModel.onBackPressed(
-                title = nameField.text.toString(),
-                description = descriptionField.text.toString(),
+                title = binding.newPlaylistEditName.text.toString(),
+                description = binding.playlistDescriptionEditText.text.toString(),
                 isImageSet = viewModel.isImageSelected()
             )
-        }
+        }*/
 
-        viewModel.shouldCloseScreen.observe(viewLifecycleOwner) { shouldClose ->
-            if (shouldClose) {
-                navController.popBackStack()
-            }
+        binding.toolbar.setNavigationOnClickListener {
+            handleBackPressed()
         }
 
         nameField.addTextChangedListener { updateButtonState() }
         descriptionField.addTextChangedListener { updateButtonState() }
+
+        // Наблюдатель для закрытия диалога
+        viewModel.shouldCloseScreen.observe(viewLifecycleOwner) { shouldClose ->
+            if (shouldClose) {
+                if (isOpenedAsDialog) {
+                    dismiss()
+                } else {
+                    parentFragmentManager.popBackStack()
+                }
+            }
+        }
 
         viewModel.showExitDialog.observe(viewLifecycleOwner) {
             showExitDialog()
@@ -121,7 +140,6 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
                 parentFragmentManager.setFragmentResult("playlist_created_result", result)
                 // Закрываем текущий фрагмент
                 parentFragmentManager.popBackStack()
-                dismiss()
             }
         }
     }
@@ -138,6 +156,27 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
     override fun requestExitConfirmation(onConfirm: () -> Unit) {
         showExitDialog()
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        // Применяем параметры окна для всех случаев
+        dialog.window?.apply {
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setBackgroundDrawableResource(android.R.color.white)
+        }
+
+        if (isOpenedAsDialog) {
+            dialog.setOnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+                    handleBackPressed()
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+        return dialog
     }
 
     private fun openImagePicker() {
@@ -160,9 +199,19 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
             .setNegativeButton(R.string.alert_dialog_negative, null)
             .show()
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        trackToAdd = arguments?.getParcelable("track_to_add")
+
+    private fun handleBackPressed() {
+        val hasChanges = binding.newPlaylistEditName.text.toString().isNotBlank() ||
+                binding.playlistDescriptionEditText.text.toString().isNotBlank() ||
+                viewModel.isImageSelected()
+
+        if (hasChanges) {
+            showExitDialog {
+                viewModel.confirmExit()
+            }
+        } else {
+            viewModel.confirmExit()
+        }
     }
 }
 

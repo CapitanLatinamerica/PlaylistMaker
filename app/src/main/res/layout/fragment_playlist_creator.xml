@@ -2,12 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/FullScreenDialog"
     android:id="@+id/creator_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:theme="@style/Theme.PlaylistMaker"
+    android:background="@color/dialog_background_color"
     tools:context=".media.fragments.creator.view.PlaylistCreatorFragment">
 
     <!-- Тулбар -->

@@ -9,4 +9,6 @@
 
     <color name="new_pl_creator_button">@color/yp_light_gray</color> <!-- цвет кнопки в криэйторе плейлиста -->
 
+    <color name="dialog_background_color">@color/yp_black</color>
+
 </resources>

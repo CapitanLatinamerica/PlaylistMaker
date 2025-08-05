@@ -29,7 +29,6 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
         parametersOf(track)
     }
 
-
     private lateinit var adapter: AddToPlaylistAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var createPlaylistBtn: Button
