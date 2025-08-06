@@ -5,17 +5,17 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.bundle.bundleOf
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
@@ -24,11 +24,10 @@ import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
 import com.practicum.playlistmaker.navigation.NavigationGuard
 import com.practicum.playlistmaker.player.domain.Track
-import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.core.graphics.drawable.toDrawable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
@@ -146,6 +145,10 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
                     } else {
                         parentFragmentManager.popBackStack()
                     }
+                    val msg = resources.getString(R.string.create_playlist) +
+                            " \"$name\" " +
+                            resources.getString(R.string.new_pl_created)
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 }
             }
         }

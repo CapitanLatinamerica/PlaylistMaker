@@ -14,17 +14,16 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.player.data.PlayerConstants
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModel
 import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
-import com.practicum.playlistmaker.media.fragments.creator.view.PlaylistCreatorFragment
-import com.practicum.playlistmaker.player.data.PlayerConstants
-import com.practicum.playlistmaker.player.data.repository.LikeStorage
-import com.practicum.playlistmaker.player.domain.model.PlayerState
 import org.koin.android.ext.android.get
 
 class AudioPlayerActivity : AppCompatActivity() {
@@ -93,7 +92,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         val releaseYear = intent.getStringExtra(PlayerConstants.Extra.RELEASE_YEAR)
         val genre = intent.getStringExtra(PlayerConstants.Extra.GENRE)
         val country = intent.getStringExtra(PlayerConstants.Extra.COUNTRY)
-        val localId = intent.getStringExtra(PlayerConstants.Extra.LOCAL_ID)
+        intent.getStringExtra(PlayerConstants.Extra.LOCAL_ID)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -264,5 +263,4 @@ class AudioPlayerActivity : AppCompatActivity() {
             null
         }
     }
-
 }

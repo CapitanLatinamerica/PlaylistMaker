@@ -20,15 +20,6 @@ class PlaylistCreatorViewModel(
 
     fun isImageSelected(): Boolean = imageSelected
 
-    fun onBackPressed(title: String, description: String, isImageSet: Boolean) {
-        val isAllEmpty = title.isBlank() && description.isBlank() && !isImageSet
-        if (isAllEmpty) {
-            _shouldCloseScreen.value = true
-        } else {
-            _showExitDialog.value = Unit
-        }
-    }
-
     fun confirmExit() {
         _shouldCloseScreen.value = true
     }

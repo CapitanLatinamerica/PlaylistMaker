@@ -74,7 +74,7 @@ class AddToPlaylistBottomSheetFragment : BottomSheetDialogFragment() {
         createPlaylistBtn.setOnClickListener {
             track.let { trackToAdd ->
                 // Используем родительский FragmentManager для открытия PlaylistCreatorFragment
-                PlaylistCreatorFragment.newInstance(trackToAdd)
+                PlaylistCreatorFragment.newInstance(trackToAdd, isDialog = true)
                     .show(parentFragmentManager, "playlist_creator")
             }
             dismiss()
