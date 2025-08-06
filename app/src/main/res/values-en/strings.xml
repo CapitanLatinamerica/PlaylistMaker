@@ -32,4 +32,18 @@
     <string name="favorites_description">Your favorite tracks</string>
     <string name="you_didnt_create_any_list">You haven\'t created\nany playlists yet</string>
     <string name="create_playlist">New playlist</string>
+
+    <string name="new_pl_descr">Description</string>
+    <string name="new_pl_name">Name*</string>
+    <string name="new_pl_update">Update</string>
+    <string name="new_pl_create">Create</string>
+
+    <string name="alert_dialog_title">Finish creating the playlist?</string>
+    <string name="alert_dialog_message">All unsaved data will be lost</string>
+    <string name="alert_dialog_positive">Finish</string>
+    <string name="alert_dialog_negative">Cancel</string>
+
+    <string name="new_pl_created">created</string>
+
+    <string name="choose_image_from">Upload image...</string>
 </resources>

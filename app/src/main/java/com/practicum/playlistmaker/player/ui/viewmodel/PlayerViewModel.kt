@@ -34,10 +34,11 @@ class PlayerViewModel(
     private val _isLiked = MutableStateFlow<Boolean>(false)
     var isLiked: StateFlow<Boolean> = _isLiked
 
-    private var track: Track? = null
+    internal var track: Track? = null
 
     // Job-короутина, обновляющая прогресс воспроизведения
     private var playbackJob: Job? = null
+
 
     init {
         // Устанавливаем callback: когда воспроизведение закончится, переходим в состояние FINISHED

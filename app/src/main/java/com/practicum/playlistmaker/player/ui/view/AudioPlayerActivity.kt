@@ -3,6 +3,8 @@ package com.practicum.playlistmaker.player.ui.view
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -10,24 +12,28 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.player.data.PlayerConstants
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.player.domain.model.PlayerState
 import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModel
 import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
-import com.practicum.playlistmaker.player.data.Constants
-import com.practicum.playlistmaker.player.data.repository.LikeStorage
-import com.practicum.playlistmaker.player.domain.model.PlayerState
 import org.koin.android.ext.android.get
 
 class AudioPlayerActivity : AppCompatActivity() {
 
     // Binding для работы с layout
     private lateinit var binding: ActivityAudioplayerBinding
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private val likeStorage: LikeStorage by lazy { get() } // Инициализируем в самом Activity
+    private lateinit var addToPlaylistBtn: ImageButton
+
 
     // ViewModel для управления логикой плеера
     // Получаем ViewModel с передачей LikeStorage
@@ -35,6 +41,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         PlayerViewModelFactory(
             playerRepository = PlayerRepositoryImpl(MediaPlayer()),
             likeStorage = likeStorage,
+            playlistInteractor = get(),
             favoriteTracksViewModel = get(),
             searchHistoryInteractor = get()
         )
@@ -49,6 +56,12 @@ class AudioPlayerActivity : AppCompatActivity() {
         // Инициализация ViewBinding
         binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val bottomSheet = findViewById<LinearLayout>(R.id.playlists_bottom_sheet)
+        val overlay = findViewById<View>(R.id.overlay)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
 
         // Настройка toolbar (кнопка "назад")
         setupToolbar()
@@ -71,15 +84,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
 
         // Получение данных о треке из Intent
-        val trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: "Unknown"
-        val artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: "Unknown"
-        val trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0
-        val albumCover = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
-        val collectionName = intent.getStringExtra(Constants.Extra.COLLECTION_NAME)
-        val releaseYear = intent.getStringExtra(Constants.Extra.RELEASE_YEAR)
-        val genre = intent.getStringExtra(Constants.Extra.GENRE)
-        val country = intent.getStringExtra(Constants.Extra.COUNTRY)
-        val localId = intent.getStringExtra(Constants.Extra.LOCAL_ID)
+        val trackName = intent.getStringExtra(PlayerConstants.Extra.TRACK_NAME) ?: "Unknown"
+        val artistName = intent.getStringExtra(PlayerConstants.Extra.ARTIST_NAME) ?: "Unknown"
+        val trackTimeMillis = intent.getStringExtra(PlayerConstants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0
+        val albumCover = intent.getStringExtra(PlayerConstants.Extra.ALBUM_COVER)
+        val collectionName = intent.getStringExtra(PlayerConstants.Extra.COLLECTION_NAME)
+        val releaseYear = intent.getStringExtra(PlayerConstants.Extra.RELEASE_YEAR)
+        val genre = intent.getStringExtra(PlayerConstants.Extra.GENRE)
+        val country = intent.getStringExtra(PlayerConstants.Extra.COUNTRY)
+        intent.getStringExtra(PlayerConstants.Extra.LOCAL_ID)
 
         // Заполнение UI данными о треке
         findViewById<TextView>(R.id.track_name).text = trackName
@@ -111,6 +124,32 @@ class AudioPlayerActivity : AppCompatActivity() {
                 row.findViewById<TextView>(R.id.parameter_name).text = param
                 row.findViewById<TextView>(R.id.parameter_value).text = value
                 trackInfoContainer.addView(row)
+            }
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                overlay.visibility = if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                overlay.alpha = slideOffset
+            }
+        })
+
+        // Создание кнопки добавления в плейлист
+        addToPlaylistBtn = findViewById(R.id.buttonAdd)
+        addToPlaylistBtn.setOnClickListener {
+            val fragment = AddToPlaylistBottomSheetFragment.newInstance(track)
+            fragment.show(supportFragmentManager, AddToPlaylistBottomSheetFragment.TAG)
+        }
+
+        //Слушаем кнопку добавления в плейлист
+        binding.buttonAdd.setOnClickListener {
+            val currentTrack = viewModel.track
+            if (currentTrack != null) {
+                AddToPlaylistBottomSheetFragment.newInstance(currentTrack)
+                    .show(supportFragmentManager, AddToPlaylistBottomSheetFragment.TAG)
             }
         }
     }
@@ -211,14 +250,14 @@ class AudioPlayerActivity : AppCompatActivity() {
     private fun createTrackFromIntent(): Track? {
         return try {
             Track(
-                trackId = intent.getLongExtra(Constants.Extra.TRACK_ID, -1),
-                trackName = intent.getStringExtra(Constants.Extra.TRACK_NAME) ?: return null,
-                artistName = intent.getStringExtra(Constants.Extra.ARTIST_NAME) ?: return null,
-                trackTimeMillis = intent.getStringExtra(Constants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
-                artworkUrl100 = intent.getStringExtra(Constants.Extra.ALBUM_COVER)
+                trackId = intent.getLongExtra(PlayerConstants.Extra.TRACK_ID, -1),
+                trackName = intent.getStringExtra(PlayerConstants.Extra.TRACK_NAME) ?: return null,
+                artistName = intent.getStringExtra(PlayerConstants.Extra.ARTIST_NAME) ?: return null,
+                trackTimeMillis = intent.getStringExtra(PlayerConstants.Extra.TRACK_TIME)?.toLongOrNull() ?: 0,
+                artworkUrl100 = intent.getStringExtra(PlayerConstants.Extra.ALBUM_COVER)
                     ?.replace("512x512bb.jpg", "100x100bb.jpg") ?: "",
-                previewUrl = intent.getStringExtra(Constants.Extra.PREVIEW_URL) ?: return null,
-                addedAt = intent.getLongExtra(Constants.Extra.LOCAL_ID, 0)
+                previewUrl = intent.getStringExtra(PlayerConstants.Extra.PREVIEW_URL) ?: return null,
+                addedAt = intent.getLongExtra(PlayerConstants.Extra.LOCAL_ID, 0)
             )
         } catch (e: Exception) {
             null

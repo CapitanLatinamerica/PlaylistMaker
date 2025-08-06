@@ -2,9 +2,23 @@ package com.practicum.playlistmaker.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
 import com.practicum.playlistmaker.app.PREFERENCE_NAME
+import com.practicum.playlistmaker.db.data.AppDatabase
+import com.practicum.playlistmaker.db.data.favorites.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksInteractor
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksInteractorImpl
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksRepository
+import com.practicum.playlistmaker.db.domain.playlists.PlaylistInteractor
+import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
 import com.practicum.playlistmaker.media.MediaViewModel
-import com.practicum.playlistmaker.media.fragmentes.viewmodel.PlaylistsViewModel
+import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
+import com.practicum.playlistmaker.media.fragments.playlists.data.PlaylistsRepositoryImpl
+import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
+import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.AddToPlaylistViewModel
+import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
+import com.practicum.playlistmaker.player.data.repository.LikeStorage
+import com.practicum.playlistmaker.player.domain.Track
 import com.practicum.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.SearchRepositoryImpl
 import com.practicum.playlistmaker.search.data.network.ITunesService
@@ -26,14 +40,6 @@ import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import androidx.room.Room
-import com.practicum.playlistmaker.db.data.AppDatabase
-import com.practicum.playlistmaker.db.data.FavoriteTracksRepositoryImpl
-import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
-import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractorImpl
-import com.practicum.playlistmaker.db.domain.FavoriteTracksRepository
-import com.practicum.playlistmaker.db.presentation.FavoriteTracksViewModel
-import com.practicum.playlistmaker.player.data.repository.LikeStorage
 
 
 val appModule = module {
@@ -66,6 +72,7 @@ val databaseModule = module {
             .build()
     }
     single { get<AppDatabase>().favoriteTrackDao() }
+    single { get<AppDatabase>().playlistDao() }
 }
 
 
@@ -100,8 +107,20 @@ val mediaModule = module {
         FavoriteTracksInteractorImpl(get())
     }
 
+    single<PlaylistsRepository> {
+        PlaylistsRepositoryImpl(get())
+    }
+
+    single<PlaylistInteractor> {
+        PlaylistInteractor(get())
+    }
+
     viewModel { FavoriteTracksViewModel(get()) }
     viewModel { PlaylistsViewModel(get()) }
+    viewModel { PlaylistCreatorViewModel(get()) }
+    viewModel { (track: Track) -> AddToPlaylistViewModel(get(), track) }
+    factory { (track: Track) -> AddToPlaylistViewModel(get(), track) }
+
 }
 
 fun provideSharedPreferences(context: Context): SharedPreferences {                                 //Создает экземпляр SharedPreferences

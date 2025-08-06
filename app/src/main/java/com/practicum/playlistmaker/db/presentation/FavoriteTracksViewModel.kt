@@ -2,7 +2,7 @@ package com.practicum.playlistmaker.db.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.practicum.playlistmaker.db.domain.FavoriteTracksInteractor
+import com.practicum.playlistmaker.db.domain.favorites.FavoriteTracksInteractor
 import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

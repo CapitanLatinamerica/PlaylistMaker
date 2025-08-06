@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.db.data
+package com.practicum.playlistmaker.db.data.favorites
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

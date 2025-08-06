@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_content"
+    android:layout_width="match_parent"
+    android:layout_height="505dp"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/bottom_sheet_handle"
+    android:gravity="center_horizontal">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/title_add_to_playlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Добавить в плейлист"
+        android:gravity="center_horizontal"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="?attr/colorOnPrimary"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/button_new_playlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_playlist"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:textSize="@dimen/button_retry_text_size"
+        app:backgroundTint="?attr/colorOnSecondary"
+        android:textColor="?attr/colorSecondaryVariant"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_add_to_playlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"/>
+
+
+
+</LinearLayout>
