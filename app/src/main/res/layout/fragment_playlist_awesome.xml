@@ -6,22 +6,14 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/myAwesomeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#E6E8EB">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/headerToolbar"
-            style="@style/MyAwesomeToolbar"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:navigationIcon="@drawable/arrow_back_light_mode"
-            app:title="" />
-
         <ImageView
             android:id="@+id/coverImage"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="1:1"
@@ -30,9 +22,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:src="@drawable/playlist_cover_placeholder" />
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/headerToolbar"
+            style="@style/MyAwesomeToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleTextColor="@color/yp_black"
+            android:background="@android:color/transparent"
+            android:minHeight="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:navigationIcon="@drawable/arrow_back_light_mode"
+            app:navigationIconTint="@color/yp_black"
+            app:title="" />
+
         <TextView
             android:id="@+id/titleText"
-            style="@style/MyTrackTitle"
+            style="@style/PlaylistTitleStyle"
             android:layout_width="0dp"
             android:layout_marginTop="24dp"
             android:layout_marginHorizontal="16dp"
@@ -41,17 +48,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Playlist 1" />
 
+
         <TextView
             android:id="@+id/subtitleText"
-            style="@style/MyTrackInfo"
+            style="@style/PlaylistSubtitleStyle"
             android:layout_width="0dp"
             android:layout_marginTop="8dp"
             android:layout_marginHorizontal="16dp"
-            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/titleText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Description" />
+            tools:text="@string/new_pl_descr" />
 
         <LinearLayout
             android:id="@+id/playlistMetaContainer"
@@ -66,42 +73,48 @@
 
             <TextView
                 android:id="@+id/durationLabel"
-                style="@style/MyTrackInfo"
+                style="@style/PlaylistSubtitleStyle"
                 android:layout_width="wrap_content"
                 android:maxWidth="150dp"
                 app:drawableRightCompat="@drawable/one_point"
                 app:drawableTint="@color/black"
-                tools:text="300 minutes" />
+                tools:text="256 minutes" />
 
             <TextView
                 android:id="@+id/trackCountLabel"
-                style="@style/MyTrackInfo"
+                style="@style/PlaylistSubtitleStyle"
                 android:layout_width="wrap_content"
                 android:maxWidth="150dp"
-                tools:text="60 tracks" />
+                tools:text="37 tracks" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/btnShare"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp"
-            android:src="@drawable/ic_share"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
             app:layout_constraintTop_toBottomOf="@id/playlistMetaContainer"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/btnMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="16dp"
-            android:src="@drawable/three_points"
-            app:layout_constraintTop_toBottomOf="@id/playlistMetaContainer"
-            app:layout_constraintStart_toEndOf="@id/btnShare" />
+            <ImageView
+                android:id="@+id/btnShare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_share" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/btnMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/three_points" />
+        </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/contentSheet"
@@ -110,7 +123,7 @@
         android:orientation="vertical"
         android:background="@drawable/bottom_sheet_handle"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:behavior_peekHeight="266dp"
+        app:behavior_peekHeight="100dp"
         app:behavior_hideable="false">
 
         <View
