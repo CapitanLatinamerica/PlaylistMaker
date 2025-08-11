@@ -90,19 +90,19 @@ class MyAwesomePlaylistFragment : Fragment() {
             openAudioPlayer(track)
         }
 
-        // Подписка на список треков из ViewModel
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.tracksStateFlow.collect { tracks ->
-                    if (tracks.isEmpty()) {
-//                        emptyStateView.visibility = View.VISIBLE
-                        recyclerView.visibility = View.GONE
-                    } else {
- //                       emptyStateView.visibility = View.GONE
-                        recyclerView.visibility = View.VISIBLE
-                        trackAdapter.submitList(tracks)
-                    }
-                }
+        // Подписываемся на список треков из ViewModel
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.tracksStateFlow.collect { tracks ->
+ /*               if (tracks.isEmpty()) {
+//                    emptyStateView.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                } else {
+//                    emptyStateView.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                    trackAdapter.submitList(tracks)
+                }*/
+
+                trackAdapter.submitList(tracks)
             }
         }
 
