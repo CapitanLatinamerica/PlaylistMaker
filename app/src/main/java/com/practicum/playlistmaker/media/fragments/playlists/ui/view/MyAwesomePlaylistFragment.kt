@@ -9,8 +9,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.MyAwesomePlaylistFragmentViewModel
@@ -20,6 +23,7 @@ class MyAwesomePlaylistFragment : Fragment() {
 
     private val viewModel: MyAwesomePlaylistFragmentViewModel by viewModel()
     private val args: MyAwesomePlaylistFragmentArgs by navArgs()
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +33,10 @@ class MyAwesomePlaylistFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Получаем ссылку на NavController для навигации
+        navController = NavHostFragment.findNavController(this)
+        // Получаем корневой вид и скрываем нижнюю панель навигации
+        activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.visibility = View.GONE
 
         return inflater.inflate(R.layout.fragment_playlist_awesome, container, false)
     }
@@ -50,6 +58,12 @@ class MyAwesomePlaylistFragment : Fragment() {
             // Отображаем детали плейлиста
             updateUI(playlist)
         }
+
+        // Настроим навигационную кнопку назад
+        val toolbar = view?.findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.headerToolbar)
+        toolbar?.setNavigationOnClickListener {
+            navController.navigateUp()
+        }
     }
 
     private fun updateUI(playlist: PlaylistUi) {
@@ -66,6 +80,12 @@ class MyAwesomePlaylistFragment : Fragment() {
 
         // Заполняем другие данные
         view?.findViewById<TextView>(R.id.durationLabel)?.text = "${playlist.trackCount} tracks"
+    }
+
+    // Показываем нижнюю панель навигации при закрытии фрагмента
+    override fun onDestroyView() {
+        super.onDestroyView()
+        activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.visibility = View.VISIBLE
     }
 
     companion object {
