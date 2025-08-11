@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.view
 
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,18 +10,29 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.MyAwesomePlaylistFragmentViewModel
+import com.practicum.playlistmaker.player.TrackAdapter
+import com.practicum.playlistmaker.player.data.PlayerConstants
+import com.practicum.playlistmaker.player.domain.Track
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 
 class MyAwesomePlaylistFragment : Fragment() {
 
+    private lateinit var trackAdapter: TrackAdapter
     private val viewModel: MyAwesomePlaylistFragmentViewModel by viewModel()
     private val args: MyAwesomePlaylistFragmentArgs by navArgs()
     private lateinit var navController: NavController
@@ -64,6 +76,56 @@ class MyAwesomePlaylistFragment : Fragment() {
         toolbar?.setNavigationOnClickListener {
             navController.navigateUp()
         }
+
+        // Инициализация RecyclerView и адаптера
+        val recyclerView = view.findViewById<RecyclerView>(R.id.listTracks)
+//        val emptyStateView = view.findViewById<TextView>(R.id.emptyStateView)
+
+        trackAdapter = TrackAdapter(mutableListOf())
+        recyclerView.adapter = trackAdapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Подписываем обработчик на клик
+        trackAdapter.setOnItemClickListener { track ->
+            openAudioPlayer(track)
+        }
+
+        // Подписка на список треков из ViewModel
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.tracksStateFlow.collect { tracks ->
+                    if (tracks.isEmpty()) {
+//                        emptyStateView.visibility = View.VISIBLE
+                        recyclerView.visibility = View.GONE
+                    } else {
+ //                       emptyStateView.visibility = View.GONE
+                        recyclerView.visibility = View.VISIBLE
+                        trackAdapter.submitList(tracks)
+                    }
+                }
+            }
+        }
+
+        // Загружаем данные
+//        val playlistId = args.playlistId
+        viewModel.loadPlaylistDetails(playlistId)
+    }
+
+    private fun openAudioPlayer(track: Track) {
+        startActivity(Intent(requireContext(), AudioPlayerActivity::class.java).apply {
+            putExtra(PlayerConstants.Extra.TRACK_ID, track.trackId)
+            putExtra(PlayerConstants.Extra.TRACK_NAME, track.trackName)
+            putExtra(PlayerConstants.Extra.ARTIST_NAME, track.artistName)
+            putExtra(PlayerConstants.Extra.TRACK_TIME, track.trackTimeMillis.toString())
+            putExtra(PlayerConstants.Extra.ALBUM_COVER, track.artworkUrl100)
+            putExtra(PlayerConstants.Extra.COLLECTION_NAME, track.collectionName ?: "")
+            putExtra(PlayerConstants.Extra.RELEASE_YEAR, track.releaseDate?.takeIf { it.isNotEmpty() }?.split("-")?.get(0) ?: "")
+            putExtra(PlayerConstants.Extra.GENRE, track.primaryGenreName ?: "")
+            putExtra(PlayerConstants.Extra.COUNTRY, track.country ?: "")
+            putExtra(PlayerConstants.Extra.PREVIEW_URL, track.previewUrl)
+            putExtra(PlayerConstants.Extra.IS_FAVORITE, track.isFavorite)
+            putExtra(PlayerConstants.Extra.LOCAL_ID, track.addedAt)
+        })
     }
 
     private fun updateUI(playlist: PlaylistUi) {
@@ -81,6 +143,7 @@ class MyAwesomePlaylistFragment : Fragment() {
         // Заполняем другие данные
         view?.findViewById<TextView>(R.id.durationLabel)?.text = "${playlist.trackCount} tracks"
     }
+
 
     // Показываем нижнюю панель навигации при закрытии фрагмента
     override fun onDestroyView() {

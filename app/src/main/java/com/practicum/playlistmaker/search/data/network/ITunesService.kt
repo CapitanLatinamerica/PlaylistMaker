@@ -13,6 +13,12 @@ interface ITunesService {
         @Query("entity") entity: String = ENTITY_SONG                                               // Тип сущности (по умолчанию - песни)
     ): ITunesSearchResponse
 
+    @GET("lookup")
+    suspend fun lookupTracksByIds(
+        @Query("id") ids: String
+    ): ITunesSearchResponse
+
+
     companion object {
         const val ENTITY_SONG = "song"                                                              // Константа для типа сущности
 

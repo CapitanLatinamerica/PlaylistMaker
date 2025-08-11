@@ -3,9 +3,13 @@ package com.practicum.playlistmaker.db.domain.playlists
 import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
 import com.practicum.playlistmaker.player.domain.Track
+import com.practicum.playlistmaker.search.data.network.ITunesService
 import kotlinx.coroutines.flow.Flow
 
-class PlaylistInteractor(private val repository: PlaylistsRepository) {
+class PlaylistInteractor(
+    private val repository: PlaylistsRepository,
+    private val iTunesService: ITunesService
+) {
     suspend fun createPlaylist(playlist: PlaylistEntity) {
         repository.insertPlaylist(playlist)
     }
@@ -26,4 +30,19 @@ class PlaylistInteractor(private val repository: PlaylistsRepository) {
         return repository.addTrackToPlaylist(playlistId, track)
     }
 
+    suspend fun getTracksForPlaylist(playlist: PlaylistEntity): List<Track> {
+        if (playlist.trackIds.isBlank()) return emptyList()
+        val ids = playlist.trackIds.split(",").mapNotNull { it.toLongOrNull() }
+        if (ids.isEmpty()) return emptyList()
+
+        // Формируем строку ID через запятую
+        val idsString = ids.joinToString(",")
+
+        return try {
+            val response = iTunesService.lookupTracksByIds(idsString)
+            response.results.map { it.toDomain() } // Реализуйте метод toDomain() для TrackDto -> Track
+        } catch (e: Exception) {
+            emptyList() // Обработка ошибки, например, пустой список
+        }
+    }
 }

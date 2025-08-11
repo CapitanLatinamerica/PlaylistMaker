@@ -157,16 +157,6 @@
                     android:layout_height="256dp"
                     android:layout_marginTop="24dp"
                     tools:listitem="@layout/track_info_row" />
-                <TextView
-                    android:id="@+id/emptyStateView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Треков нет"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@id/contentSheet"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
             </FrameLayout>
         </LinearLayout>
 
