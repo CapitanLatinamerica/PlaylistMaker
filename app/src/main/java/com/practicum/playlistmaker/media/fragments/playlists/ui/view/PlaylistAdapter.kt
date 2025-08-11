@@ -36,7 +36,7 @@ class PlaylistAdapter (
 
     override fun getItemCount(): Int = items.size
 
-    class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleText: TextView = itemView.findViewById(R.id.itemNamePL)
         private val descriptionText: TextView = itemView.findViewById(R.id.itemCountPL)
         private val coverImage: ImageView = itemView.findViewById(R.id.itemImagePL)
@@ -55,6 +55,10 @@ class PlaylistAdapter (
                 coverImage.setImageResource(R.drawable.playlist_cover_placeholder)
             }
 
+            // Обработка клика на элемент
+            itemView.setOnClickListener {
+                onPlaylistClicked(playlist) // передаем данные в onPlaylistClicked
+            }
         }
     }
 }

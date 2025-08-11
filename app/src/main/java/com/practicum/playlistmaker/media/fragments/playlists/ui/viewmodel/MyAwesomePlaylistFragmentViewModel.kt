@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel
 
-
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
