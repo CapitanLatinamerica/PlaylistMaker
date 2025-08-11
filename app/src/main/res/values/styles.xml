@@ -342,5 +342,10 @@
         <item name="android:maxLines">1</item>
     </style>
 
+    <!-- Стиль списка треков в диалоге просмотра плейлиста -->
+    <style name="PlaylistRecyclerViewStyle" parent="">
+        <item name="android:background">@color/dialog_background_color</item>
+        <item name="background">@color/dialog_background_color</item>
+    </style>
 
 </resources>

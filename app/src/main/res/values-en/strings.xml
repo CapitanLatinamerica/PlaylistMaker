@@ -46,4 +46,7 @@
     <string name="new_pl_created">created</string>
 
     <string name="choose_image_from">Upload image...</string>
+    <string name="share_playlist">Share</string>
+    <string name="playlist_info_edit">Edit information</string>
+    <string name="playlist_delete">Delete playlist</string>
 </resources>

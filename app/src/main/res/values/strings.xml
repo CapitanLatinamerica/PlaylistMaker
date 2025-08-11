@@ -58,6 +58,9 @@
     <string name="alert_dialog_negative">Отмена</string>
 
     <string name="choose_image_from">Загрузить изображение...</string>
+    <string name="share_playlist">Поделиться</string>
+    <string name="playlist_info_edit">Редактировать информацию</string>
+    <string name="playlist_delete">Удалить плейлист</string>
 
 
 </resources>
