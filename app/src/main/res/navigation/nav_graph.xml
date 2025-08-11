@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/mediaFragment">  <!-- Стартовый фрагмент -->
 
@@ -17,6 +18,9 @@
         <action
             android:id="@+id/action_mediaFragment_to_playlistCreatorFragment"
             app:destination="@id/playlistCreatorFragment" />
+        <action
+            android:id="@+id/actionPlaylistsFragmentToPlaylistDetailFragment"
+            app:destination="@id/myAwesomePlaylistFragment" />
     </fragment>
 
     <fragment
@@ -37,6 +41,17 @@
         <action
             android:id="@+id/action_addToPlaylistBottomSheetFragment_to_playlistCreatorFragment"
             app:destination="@id/playlistCreatorFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myAwesomePlaylistFragment"
+        android:name="com.practicum.playlistmaker.media.fragments.playlists.ui.view.MyAwesomePlaylistFragment"
+        android:label="Playlist Detail"
+        tools:layout="@layout/fragment_playlist_awesome">
+        <argument
+            android:name="playlistId"
+            app:argType="integer" />
+
     </fragment>
 
 

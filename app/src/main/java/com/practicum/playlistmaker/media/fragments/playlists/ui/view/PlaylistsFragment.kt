@@ -12,6 +12,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.media.MediaFragmentDirections
+import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -54,7 +56,10 @@ class PlaylistsFragment : Fragment() {
         val placeholderLayout = view.findViewById<LinearLayout>(R.id.playlists_layout)
         val scrollView = view.findViewById<NestedScrollView>(R.id.playlistScroll)
 
-        val adapter = PlaylistAdapter()
+        val adapter = PlaylistAdapter { playlist ->
+            onPlaylistClicked(playlist)
+        }
+
         recyclerView.adapter = adapter
 
         viewModel.playlists.observe(viewLifecycleOwner) { playlists ->
@@ -78,5 +83,11 @@ class PlaylistsFragment : Fragment() {
                 viewModel.onNavigationHandled()
             }
         }
+    }
+    private fun onPlaylistClicked(playlist: PlaylistUi) {
+        // Навигация на фрагмент просмотра плейлиста
+        val action = MediaFragmentDirections
+            .actionPlaylistsFragmentToPlaylistDetailFragment(playlist.id)
+        navController.navigate(action)
     }
 }

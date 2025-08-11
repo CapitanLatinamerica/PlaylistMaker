@@ -14,7 +14,7 @@ class PlaylistInteractor(private val repository: PlaylistsRepository) {
         repository.updatePlaylist(playlist)
     }
 
-    suspend fun getPlaylist(id: Int): PlaylistEntity? {
+    suspend fun getPlaylistById(id: Int): PlaylistEntity? {
         return repository.getPlaylistById(id)           //это потом
     }
 

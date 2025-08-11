@@ -12,7 +12,9 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.util.getTrackCountText
 
-class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
+class PlaylistAdapter (
+    private val onPlaylistClicked: (PlaylistUi) -> Unit
+) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
     private val items = mutableListOf<PlaylistUi>()
 

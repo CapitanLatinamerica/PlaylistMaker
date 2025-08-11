@@ -4,7 +4,10 @@ plugins {
     kotlin("plugin.serialization") version "2.1.20"
     id ("kotlin-parcelize")
     id ("kotlin-kapt")
+    id ("androidx.navigation.safeargs.kotlin")
 }
+
+apply { plugin ("androidx.navigation.safeargs.kotlin") }
 
 android {
     namespace = "com.practicum.playlistmaker"
@@ -32,6 +35,7 @@ android {
                 "proguard-rules.pro"
             )
         }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
