@@ -75,6 +75,30 @@ class MyAwesomePlaylistFragment : Fragment() {
         viewModel.playlistDetails.observe(viewLifecycleOwner) { playlist ->
             // Отображаем детали плейлиста
             updateUI(playlist)
+
+            // Обновляем меню bottom sheet с данными плейлиста
+            view.let { rootView ->
+                val posterImage = rootView.findViewById<ImageView>(R.id.playlistPoster)
+                val infoText = rootView.findViewById<TextView>(R.id.playlistInfoText)
+                val trackCountText = rootView.findViewById<TextView>(R.id.playlistTrackCount)
+
+                // Загрузка обложки через Glide (если путь не пуст)
+                if (!playlist.coverPath.isNullOrEmpty()) {
+                    Glide.with(this)
+                        .load(playlist.coverPath)
+                        .placeholder(R.drawable.playlist_cover_placeholder)
+                        .centerCrop()
+                        .into(posterImage)
+                } else {
+                    posterImage.setImageResource(R.drawable.playlist_cover_placeholder)
+                }
+
+                // Название плейлиста
+                infoText.text = playlist.name
+
+                // Количество треков
+                trackCountText.text = getTrackCountText(playlist.trackCount)
+            }
         }
 
         //Вызов меню плейлиста
