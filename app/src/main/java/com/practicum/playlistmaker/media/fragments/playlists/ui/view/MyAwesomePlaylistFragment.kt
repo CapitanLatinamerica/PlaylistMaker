@@ -234,6 +234,15 @@ class MyAwesomePlaylistFragment : Fragment() {
                     emptyStateView.visibility = View.GONE
                 }
                 trackAdapter.submitList(tracks)
+
+                // Подсчет общей продолжительности в минутах, округляя вниз
+                val totalDurationMillis = tracks.sumOf { it.trackTimeMillis.toLong() }
+                val totalDurationMinutes = (totalDurationMillis / 1000 / 60).toInt()
+
+                // Обновление UI
+                val minutesText = resources.getQuantityString(R.plurals.playlist_minutes, totalDurationMinutes, totalDurationMinutes)
+                view.findViewById<TextView>(R.id.durationLabel)?.text = minutesText
+                view.findViewById<TextView>(R.id.trackCountLabel)?.text = getTrackCountText(tracks.size)
             }
         }
 

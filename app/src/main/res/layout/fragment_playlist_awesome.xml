@@ -204,6 +204,7 @@
         android:orientation="vertical"
         android:background="@drawable/bottom_sheet_handle"
         android:paddingBottom="40dp"
+        android:visibility="gone"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="true">
 

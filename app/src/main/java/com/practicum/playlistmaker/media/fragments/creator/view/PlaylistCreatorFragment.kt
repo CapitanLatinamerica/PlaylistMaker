@@ -18,6 +18,7 @@ import androidx.core.bundle.bundleOf
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
+import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.practicum.playlistmaker.R
@@ -29,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
 
 class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
@@ -48,28 +48,6 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
     }
 
     companion object {
-        private const val ARG_IS_EDIT = "arg_is_edit"
-        private const val ARG_PLAYLIST_ID = "arg_playlist_id"
-        private const val ARG_PLAYLIST_NAME = "arg_playlist_name"
-        private const val ARG_PLAYLIST_DESCRIPTION = "arg_playlist_description"
-        private const val ARG_PLAYLIST_COVER = "arg_playlist_cover"
-
-        fun newInstanceForEdit(
-            id: Int,
-            name: String,
-            description: String?,
-            coverPath: String?
-        ): PlaylistCreatorFragment {
-            return PlaylistCreatorFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(ARG_IS_EDIT, true)
-                    putInt(ARG_PLAYLIST_ID, id)
-                    putString(ARG_PLAYLIST_NAME, name)
-                    putString(ARG_PLAYLIST_DESCRIPTION, description)
-                    putString(ARG_PLAYLIST_COVER, coverPath)
-                }
-            }
-        }
 
         fun newInstance(track: Track?, isDialog: Boolean = false): PlaylistCreatorFragment {
             return PlaylistCreatorFragment().apply {
@@ -178,6 +156,16 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
         binding.poster.setOnClickListener {
             openImagePicker()
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (isEditMode) {
+                // Просто закрываем экран без диалога
+                viewModel.confirmExit()
+            } else {
+                // показываем диалог при выходе
+                handleBackPressed()
+            }
         }
 
         binding.createButton.setOnClickListener {
