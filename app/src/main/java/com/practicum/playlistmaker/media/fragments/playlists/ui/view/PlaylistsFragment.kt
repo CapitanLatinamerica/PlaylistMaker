@@ -63,11 +63,9 @@ class PlaylistsFragment : Fragment() {
             playlists = emptyList()
         )
 
-
         val recyclerView = view.findViewById<RecyclerView>(R.id.playlistRV)
         val placeholderLayout = view.findViewById<LinearLayout>(R.id.playlists_layout)
         val scrollView = view.findViewById<NestedScrollView>(R.id.playlistScroll)
-
 
         adapter.setOnItemClickListener { playlist ->
             onPlaylistClicked(playlist)
