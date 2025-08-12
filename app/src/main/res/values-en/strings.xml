@@ -49,4 +49,8 @@
     <string name="share_playlist">Share</string>
     <string name="playlist_info_edit">Edit information</string>
     <string name="playlist_delete">Delete playlist</string>
+    <string name="no_tracks_in_playlist">There is no tracks</string>
+    <string name="delete_playlist_message">Are U sure want to delete "%1$s"?</string>
+    <string name="delete">Delete</string>
+
 </resources>

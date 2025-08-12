@@ -13,10 +13,22 @@ import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.util.getTrackCountText
 
 class PlaylistAdapter (
-    private val onPlaylistClicked: (PlaylistUi) -> Unit
+    private val onPlaylistClicked: (PlaylistUi) -> Unit,
+    private var playlists: List<PlaylistUi>
 ) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
     private val items = mutableListOf<PlaylistUi>()
+    private var onItemClickListener: ((PlaylistUi) -> Unit)? = null
+    private var onItemLongClickListener: ((PlaylistUi) -> Unit)? = null
+
+
+    fun setOnItemClickListener(listener: (PlaylistUi) -> Unit) {
+        onItemClickListener = listener
+    }
+
+    fun setOnItemLongClickListener(listener: (PlaylistUi) -> Unit) {
+        onItemLongClickListener = listener
+    }
 
     fun submitList(newList: List<PlaylistUi>) {
         items.clear()
@@ -31,7 +43,18 @@ class PlaylistAdapter (
     }
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
-        holder.bind(items[position])
+
+        val playlist = items[position]
+        holder.bind(playlist)
+
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(playlist)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            onItemLongClickListener?.invoke(playlist)
+            true
+        }
     }
 
     override fun getItemCount(): Int = items.size
@@ -60,6 +83,11 @@ class PlaylistAdapter (
                 onPlaylistClicked(playlist) // передаем данные в onPlaylistClicked
             }
         }
+    }
+
+    fun updatePlaylists(newPlaylists: List<PlaylistUi>) {
+        playlists = newPlaylists
+        notifyDataSetChanged()
     }
 }
 

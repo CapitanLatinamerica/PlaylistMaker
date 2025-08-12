@@ -139,19 +139,45 @@
             android:layout_marginTop="24dp">
 
             <View
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="4dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp"
                 android:background="@color/yp_light_gray" />
+
+            <TextView
+                android:id="@+id/itHasNotTracks"
+                android:fontFamily="@font/ys_display_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:text="@string/no_tracks_in_playlist"
+                android:textSize="19sp"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/dialog_background_color">
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="13dp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_end="13dp" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/listTracks"
+                    app:layout_constraintStart_toStartOf="@id/guideline_start"
+                    app:layout_constraintEnd_toEndOf="@id/guideline_end"
                     style="@style/PlaylistRecyclerViewStyle"
                     android:layout_width="match_parent"
                     android:layout_height="256dp"

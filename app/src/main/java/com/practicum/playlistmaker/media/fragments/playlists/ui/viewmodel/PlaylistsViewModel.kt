@@ -16,7 +16,6 @@ class PlaylistsViewModel(
     private val _navigateToCreate = MutableLiveData(false)
     val navigateToCreate: LiveData<Boolean> = _navigateToCreate
 
-
     private val _playlists = MutableLiveData<List<PlaylistUi>>()
     val playlists: MutableLiveData<List<PlaylistUi>> = _playlists
 
@@ -47,4 +46,11 @@ class PlaylistsViewModel(
                 }
         }
     }
+
+    fun deletePlaylist(playlistId: Int) {
+        viewModelScope.launch {
+            playlistInteractor.deletePlaylistById(playlistId)
+        }
+    }
+
 }

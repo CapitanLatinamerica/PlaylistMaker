@@ -79,7 +79,7 @@ class MyAwesomePlaylistFragment : Fragment() {
 
         // Инициализация RecyclerView и адаптера
         val recyclerView = view.findViewById<RecyclerView>(R.id.listTracks)
-//        val emptyStateView = view.findViewById<TextView>(R.id.emptyStateView)
+        val emptyStateView = view.findViewById<TextView>(R.id.itHasNotTracks)
 
         trackAdapter = TrackAdapter(mutableListOf())
         recyclerView.adapter = trackAdapter
@@ -93,15 +93,11 @@ class MyAwesomePlaylistFragment : Fragment() {
         // Подписываемся на список треков из ViewModel
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.tracksStateFlow.collect { tracks ->
- /*               if (tracks.isEmpty()) {
-//                    emptyStateView.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
+                if (tracks.isEmpty()) {
+                    emptyStateView.visibility = View.VISIBLE
                 } else {
-//                    emptyStateView.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
-                    trackAdapter.submitList(tracks)
-                }*/
-
+                    emptyStateView.visibility = View.GONE
+                }
                 trackAdapter.submitList(tracks)
             }
         }

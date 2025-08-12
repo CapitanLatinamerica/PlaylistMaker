@@ -55,4 +55,8 @@ class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepositor
         return true
     }
 
+    override suspend fun deletePlaylistById(playlistId: Int) {
+        dao.deletePlaylistById(playlistId)
+    }
+
 }

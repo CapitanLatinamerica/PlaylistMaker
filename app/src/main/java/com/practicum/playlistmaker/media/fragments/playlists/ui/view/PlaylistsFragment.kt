@@ -1,11 +1,13 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.view
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -19,7 +21,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
 
+
     private val viewModel: PlaylistsViewModel by viewModel ()
+    private lateinit var adapter: PlaylistAdapter
 
     companion object {
         fun newInstance(): PlaylistsFragment {
@@ -52,12 +56,24 @@ class PlaylistsFragment : Fragment() {
 
         viewModel.loadPlaylists()
 
+        // Инициализация адаптера
+        adapter = PlaylistAdapter(
+            onPlaylistClicked = { playlist -> onPlaylistClicked(playlist) },
+            playlists = emptyList()
+        )
+
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.playlistRV)
         val placeholderLayout = view.findViewById<LinearLayout>(R.id.playlists_layout)
         val scrollView = view.findViewById<NestedScrollView>(R.id.playlistScroll)
 
-        val adapter = PlaylistAdapter { playlist ->
+
+        adapter.setOnItemClickListener { playlist ->
             onPlaylistClicked(playlist)
+        }
+
+        adapter.setOnItemLongClickListener { playlist ->
+            showDeletePlaylistDialog(playlist)
         }
 
         recyclerView.adapter = adapter
@@ -90,4 +106,26 @@ class PlaylistsFragment : Fragment() {
             .actionPlaylistsFragmentToPlaylistDetailFragment(playlist.id)
         navController.navigate(action)
     }
+
+    private fun showDeletePlaylistDialog(playlist: PlaylistUi) {
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.playlist_delete))
+            .setMessage(getString(R.string.delete_playlist_message, playlist.name))
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
+                viewModel.deletePlaylist(playlist.id)
+            }
+            .setNegativeButton(getString(R.string.alert_dialog_negative), null)
+            .show()
+
+
+        // Задаём цвет кнопок после показа диалога
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+        val blueColor = ContextCompat.getColor(requireContext(), R.color.yp_blue)
+        positiveButton.setTextColor(blueColor)
+        negativeButton.setTextColor(blueColor)
+    }
+
 }

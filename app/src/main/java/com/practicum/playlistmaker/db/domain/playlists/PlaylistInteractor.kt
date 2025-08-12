@@ -45,4 +45,8 @@ class PlaylistInteractor(
             emptyList() // Обработка ошибки, например, пустой список
         }
     }
+
+    suspend fun deletePlaylistById(playlistId: Int) {
+        repository.deletePlaylistById(playlistId)
+    }
 }
