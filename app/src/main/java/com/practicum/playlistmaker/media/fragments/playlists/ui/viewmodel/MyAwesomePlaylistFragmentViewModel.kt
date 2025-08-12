@@ -23,14 +23,17 @@ class MyAwesomePlaylistFragmentViewModel(
 
     fun loadPlaylistDetails(playlistId: Int) {
         viewModelScope.launch {
-            val playlist = playlistInteractor.getPlaylistById(playlistId)
-            _playlistDetails.value = PlaylistUi(
-                id = playlist?.id ?: 0,
-                name = playlist?.name ?: "No name",
-                description = playlist?.description,
-                coverPath = playlist?.coverPath,
-                trackCount = playlist?.trackCount ?: 0
-            )
+            val playlistEntity = playlistInteractor.getPlaylistById(playlistId)
+            if (playlistEntity != null) {
+                _playlistDetails.value = PlaylistUi(
+                    id = playlistEntity.id,
+                    name = playlistEntity.name,
+                    description = playlistEntity.description,
+                    coverPath = playlistEntity.coverPath,
+                    trackCount = playlistEntity.trackCount
+                )
+                loadPlaylistTracks(playlistEntity)
+            }
         }
     }
 
