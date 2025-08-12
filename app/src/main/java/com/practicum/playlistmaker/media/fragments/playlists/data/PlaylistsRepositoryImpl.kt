@@ -59,4 +59,26 @@ class PlaylistsRepositoryImpl(private val dao: PlaylistDao) : PlaylistsRepositor
         dao.deletePlaylistById(playlistId)
     }
 
+    override suspend fun deleteTrackFromPlaylist(playlistId: Int, trackId: Long) {
+        val playlist = dao.getPlaylistById(playlistId) ?: return
+
+        val existingTrackIds = if (playlist.trackIds.isBlank()) {
+            mutableListOf()
+        } else {
+            playlist.trackIds.split(",").toMutableList()
+        }
+
+        val trackIdStr = trackId.toString()
+        if (!existingTrackIds.remove(trackIdStr)) {
+            // Трек не найден, ничего не делаем
+            return
+        }
+
+        val updatedTrackIds = existingTrackIds.joinToString(",")
+        val updatedTrackCount = existingTrackIds.size
+
+        dao.updateTracks(playlistId, updatedTrackIds, updatedTrackCount)
+    }
+
+
 }

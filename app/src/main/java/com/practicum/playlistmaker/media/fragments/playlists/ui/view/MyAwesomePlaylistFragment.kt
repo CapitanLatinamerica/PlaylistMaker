@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.view
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -31,6 +32,7 @@ import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.util.getTrackCountText
 import com.practicum.playlistmaker.util.showDeletePlaylistDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.practicum.playlistmaker.util.showDeleteTrackDialog
 
 class MyAwesomePlaylistFragment : Fragment() {
 
@@ -38,6 +40,7 @@ class MyAwesomePlaylistFragment : Fragment() {
     private val viewModel: MyAwesomePlaylistFragmentViewModel by viewModel()
     private val args: MyAwesomePlaylistFragmentArgs by navArgs()
     private lateinit var navController: NavController
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,196 +61,13 @@ class MyAwesomePlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Я покрашу иконку прямо здесь, чтобы не создавать копию
-        val btnShare = view.findViewById<ImageView>(R.id.btnShare)
-        btnShare?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yp_black), PorterDuff.Mode.SRC_IN)
-
-        // Получаем playlistId из аргументов
-        val playlistId = args.playlistId
-        // Загружаем данные о плейлисте через ViewModel
-        viewModel.loadPlaylistDetails(playlistId)
-
-        // Подключаем данные к UI
-        viewModel.playlistDetails.observe(viewLifecycleOwner) { playlist ->
-            // Отображаем детали плейлиста
-            updateUI(playlist)
-
-            // Обновляем меню bottom sheet с данными плейлиста
-            view.let { rootView ->
-                val posterImage = rootView.findViewById<ImageView>(R.id.playlistPoster)
-                val infoText = rootView.findViewById<TextView>(R.id.playlistInfoText)
-                val trackCountText = rootView.findViewById<TextView>(R.id.playlistTrackCount)
-
-                // Загрузка обложки через Glide (если путь не пуст)
-                if (!playlist.coverPath.isNullOrEmpty()) {
-                    Glide.with(this)
-                        .load(playlist.coverPath)
-                        .placeholder(R.drawable.playlist_cover_placeholder)
-                        .centerCrop()
-                        .into(posterImage)
-                } else {
-                    posterImage.setImageResource(R.drawable.playlist_cover_placeholder)
-                }
-
-                // Название плейлиста
-                infoText.text = playlist.name
-
-                // Количество треков
-                trackCountText.text = getTrackCountText(playlist.trackCount)
-            }
-        }
-
-        //Вызов меню плейлиста
-        val menuSheet = view.findViewById<LinearLayout>(R.id.menuSheet)
-        val bottomSheetBehavior = BottomSheetBehavior.from(menuSheet)
-
-        // Скрываем меню по умолчанию
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        menuSheet.visibility = View.GONE
-
-        // Показывать меню по нажатию кнопки
-        val btnMenu = view.findViewById<ImageView>(R.id.btnMenu)
-        btnMenu.setOnClickListener {
-            if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
-                menuSheet.visibility = View.VISIBLE
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-        }
-
-        // Контролируем состояние меню
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    menuSheet.visibility = View.GONE
-                }
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-        })
-
-        // Обработка клика по пункту Поделиться
-        val shareAction = view.findViewById<TextView>(R.id.actionShare)
-        shareAction.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN   // Скрываем меню
-            val playlist = viewModel.playlistDetails.value
-            val tracks = viewModel.tracksStateFlow.value
-            if (playlist != null) {
-                if (tracks.isEmpty()) {
-                    Toast.makeText(requireContext(), getString(R.string.no_tracks_to_share_message), Toast.LENGTH_SHORT).show()
-                } else {
-                    sharePlaylist(playlist, tracks)
-                }
-            }
-        }
-
-        // Обработка клика по пункту Удалить
-        val deleteAction = view.findViewById<TextView>(R.id.actionDelete)
-        deleteAction.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN  // Скрываем меню
-
-            val playlist = viewModel.playlistDetails.value
-            if (playlist == null) {
-                Toast.makeText(requireContext(), "Ошибка: плейлист не загружен", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            showDeletePlaylistDialog(
-                title = getString(R.string.playlist_delete),
-                message = getString(R.string.delete_playlist_message, playlist.name),
-                positiveText = getString(R.string.delete),
-                negativeText = getString(R.string.alert_dialog_negative)
-            ) {
-                viewModel.deletePlaylist(playlist.id)
-                navController.popBackStack()
-            }
-        }
-
-        val editAction = view.findViewById<TextView>(R.id.actionEdit)
-        editAction.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-            val playlist = viewModel.playlistDetails.value
-            if (playlist == null) {
-                Toast.makeText(requireContext(), "Плейлист не загружен", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val action = MyAwesomePlaylistFragmentDirections.actionMyAwesomePlaylistFragmentToPlaylistCreatorFragmentForEdit(
-                playlistId = playlist.id,
-                playlistName = playlist.name,
-                playlistDescription = playlist.description ?: "",
-                playlistCoverPath = playlist.coverPath ?: ""
-            )
-            navController.navigate(action)
-
-        }
-
-
-        // Кнопка share
-        btnShare?.setOnClickListener {
-            val playlist = viewModel.playlistDetails.value
-            val tracks = viewModel.tracksStateFlow.value
-
-            if (playlist == null) {
-                // Можно показать ошибку или ничего не делать
-                return@setOnClickListener
-            }
-
-            if (tracks.isNullOrEmpty()) {
-                // Треков нет — показать предупреждение
-                Toast.makeText(requireContext(),
-                    getString(R.string.no_tracks_to_share_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                sharePlaylist(playlist, tracks)
-            }
-        }
-
-        // Настроим навигационную кнопку назад
-        val toolbar = view?.findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.headerToolbar)
-        toolbar?.setNavigationOnClickListener {
-            navController.navigateUp()
-        }
-
-        // Инициализация RecyclerView и адаптера
-        val recyclerView = view.findViewById<RecyclerView>(R.id.listTracks)
-        val emptyStateView = view.findViewById<TextView>(R.id.itHasNotTracks)
-
-        trackAdapter = TrackAdapter(mutableListOf())
-        recyclerView.adapter = trackAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        // Подписываем обработчик на клик
-        trackAdapter.setOnItemClickListener { track ->
-            openAudioPlayer(track)
-        }
-
-        // Подписываемся на список треков из ViewModel
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.tracksStateFlow.collect { tracks ->
-                if (tracks.isEmpty()) {
-                    emptyStateView.visibility = View.VISIBLE
-                } else {
-                    emptyStateView.visibility = View.GONE
-                }
-                trackAdapter.submitList(tracks)
-
-                // Подсчет общей продолжительности в минутах, округляя вниз
-                val totalDurationMillis = tracks.sumOf { it.trackTimeMillis.toLong() }
-                val totalDurationMinutes = (totalDurationMillis / 1000 / 60).toInt()
-
-                // Обновление UI
-                val minutesText = resources.getQuantityString(R.plurals.playlist_minutes, totalDurationMinutes, totalDurationMinutes)
-                view.findViewById<TextView>(R.id.durationLabel)?.text = minutesText
-                view.findViewById<TextView>(R.id.trackCountLabel)?.text = getTrackCountText(tracks.size)
-            }
-        }
-
-        // Загружаем данные
-        viewModel.loadPlaylistDetails(playlistId)
+        initNavController()
+        hideBottomNavigation()
+        initRecyclerView(view)
+        initBottomSheet(view)
+        setupClickListeners(view)
+        observeViewModel()
+        loadPlaylist()
     }
 
     private fun openAudioPlayer(track: Track) {
@@ -307,6 +127,171 @@ class MyAwesomePlaylistFragment : Fragment() {
         }
 
         return sb.toString().trimEnd()
+    }
+
+    private fun showDeleteTrackDialog(track: Track) {
+        showDeleteTrackDialog(track.trackName) {
+            viewModel.deleteTrackFromPlaylist(track.trackId.toLong())
+        }
+    }
+
+    private fun initNavController() {
+        navController = NavHostFragment.findNavController(this)
+    }
+
+    private fun hideBottomNavigation() {
+        activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.visibility = View.GONE
+    }
+
+    private fun initRecyclerView(view: View) {
+        val recyclerView = view.findViewById<RecyclerView>(R.id.listTracks)
+        val emptyStateView = view.findViewById<TextView>(R.id.itHasNotTracks)
+
+        trackAdapter = TrackAdapter(mutableListOf())
+        recyclerView.adapter = trackAdapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        trackAdapter.setOnItemClickListener { track ->
+            openAudioPlayer(track)
+        }
+        trackAdapter.setOnItemLongClickListener { track ->
+            showDeleteTrackDialog(track)
+        }
+
+        // Подписка на изменения списка треков
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.tracksStateFlow.collect { tracks ->
+                if (tracks.isEmpty()) {
+                    emptyStateView.visibility = View.VISIBLE
+                } else {
+                    emptyStateView.visibility = View.GONE
+                }
+                trackAdapter.submitList(tracks)
+
+                updateDurationAndTrackCount(tracks, view)
+            }
+        }
+    }
+
+    private fun updateDurationAndTrackCount(tracks: List<Track>, view: View) {
+        val totalDurationMillis = tracks.sumOf { it.trackTimeMillis.toLong() }
+        val totalDurationMinutes = (totalDurationMillis / 1000 / 60).toInt()
+        val minutesText = resources.getQuantityString(R.plurals.playlist_minutes, totalDurationMinutes, totalDurationMinutes)
+
+        view.findViewById<TextView>(R.id.durationLabel)?.text = minutesText
+        view.findViewById<TextView>(R.id.trackCountLabel)?.text = getTrackCountText(tracks.size)
+    }
+
+    private fun initBottomSheet(view: View) {
+        val menuSheet = view.findViewById<LinearLayout>(R.id.menuSheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(menuSheet)
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        menuSheet.visibility = View.GONE
+
+        val btnMenu = view.findViewById<ImageView>(R.id.btnMenu)
+        btnMenu.setOnClickListener {
+            if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                menuSheet.visibility = View.VISIBLE
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    menuSheet.visibility = View.GONE
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+
+        setupBottomSheetMenuActions(view)
+    }
+
+    private fun setupBottomSheetMenuActions(view: View) {
+        val shareAction = view.findViewById<TextView>(R.id.actionShare)
+        shareAction.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            shareCurrentPlaylist()
+        }
+
+        val deleteAction = view.findViewById<TextView>(R.id.actionDelete)
+        deleteAction.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            confirmDeletePlaylist()
+        }
+
+        val editAction = view.findViewById<TextView>(R.id.actionEdit)
+        editAction.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            navigateToEditPlaylist()
+        }
+    }
+
+    private fun shareCurrentPlaylist() {
+        val playlist = viewModel.playlistDetails.value ?: return
+        val tracks = viewModel.tracksStateFlow.value
+
+        if (tracks.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), getString(R.string.no_tracks_to_share_message), Toast.LENGTH_SHORT).show()
+        } else {
+            sharePlaylist(playlist, tracks)
+        }
+    }
+
+    private fun confirmDeletePlaylist() {
+        val playlist = viewModel.playlistDetails.value ?: return
+
+        showDeletePlaylistDialog(
+            title = getString(R.string.playlist_delete),
+            message = getString(R.string.delete_playlist_message, playlist.name),
+            positiveText = getString(R.string.delete),
+            negativeText = getString(R.string.alert_dialog_negative)
+        ) {
+            viewModel.deletePlaylist(playlist.id)
+            navController.popBackStack()
+        }
+    }
+
+    private fun navigateToEditPlaylist() {
+        val playlist = viewModel.playlistDetails.value ?: return
+
+        val action = MyAwesomePlaylistFragmentDirections.actionMyAwesomePlaylistFragmentToPlaylistCreatorFragmentForEdit(
+            argIsEdit = true,
+            playlistId = playlist.id,
+            playlistName = playlist.name,
+            playlistDescription = playlist.description ?: "",
+            playlistCoverPath = playlist.coverPath ?: ""
+        )
+        navController.navigate(action)
+    }
+
+    private fun setupClickListeners(view: View) {
+        val btnShare = view.findViewById<ImageView>(R.id.btnShare)
+        btnShare?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yp_black), PorterDuff.Mode.SRC_IN)
+        btnShare?.setOnClickListener {
+            shareCurrentPlaylist()
+        }
+
+        val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.headerToolbar)
+        toolbar?.setNavigationOnClickListener {
+            navController.navigateUp()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.playlistDetails.observe(viewLifecycleOwner) { playlist ->
+            updateUI(playlist)
+        }
+    }
+
+    private fun loadPlaylist() {
+        val playlistId = args.playlistId
+        viewModel.loadPlaylistDetails(playlistId)
     }
 
     // Показываем нижнюю панель навигации при закрытии фрагмента

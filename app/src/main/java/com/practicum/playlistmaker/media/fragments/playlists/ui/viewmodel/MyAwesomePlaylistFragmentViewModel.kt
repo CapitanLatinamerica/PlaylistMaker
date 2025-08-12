@@ -53,4 +53,24 @@ class MyAwesomePlaylistFragmentViewModel(
             playlistInteractor.deletePlaylistById(playlistId)
         }
     }
+
+    fun deleteTrackFromPlaylist(trackId: Long) {
+        val playlistId = _playlistDetails.value?.id ?: return
+
+        viewModelScope.launch {
+            playlistInteractor.deleteTrackFromPlaylist(playlistId, trackId)
+            // Обновляем данные плейлиста и треков после удаления
+            val updatedPlaylist = playlistInteractor.getPlaylistById(playlistId)
+            if (updatedPlaylist != null) {
+                _playlistDetails.value = PlaylistUi(
+                    id = updatedPlaylist.id,
+                    name = updatedPlaylist.name,
+                    description = updatedPlaylist.description,
+                    coverPath = updatedPlaylist.coverPath,
+                    trackCount = updatedPlaylist.trackCount
+                )
+                loadPlaylistTracks(updatedPlaylist)
+            }
+        }
+    }
 }

@@ -19,7 +19,7 @@ class PlaylistInteractor(
     }
 
     suspend fun getPlaylistById(id: Int): PlaylistEntity? {
-        return repository.getPlaylistById(id)           //это потом
+        return repository.getPlaylistById(id)
     }
 
     suspend fun getAllPlaylistsFlow(): Flow<List<PlaylistEntity>> {
@@ -48,5 +48,9 @@ class PlaylistInteractor(
 
     suspend fun deletePlaylistById(playlistId: Int) {
         repository.deletePlaylistById(playlistId)
+    }
+
+    suspend fun deleteTrackFromPlaylist(playlistId: Int, trackId: Long) {
+        repository.deleteTrackFromPlaylist(playlistId, trackId)
     }
 }

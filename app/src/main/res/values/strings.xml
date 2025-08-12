@@ -68,5 +68,9 @@
     <string name="share_playlist_title">Поделиться плейлистом</string>
     <string name="edit_playlist_title">Редактировать</string>
     <string name="save">Сохранить</string>
+    <string name="playlist_error">Плейлист не загружен</string>
+    <string name="delete_track_title">Удалить трек</string>
+    <string name="delete_track_message">Вы действительно хотите удалить трек «%1$s» из плейлиста?</string>
+
 
 </resources>

@@ -20,10 +20,10 @@ fun getTrackCountText(count: Int): String {
     }
 
 fun Fragment.showDeletePlaylistDialog(
-    title: String = "Удалить плейлист",
-    message: String = "Хотите удалить плейлист?",
-    positiveText: String = "Да",
-    negativeText: String = "Нет",
+    title: String = getString(R.string.playlist_delete),
+    message: String = getString(R.string.delete_playlist_message),
+    positiveText: String = getString(R.string.delete),
+    negativeText: String = getString(R.string.alert_dialog_negative),
     onDeleteCallback: () -> Unit
 ) {
     val dialog = AlertDialog.Builder(requireContext())
@@ -41,4 +41,39 @@ fun Fragment.showDeletePlaylistDialog(
     positiveButton.setTextColor(blueColor)
     negativeButton.setTextColor(blueColor)
 }
+
+// Специализированный диалог для удаления трека
+fun Fragment.showDeleteTrackDialog(
+    trackName: String,
+    onDeleteCallback: () -> Unit
+) {
+    val title = getString(R.string.delete_track_title)
+    val message = getString(R.string.delete_track_message, trackName)
+    showDeleteConfirmationDialog(
+        title = title,
+        message = message,
+        onConfirm = onDeleteCallback
+    )
+}
+
+fun Fragment.showDeleteConfirmationDialog(
+    title: String,
+    message: String,
+    positiveText: String = getString(R.string.delete),
+    negativeText: String = getString(R.string.alert_dialog_negative),
+    onConfirm: () -> Unit
+) {
+    val dialog = AlertDialog.Builder(requireContext())
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton(positiveText) { _, _ -> onConfirm() }
+        .setNegativeButton(negativeText, null)
+        .show()
+
+    val blueColor = ContextCompat.getColor(requireContext(), R.color.yp_blue)
+    dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(blueColor)
+    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(blueColor)
+}
+
+
 
