@@ -64,5 +64,7 @@
     <string name="no_tracks_in_playlist">В этом плейлисте нет треков</string>
     <string name="delete_playlist_message">Вы действительно хотите удалить плейлист "%1$s"?</string>
     <string name="delete">Удалить</string>
+    <string name="no_tracks_to_share_message">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="share_playlist_title">Поделиться плейлистом</string>
 
 </resources>

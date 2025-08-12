@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -29,6 +30,7 @@ import com.practicum.playlistmaker.player.domain.Track
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
+import com.practicum.playlistmaker.util.getTrackCountText
 
 class MyAwesomePlaylistFragment : Fragment() {
 
@@ -57,7 +59,7 @@ class MyAwesomePlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //Я покрашу иконку прямо здесь, чтобы не создавать копию
-        val btnShare = view?.findViewById<ImageView>(R.id.btnShare)
+        val btnShare = view.findViewById<ImageView>(R.id.btnShare)
         btnShare?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yp_black), PorterDuff.Mode.SRC_IN)
 
         // Получаем playlistId из аргументов
@@ -69,6 +71,27 @@ class MyAwesomePlaylistFragment : Fragment() {
         viewModel.playlistDetails.observe(viewLifecycleOwner) { playlist ->
             // Отображаем детали плейлиста
             updateUI(playlist)
+        }
+
+        // Кнопка share
+        btnShare?.setOnClickListener {
+            val playlist = viewModel.playlistDetails.value
+            val tracks = viewModel.tracksStateFlow.value
+
+            if (playlist == null) {
+                // Можно показать ошибку или ничего не делать
+                return@setOnClickListener
+            }
+
+            if (tracks.isNullOrEmpty()) {
+                // Треков нет — показать предупреждение
+                Toast.makeText(requireContext(),
+                    getString(R.string.no_tracks_to_share_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                sharePlaylist(playlist, tracks)
+            }
         }
 
         // Настроим навигационную кнопку назад
@@ -103,7 +126,6 @@ class MyAwesomePlaylistFragment : Fragment() {
         }
 
         // Загружаем данные
-//        val playlistId = args.playlistId
         viewModel.loadPlaylistDetails(playlistId)
     }
 
@@ -138,6 +160,32 @@ class MyAwesomePlaylistFragment : Fragment() {
 
         // Заполняем другие данные
         view?.findViewById<TextView>(R.id.durationLabel)?.text = "${playlist.trackCount} tracks"
+    }
+
+    private fun sharePlaylist(playlist: PlaylistUi, tracks: List<Track>) {
+        val shareText = buildShareText(playlist, tracks)
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_playlist_title)))
+    }
+
+    private fun buildShareText(playlist: PlaylistUi, tracks: List<Track>): String {
+        val sb = StringBuilder()
+        sb.append(playlist.name).append("\n")
+        sb.append(playlist.description).append("\n")
+        sb.append("${tracks.size} ${getTrackCountText(tracks.size)}").append("\n")
+
+        tracks.forEachIndexed { index, track ->
+            val trackTimeFormatted = com.practicum.playlistmaker.player.ui.TimeFormatter.formatTrackTime(track.trackTimeMillis)
+            sb.append("${index + 1}. ${track.artistName} - ${track.trackName} ($trackTimeFormatted)").append("\n")
+        }
+
+        return sb.toString().trimEnd()
     }
 
 

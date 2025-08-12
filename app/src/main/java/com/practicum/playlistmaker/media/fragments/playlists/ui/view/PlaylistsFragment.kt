@@ -118,7 +118,6 @@ class PlaylistsFragment : Fragment() {
             .setNegativeButton(getString(R.string.alert_dialog_negative), null)
             .show()
 
-
         // Задаём цвет кнопок после показа диалога
         val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
