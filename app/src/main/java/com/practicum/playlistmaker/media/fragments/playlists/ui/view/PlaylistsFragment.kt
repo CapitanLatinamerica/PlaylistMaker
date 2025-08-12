@@ -17,6 +17,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.MediaFragmentDirections
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
+import com.practicum.playlistmaker.util.showDeletePlaylistDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
@@ -73,7 +74,15 @@ class PlaylistsFragment : Fragment() {
         }
 
         adapter.setOnItemLongClickListener { playlist ->
-            showDeletePlaylistDialog(playlist)
+            showDeletePlaylistDialog(
+                title = getString(R.string.playlist_delete),
+                message = getString(R.string.delete_playlist_message, playlist.name),
+                positiveText = getString(R.string.delete),
+                negativeText = getString(R.string.alert_dialog_negative)
+            ) {
+                viewModel.deletePlaylist(playlist.id)
+                navController.popBackStack()
+            }
         }
 
         recyclerView.adapter = adapter
@@ -106,25 +115,4 @@ class PlaylistsFragment : Fragment() {
             .actionPlaylistsFragmentToPlaylistDetailFragment(playlist.id)
         navController.navigate(action)
     }
-
-    private fun showDeletePlaylistDialog(playlist: PlaylistUi) {
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.playlist_delete))
-            .setMessage(getString(R.string.delete_playlist_message, playlist.name))
-            .setPositiveButton(getString(R.string.delete)) { _, _ ->
-                viewModel.deletePlaylist(playlist.id)
-            }
-            .setNegativeButton(getString(R.string.alert_dialog_negative), null)
-            .show()
-
-        // Задаём цвет кнопок после показа диалога
-        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-
-        val blueColor = ContextCompat.getColor(requireContext(), R.color.yp_blue)
-        positiveButton.setTextColor(blueColor)
-        negativeButton.setTextColor(blueColor)
-    }
-
 }

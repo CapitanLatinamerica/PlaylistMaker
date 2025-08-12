@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.view
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -21,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.MyAwesomePlaylistFragmentViewModel
@@ -31,6 +34,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.util.getTrackCountText
+import com.practicum.playlistmaker.util.showDeletePlaylistDialog
 
 class MyAwesomePlaylistFragment : Fragment() {
 
@@ -71,6 +75,72 @@ class MyAwesomePlaylistFragment : Fragment() {
         viewModel.playlistDetails.observe(viewLifecycleOwner) { playlist ->
             // Отображаем детали плейлиста
             updateUI(playlist)
+        }
+
+        //Вызов меню плейлиста
+        val menuSheet = view.findViewById<LinearLayout>(R.id.menuSheet)
+        val bottomSheetBehavior = BottomSheetBehavior.from(menuSheet)
+
+        // Скрываем меню по умолчанию
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        menuSheet.visibility = View.GONE
+
+        // Показывать меню по нажатию кнопки
+        val btnMenu = view.findViewById<ImageView>(R.id.btnMenu)
+        btnMenu.setOnClickListener {
+            if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                menuSheet.visibility = View.VISIBLE
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+
+        // Контролируем состояние меню
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    menuSheet.visibility = View.GONE
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+        })
+
+        // Обработка клика по пункту Поделиться
+        val shareAction = view.findViewById<TextView>(R.id.actionShare)
+        shareAction.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN   // Скрываем меню
+            val playlist = viewModel.playlistDetails.value
+            val tracks = viewModel.tracksStateFlow.value
+            if (playlist != null) {
+                if (tracks.isEmpty()) {
+                    Toast.makeText(requireContext(), getString(R.string.no_tracks_to_share_message), Toast.LENGTH_SHORT).show()
+                } else {
+                    sharePlaylist(playlist, tracks)
+                }
+            }
+        }
+
+        val deleteAction = view.findViewById<TextView>(R.id.actionDelete)
+        deleteAction.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN  // Скрываем меню
+
+            val playlist = viewModel.playlistDetails.value
+            if (playlist == null) {
+                Toast.makeText(requireContext(), "Ошибка: плейлист не загружен", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            showDeletePlaylistDialog(
+                title = getString(R.string.playlist_delete),
+                message = getString(R.string.delete_playlist_message, playlist.name),
+                positiveText = getString(R.string.delete),
+                negativeText = getString(R.string.alert_dialog_negative)
+            ) {
+                viewModel.deletePlaylist(playlist.id)
+                navController.popBackStack()
+            }
         }
 
         // Кнопка share
@@ -187,7 +257,6 @@ class MyAwesomePlaylistFragment : Fragment() {
 
         return sb.toString().trimEnd()
     }
-
 
     // Показываем нижнюю панель навигации при закрытии фрагмента
     override fun onDestroyView() {

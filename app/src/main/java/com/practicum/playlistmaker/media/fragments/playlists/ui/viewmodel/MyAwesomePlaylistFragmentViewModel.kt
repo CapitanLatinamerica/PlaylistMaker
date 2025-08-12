@@ -47,4 +47,10 @@ class MyAwesomePlaylistFragmentViewModel(
             }
         }
     }
+
+    fun deletePlaylist(playlistId: Int) {
+        viewModelScope.launch {
+            playlistInteractor.deletePlaylistById(playlistId)
+        }
+    }
 }
