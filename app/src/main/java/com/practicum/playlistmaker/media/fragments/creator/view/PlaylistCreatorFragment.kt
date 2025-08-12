@@ -19,6 +19,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
@@ -34,6 +35,7 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
     private var trackToAdd: Track? = null
     private var isOpenedAsDialog = false
+    private val args: PlaylistCreatorFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +48,29 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
     }
 
     companion object {
+        private const val ARG_IS_EDIT = "arg_is_edit"
+        private const val ARG_PLAYLIST_ID = "arg_playlist_id"
+        private const val ARG_PLAYLIST_NAME = "arg_playlist_name"
+        private const val ARG_PLAYLIST_DESCRIPTION = "arg_playlist_description"
+        private const val ARG_PLAYLIST_COVER = "arg_playlist_cover"
+
+        fun newInstanceForEdit(
+            id: Int,
+            name: String,
+            description: String?,
+            coverPath: String?
+        ): PlaylistCreatorFragment {
+            return PlaylistCreatorFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(ARG_IS_EDIT, true)
+                    putInt(ARG_PLAYLIST_ID, id)
+                    putString(ARG_PLAYLIST_NAME, name)
+                    putString(ARG_PLAYLIST_DESCRIPTION, description)
+                    putString(ARG_PLAYLIST_COVER, coverPath)
+                }
+            }
+        }
+
         fun newInstance(track: Track?, isDialog: Boolean = false): PlaylistCreatorFragment {
             return PlaylistCreatorFragment().apply {
                 arguments = Bundle().apply {
@@ -66,15 +91,41 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-
         binding = FragmentPlaylistCreatorBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val isEditMode = args.argIsEdit
+        val playlistId = args.playlistId
+
+        // Чтение аргументов
+        arguments?.let {
+            if (isEditMode) {
+                val name = it.getString(ARG_PLAYLIST_NAME).orEmpty()
+                val description = it.getString(ARG_PLAYLIST_DESCRIPTION).orEmpty()
+                val cover = it.getString(ARG_PLAYLIST_COVER)
+
+                binding.newPlaylistEditName.setText(name)
+                binding.playlistDescriptionEditText.setText(description)
+
+                if (!cover.isNullOrEmpty()) {
+                    binding.poster.setImageURI(Uri.parse(cover))
+                    binding.poster.background = null
+                    selectedImageUri = Uri.parse(cover)
+                } else {
+                    binding.poster.setImageResource(R.drawable.new_pl_image_placeholder)
+                }
+
+                // Заголовок тулбара и кнопка
+                binding.toolbar.title = getString(R.string.edit_playlist_title)
+                binding.createButton.text = getString(R.string.save)
+                updateButtonState()
+            }
+        }
+
         trackToAdd = arguments?.getParcelable("track_to_add")
 
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -84,7 +135,6 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
                 imageUri?.let {
                     selectedImageUri = it
                     binding.poster.setImageURI(it)
-                    // Убираем фон, если изображение выбрано
                     binding.poster.background = null
                 }
             }
@@ -125,30 +175,40 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
             if (name.isEmpty()) return@setOnClickListener
 
             viewLifecycleOwner.lifecycleScope.launch {
-                val newPlaylistId = viewModel.createPlaylist(
-                    name = name,
-                    description = binding.playlistDescriptionEditText.text.toString(),
-                    coverPath = selectedImageUri?.toString()
-                )
-
-                withContext(Dispatchers.Main) {
-                    parentFragmentManager.setFragmentResult(
-                        "playlist_created_result",
-                        bundleOf(
-                            "track_to_add" to trackToAdd,
-                            "created_playlist_id" to newPlaylistId
-                        )
+                if (isEditMode) {
+                    // Обновляем плейлист
+                    viewModel.updatePlaylist(
+                        id = playlistId,
+                        name = name,
+                        description = binding.playlistDescriptionEditText.text.toString(),
+                        coverPath = selectedImageUri?.toString()
+                    )
+                } else {
+                    val newPlaylistId = viewModel.createPlaylist(
+                        name = name,
+                        description = binding.playlistDescriptionEditText.text.toString(),
+                        coverPath = selectedImageUri?.toString()
                     )
 
-                    if (isOpenedAsDialog) {
-                        dismissAllowingStateLoss()
-                    } else {
-                        parentFragmentManager.popBackStack()
+                    withContext(Dispatchers.Main) {
+                        parentFragmentManager.setFragmentResult(
+                            "playlist_created_result",
+                            bundleOf(
+                                "track_to_add" to trackToAdd,
+                                "created_playlist_id" to newPlaylistId
+                            )
+                        )
+
+                        if (isOpenedAsDialog) {
+                            dismissAllowingStateLoss()
+                        } else {
+                            parentFragmentManager.popBackStack()
+                        }
+                        val msg = resources.getString(R.string.create_playlist) +
+                                " \"$name\" " +
+                                resources.getString(R.string.new_pl_created)
+                        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                     }
-                    val msg = resources.getString(R.string.create_playlist) +
-                            " \"$name\" " +
-                            resources.getString(R.string.new_pl_created)
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.app.SingleLiveEvent
+import com.practicum.playlistmaker.db.data.playlists.PlaylistEntity
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
 
 class PlaylistCreatorViewModel(
@@ -28,6 +29,7 @@ class PlaylistCreatorViewModel(
         _shouldCloseScreen.value = false
     }
 
+    // Для создания плейлиста
     suspend fun createPlaylist(name: String, description: String?, coverPath: String?): Long {
         return playlistsRepository.createPlaylist(
             name = name,
@@ -36,4 +38,20 @@ class PlaylistCreatorViewModel(
         )
         _shouldCloseScreen.value = true
     }
+
+    // Для редактирования плейлиста
+    suspend fun updatePlaylist(id: Int, name: String, description: String?, coverPath: String?) {
+        playlistsRepository.updatePlaylist(
+            PlaylistEntity(
+                id = id,
+                name = name,
+                description = description ?: "",
+                coverPath = coverPath,
+                trackIds = "",
+                trackCount = 0
+            )
+        )
+        _shouldCloseScreen.postValue(true)
+    }
+
 }

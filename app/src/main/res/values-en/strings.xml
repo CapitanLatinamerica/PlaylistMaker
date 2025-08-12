@@ -54,5 +54,7 @@
     <string name="delete">Delete</string>
     <string name="no_tracks_to_share_message">There is no track list in this playlist that can be shared</string>
     <string name="share_playlist_title">Share playlist</string>
+    <string name="edit_playlist_title">Редактировать</string>
+    <string name="save">Сохранить</string>
 
 </resources>

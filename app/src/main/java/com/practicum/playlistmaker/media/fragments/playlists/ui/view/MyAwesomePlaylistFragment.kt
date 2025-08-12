@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.media.fragments.playlists.ui.view
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -13,9 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
@@ -30,11 +27,10 @@ import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.MyAwes
 import com.practicum.playlistmaker.player.TrackAdapter
 import com.practicum.playlistmaker.player.data.PlayerConstants
 import com.practicum.playlistmaker.player.domain.Track
-import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.practicum.playlistmaker.player.ui.view.AudioPlayerActivity
 import com.practicum.playlistmaker.util.getTrackCountText
 import com.practicum.playlistmaker.util.showDeletePlaylistDialog
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MyAwesomePlaylistFragment : Fragment() {
 
@@ -146,6 +142,7 @@ class MyAwesomePlaylistFragment : Fragment() {
             }
         }
 
+        // Обработка клика по пункту Удалить
         val deleteAction = view.findViewById<TextView>(R.id.actionDelete)
         deleteAction.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN  // Скрываем меню
@@ -166,6 +163,27 @@ class MyAwesomePlaylistFragment : Fragment() {
                 navController.popBackStack()
             }
         }
+
+        val editAction = view.findViewById<TextView>(R.id.actionEdit)
+        editAction.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+            val playlist = viewModel.playlistDetails.value
+            if (playlist == null) {
+                Toast.makeText(requireContext(), "Плейлист не загружен", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val action = MyAwesomePlaylistFragmentDirections.actionMyAwesomePlaylistFragmentToPlaylistCreatorFragmentForEdit(
+                playlistId = playlist.id,
+                playlistName = playlist.name,
+                playlistDescription = playlist.description ?: "",
+                playlistCoverPath = playlist.coverPath ?: ""
+            )
+            navController.navigate(action)
+
+        }
+
 
         // Кнопка share
         btnShare?.setOnClickListener {

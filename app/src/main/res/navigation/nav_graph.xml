@@ -32,6 +32,31 @@
         android:id="@+id/playlistCreatorFragment"
         android:name="com.practicum.playlistmaker.media.fragments.creator.view.PlaylistCreatorFragment"
         android:label="@string/create_playlist">
+        <!-- Аргументы для режима создания/редактирования -->
+        <argument
+            android:name="argIsEdit"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
+        <argument
+            android:name="playlistId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+        <argument
+            android:name="playlistName"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="playlistDescription"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="playlistCoverPath"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
     <fragment
@@ -51,6 +76,24 @@
         <argument
             android:name="playlistId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_myAwesomePlaylistFragment_to_playlistCreatorFragmentForEdit"
+            app:destination="@id/playlistCreatorFragment" >
+            <argument
+                android:name="playlistId"
+                app:argType="integer" />
+            <argument
+                android:name="playlistName"
+                app:argType="string" />
+            <argument
+                android:name="playlistDescription"
+                app:argType="string"
+                android:defaultValue="" />
+            <argument
+                android:name="playlistCoverPath"
+                app:argType="string"
+                android:defaultValue="" />
+        </action>
 
     </fragment>
 
