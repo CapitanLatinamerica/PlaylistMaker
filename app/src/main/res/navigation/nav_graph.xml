@@ -80,20 +80,15 @@
             android:id="@+id/action_myAwesomePlaylistFragment_to_playlistCreatorFragmentForEdit"
             app:destination="@id/playlistCreatorFragment" >
             <argument
-                android:name="playlistId"
-                app:argType="integer" />
-            <argument
-                android:name="playlistName"
-                app:argType="string" />
-            <argument
-                android:name="playlistDescription"
-                app:argType="string"
-                android:defaultValue="" />
-            <argument
-                android:name="playlistCoverPath"
-                app:argType="string"
-                android:defaultValue="" />
+                android:name="argIsEdit"
+                app:argType="boolean"
+                android:defaultValue="true" />
+            <argument android:name="playlistId" app:argType="integer" />
+            <argument android:name="playlistName" app:argType="string" />
+            <argument android:name="playlistDescription" app:argType="string" android:defaultValue="" />
+            <argument android:name="playlistCoverPath" app:argType="string" android:defaultValue="" />
         </action>
+
 
     </fragment>
 

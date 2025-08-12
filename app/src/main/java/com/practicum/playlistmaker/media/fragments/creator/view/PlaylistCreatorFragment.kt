@@ -101,30 +101,34 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         val isEditMode = args.argIsEdit
         val playlistId = args.playlistId
 
-        // Чтение аргументов
-        arguments?.let {
-            if (isEditMode) {
-                val name = it.getString(ARG_PLAYLIST_NAME).orEmpty()
-                val description = it.getString(ARG_PLAYLIST_DESCRIPTION).orEmpty()
-                val cover = it.getString(ARG_PLAYLIST_COVER)
+        if (isEditMode) {
+            val name = args.playlistName
+            val description = args.playlistDescription
+            val cover = args.playlistCoverPath
 
-                binding.newPlaylistEditName.setText(name)
-                binding.playlistDescriptionEditText.setText(description)
+            // Заполняем поля
+            binding.newPlaylistEditName.setText(name)
+            binding.playlistDescriptionEditText.setText(description)
 
-                if (!cover.isNullOrEmpty()) {
-                    binding.poster.setImageURI(Uri.parse(cover))
-                    binding.poster.background = null
-                    selectedImageUri = Uri.parse(cover)
-                } else {
-                    binding.poster.setImageResource(R.drawable.new_pl_image_placeholder)
-                }
-
-                // Заголовок тулбара и кнопка
-                binding.toolbar.title = getString(R.string.edit_playlist_title)
-                binding.createButton.text = getString(R.string.save)
-                updateButtonState()
+            if (cover.isNotEmpty()) {
+                selectedImageUri = Uri.parse(cover)
+                binding.poster.setImageURI(selectedImageUri)
+                binding.poster.background = null
+            } else {
+                binding.poster.setImageResource(R.drawable.new_pl_image_placeholder)
             }
+
+            // Обновляем заголовок и текст кнопки
+            binding.toolbar.title = getString(R.string.edit_playlist_title)
+            binding.createButton.text = getString(R.string.save)
+        } else {
+            // Режим создания
+            binding.toolbar.title = getString(R.string.create_playlist)
+            binding.createButton.text = getString(R.string.new_pl_create)
+            binding.poster.setImageResource(R.drawable.new_pl_image_placeholder)
         }
+
+        updateButtonState()
 
         trackToAdd = arguments?.getParcelable("track_to_add")
 
@@ -144,7 +148,13 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         val descriptionField = binding.playlistDescriptionEditText
 
         binding.toolbar.setNavigationOnClickListener {
-            handleBackPressed()
+            if (isEditMode) {
+                // Просто закрываем экран без диалога
+                viewModel.confirmExit()
+            } else {
+                // Вызвать диалог, если это экран создания
+                handleBackPressed()
+            }
         }
 
         nameField.addTextChangedListener { updateButtonState() }
