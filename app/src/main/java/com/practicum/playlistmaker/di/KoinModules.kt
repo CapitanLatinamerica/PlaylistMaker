@@ -16,6 +16,7 @@ import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCre
 import com.practicum.playlistmaker.media.fragments.playlists.data.PlaylistsRepositoryImpl
 import com.practicum.playlistmaker.media.fragments.playlists.domain.PlaylistsRepository
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.AddToPlaylistViewModel
+import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.MyAwesomePlaylistFragmentViewModel
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.player.data.repository.LikeStorage
 import com.practicum.playlistmaker.player.domain.Track
@@ -59,6 +60,8 @@ val appModule = module {
         single<SearchHistoryInteractor> { SearchHistoryInteractor(get()) }
         single { ITunesService.create() } // Retrofit сервис
         viewModel { SearchViewModel(get(), get()) }
+        // Регистрация ViewModel для MyAwesomePlaylistFragment
+        viewModel { MyAwesomePlaylistFragmentViewModel(get()) }
     }
 
 // Модуль для работы с Room
@@ -112,7 +115,7 @@ val mediaModule = module {
     }
 
     single<PlaylistInteractor> {
-        PlaylistInteractor(get())
+        PlaylistInteractor(get(), get())
     }
 
     viewModel { FavoriteTracksViewModel(get()) }

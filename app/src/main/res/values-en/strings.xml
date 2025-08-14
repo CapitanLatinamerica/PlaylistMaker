@@ -46,4 +46,18 @@
     <string name="new_pl_created">created</string>
 
     <string name="choose_image_from">Upload image...</string>
+    <string name="share_playlist">Share</string>
+    <string name="playlist_info_edit">Edit information</string>
+    <string name="playlist_delete">Delete playlist</string>
+    <string name="no_tracks_in_playlist">There is no tracks</string>
+    <string name="delete_playlist_message">Are U sure want to delete "%1$s"?</string>
+    <string name="delete">Delete</string>
+    <string name="no_tracks_to_share_message">There is no track list in this playlist that can be shared</string>
+    <string name="share_playlist_title">Share playlist</string>
+    <string name="edit_playlist_title">Edit</string>
+    <string name="save">Save</string>
+    <string name="playlist_error">Playlist did not loaded</string>
+    <string name="delete_track_title">Delete track</string>
+    <string name="delete_track_message">Are you sure want to delete «%1$s» from playlist?</string>
+
 </resources>

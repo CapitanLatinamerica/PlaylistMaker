@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/mediaFragment">  <!-- Стартовый фрагмент -->
 
@@ -17,6 +18,9 @@
         <action
             android:id="@+id/action_mediaFragment_to_playlistCreatorFragment"
             app:destination="@id/playlistCreatorFragment" />
+        <action
+            android:id="@+id/actionPlaylistsFragmentToPlaylistDetailFragment"
+            app:destination="@id/myAwesomePlaylistFragment" />
     </fragment>
 
     <fragment
@@ -28,6 +32,31 @@
         android:id="@+id/playlistCreatorFragment"
         android:name="com.practicum.playlistmaker.media.fragments.creator.view.PlaylistCreatorFragment"
         android:label="@string/create_playlist">
+        <!-- Аргументы для режима создания/редактирования -->
+        <argument
+            android:name="argIsEdit"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
+        <argument
+            android:name="playlistId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+        <argument
+            android:name="playlistName"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="playlistDescription"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="playlistCoverPath"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
     <fragment
@@ -37,6 +66,30 @@
         <action
             android:id="@+id/action_addToPlaylistBottomSheetFragment_to_playlistCreatorFragment"
             app:destination="@id/playlistCreatorFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myAwesomePlaylistFragment"
+        android:name="com.practicum.playlistmaker.media.fragments.playlists.ui.view.MyAwesomePlaylistFragment"
+        android:label="Playlist Detail"
+        tools:layout="@layout/fragment_playlist_awesome">
+        <argument
+            android:name="playlistId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_myAwesomePlaylistFragment_to_playlistCreatorFragmentForEdit"
+            app:destination="@id/playlistCreatorFragment" >
+            <argument
+                android:name="argIsEdit"
+                app:argType="boolean"
+                android:defaultValue="true" />
+            <argument android:name="playlistId" app:argType="integer" />
+            <argument android:name="playlistName" app:argType="string" />
+            <argument android:name="playlistDescription" app:argType="string" android:defaultValue="" />
+            <argument android:name="playlistCoverPath" app:argType="string" android:defaultValue="" />
+        </action>
+
+
     </fragment>
 
 

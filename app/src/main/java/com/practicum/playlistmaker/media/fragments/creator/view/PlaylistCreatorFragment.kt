@@ -18,7 +18,9 @@ import androidx.core.bundle.bundleOf
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
+import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistCreatorBinding
 import com.practicum.playlistmaker.media.fragments.creator.viewmodel.PlaylistCreatorViewModel
@@ -29,11 +31,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
 class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
 
     private var trackToAdd: Track? = null
     private var isOpenedAsDialog = false
+    private val args: PlaylistCreatorFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +48,7 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
     }
 
     companion object {
+
         fun newInstance(track: Track?, isDialog: Boolean = false): PlaylistCreatorFragment {
             return PlaylistCreatorFragment().apply {
                 arguments = Bundle().apply {
@@ -66,15 +69,45 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-
         binding = FragmentPlaylistCreatorBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val isEditMode = args.argIsEdit
+        val playlistId = args.playlistId
+
+        if (isEditMode) {
+            val name = args.playlistName
+            val description = args.playlistDescription
+            val cover = args.playlistCoverPath
+
+            // Заполняем поля
+            binding.newPlaylistEditName.setText(name)
+            binding.playlistDescriptionEditText.setText(description)
+
+            if (cover.isNotEmpty()) {
+                selectedImageUri = Uri.parse(cover)
+                binding.poster.setImageURI(selectedImageUri)
+                binding.poster.background = null
+            } else {
+                binding.poster.setImageResource(R.drawable.new_pl_image_placeholder)
+            }
+
+            // Обновляем заголовок и текст кнопки
+            binding.toolbar.title = getString(R.string.edit_playlist_title)
+            binding.createButton.text = getString(R.string.save)
+        } else {
+            // Режим создания
+            binding.toolbar.title = getString(R.string.create_playlist)
+            binding.createButton.text = getString(R.string.new_pl_create)
+            binding.poster.setImageResource(R.drawable.new_pl_image_placeholder)
+        }
+
+        updateButtonState()
+
         trackToAdd = arguments?.getParcelable("track_to_add")
 
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -84,7 +117,6 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
                 imageUri?.let {
                     selectedImageUri = it
                     binding.poster.setImageURI(it)
-                    // Убираем фон, если изображение выбрано
                     binding.poster.background = null
                 }
             }
@@ -94,7 +126,13 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
         val descriptionField = binding.playlistDescriptionEditText
 
         binding.toolbar.setNavigationOnClickListener {
-            handleBackPressed()
+            if (isEditMode) {
+                // Просто закрываем экран без диалога
+                viewModel.confirmExit()
+            } else {
+                // Вызвать диалог, если это экран создания
+                handleBackPressed()
+            }
         }
 
         nameField.addTextChangedListener { updateButtonState() }
@@ -120,35 +158,55 @@ class PlaylistCreatorFragment : DialogFragment(), NavigationGuard {
             openImagePicker()
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (isEditMode) {
+                // Просто закрываем экран без диалога
+                viewModel.confirmExit()
+            } else {
+                // показываем диалог при выходе
+                handleBackPressed()
+            }
+        }
+
         binding.createButton.setOnClickListener {
             val name = binding.newPlaylistEditName.text.toString()
             if (name.isEmpty()) return@setOnClickListener
 
             viewLifecycleOwner.lifecycleScope.launch {
-                val newPlaylistId = viewModel.createPlaylist(
-                    name = name,
-                    description = binding.playlistDescriptionEditText.text.toString(),
-                    coverPath = selectedImageUri?.toString()
-                )
-
-                withContext(Dispatchers.Main) {
-                    parentFragmentManager.setFragmentResult(
-                        "playlist_created_result",
-                        bundleOf(
-                            "track_to_add" to trackToAdd,
-                            "created_playlist_id" to newPlaylistId
-                        )
+                if (isEditMode) {
+                    // Обновляем плейлист
+                    viewModel.updatePlaylist(
+                        id = playlistId,
+                        name = name,
+                        description = binding.playlistDescriptionEditText.text.toString(),
+                        coverPath = selectedImageUri?.toString()
+                    )
+                } else {
+                    val newPlaylistId = viewModel.createPlaylist(
+                        name = name,
+                        description = binding.playlistDescriptionEditText.text.toString(),
+                        coverPath = selectedImageUri?.toString()
                     )
 
-                    if (isOpenedAsDialog) {
-                        dismissAllowingStateLoss()
-                    } else {
-                        parentFragmentManager.popBackStack()
+                    withContext(Dispatchers.Main) {
+                        parentFragmentManager.setFragmentResult(
+                            "playlist_created_result",
+                            bundleOf(
+                                "track_to_add" to trackToAdd,
+                                "created_playlist_id" to newPlaylistId
+                            )
+                        )
+
+                        if (isOpenedAsDialog) {
+                            dismissAllowingStateLoss()
+                        } else {
+                            parentFragmentManager.popBackStack()
+                        }
+                        val msg = resources.getString(R.string.create_playlist) +
+                                " \"$name\" " +
+                                resources.getString(R.string.new_pl_created)
+                        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                     }
-                    val msg = resources.getString(R.string.create_playlist) +
-                            " \"$name\" " +
-                            resources.getString(R.string.new_pl_created)
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 }
             }
         }

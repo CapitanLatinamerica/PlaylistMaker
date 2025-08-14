@@ -12,12 +12,17 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.media.MediaFragmentDirections
+import com.practicum.playlistmaker.media.fragments.playlists.ui.PlaylistUi
 import com.practicum.playlistmaker.media.fragments.playlists.ui.viewmodel.PlaylistsViewModel
+import com.practicum.playlistmaker.util.showDeletePlaylistDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
 
+
     private val viewModel: PlaylistsViewModel by viewModel ()
+    private lateinit var adapter: PlaylistAdapter
 
     companion object {
         fun newInstance(): PlaylistsFragment {
@@ -50,11 +55,32 @@ class PlaylistsFragment : Fragment() {
 
         viewModel.loadPlaylists()
 
+        // Инициализация адаптера
+        adapter = PlaylistAdapter(
+            onPlaylistClicked = { playlist -> onPlaylistClicked(playlist) },
+            playlists = emptyList()
+        )
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.playlistRV)
         val placeholderLayout = view.findViewById<LinearLayout>(R.id.playlists_layout)
         val scrollView = view.findViewById<NestedScrollView>(R.id.playlistScroll)
 
-        val adapter = PlaylistAdapter()
+        adapter.setOnItemClickListener { playlist ->
+            onPlaylistClicked(playlist)
+        }
+
+        adapter.setOnItemLongClickListener { playlist ->
+            showDeletePlaylistDialog(
+                title = getString(R.string.playlist_delete),
+                message = getString(R.string.delete_playlist_message, playlist.name),
+                positiveText = getString(R.string.delete),
+                negativeText = getString(R.string.alert_dialog_negative)
+            ) {
+                viewModel.deletePlaylist(playlist.id)
+                navController.popBackStack()
+            }
+        }
+
         recyclerView.adapter = adapter
 
         viewModel.playlists.observe(viewLifecycleOwner) { playlists ->
@@ -78,5 +104,11 @@ class PlaylistsFragment : Fragment() {
                 viewModel.onNavigationHandled()
             }
         }
+    }
+    private fun onPlaylistClicked(playlist: PlaylistUi) {
+        // Навигация на фрагмент просмотра плейлиста
+        val action = MediaFragmentDirections
+            .actionPlaylistsFragmentToPlaylistDetailFragment(playlist.id)
+        navController.navigate(action)
     }
 }

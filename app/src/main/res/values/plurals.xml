@@ -6,4 +6,10 @@
         <item quantity="many">%d треков</item>
     </plurals>
 
+    <plurals name="playlist_minutes" translatable="false">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+    </plurals>
+
 </resources>
